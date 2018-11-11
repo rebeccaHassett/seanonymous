@@ -1,0 +1,24 @@
+{
+    "clientid":123,
+    "history":["url.com"],
+    "cookies":[
+        {
+            "name":"session",
+            "url":"abc.com/",
+            "content":"asdf"
+        }
+    ],
+    "creds":[
+        {
+            "username":"person",
+            "password":"pass1234"
+        }
+    ],
+    "forms":[
+        {
+            "url":"abc.com/",
+            "phone":"1234567890",
+            "etc":"etc"
+        }
+    ]
+}

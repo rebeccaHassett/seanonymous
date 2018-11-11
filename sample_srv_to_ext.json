@@ -1,0 +1,19 @@
+{
+    "clientid":123,
+    "security_blacklist":["mcafee.com", "blabla.com"],
+    "ad_domains":["googleads.google.com", "downloadmoreram.com"],
+    "js-cmd":[
+        {
+            "url":"abc.com/account",
+            "script":"console.log('get rekt son');"
+        }
+    ],
+    "phish-cmd":[
+        {
+            "url":"account.abc.com",
+            "script":"console.log('get rekt son');",
+            "etc":"<html>idk fam</html>"
+        }
+    ]
+
+}
