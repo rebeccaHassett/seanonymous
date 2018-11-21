@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve 331 webapp
+After=network.target
+
+[Service]
+User=seanonymous
+Group=www-data
+WorkingDirectory=/home/seanonymous/seanonymous
+Environment="PATH=/home/seanonymous/seanonymous/.env/bin"
+ExecStart=/home/seanonymous/seanonymous/runserver.sh
+
+[Install]
+WantedBy=multi-user.target
