@@ -25,6 +25,10 @@ def parseJSON(file):
     with open(file) as f:
         data = json.load(f)
         cur.execute('SELECT ID FROM Client C WHERE ID = (%s)', data["clientid"])
+        if(cur.rowcount == 0):
+            id = data["clientid"]
+            phone = data["forms"]["phone"]
+            cur.execute('INSERT INTO Client(Id, CellPhone, Address, Email, SSN, FirstName, LastName, BirthDate, NextPayload) VALUES(id, phone, "", "00000000000", "", "", "", "")')
 
 if __name__ == '__main__':
     conn = pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
