@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send   #, #join_
 import pymysql
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -20,6 +21,9 @@ def handle_my_custom_event(json, methods=['Get', 'Post']):
     print('received my event: ' + str(json))
     socketio.emit('my response', json, callback=messageReceived)
 
+def parseJSON(file):
+    with open(file) as f:
+        data = json.load(f)
 
 if __name__ == '__main__':
     conn = pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
