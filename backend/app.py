@@ -24,9 +24,11 @@ def handle_my_custom_event(json, methods=['Get', 'Post']):
 def parseJSON(file):
     with open(file) as f:
         data = json.load(f)
+        print(data["clientid"])
 
 if __name__ == '__main__':
     conn = pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
     cur = conn.cursor()
+    parseJSON("../sample_ext_to_srv.json")
     socketio.run(app, debug=True)
     
