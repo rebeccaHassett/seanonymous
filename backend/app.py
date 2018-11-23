@@ -21,18 +21,20 @@ def handle_my_custom_event(json, methods=['Get', 'Post']):
     print('received my event: ' + str(json))
     socketio.emit('my response', json, callback=messageReceived)
 
-def parseJSON(file):
-    with open(file) as f:
-        data = json.load(f)
-        cur.execute('SELECT ID FROM Client C WHERE ID = (%s)', data["clientid"])
-        if(cur.rowcount == 0):
-            id = data["clientid"]
-            phoneNumber = data["forms"]["phone"]
-            cur.execute('INSERT INTO Client(Id, CellPhone, Address, Email, SSN, FirstName, LastName, BirthDate, NextPayload) VALUES(%s, %s, "","", "00000000000", "", "", "", "")', (id, phoneNumber))
-
+def parseJSON(payload_json):
+    data = json.loads(payload_json)
+    cur.execute('SELECT ID FROM Client C WHERE ID = (%s)', data["clientid"])
+    if(cur.rowcount == 0):
+        id = data["clientid"]
+        phoneNumber = data["forms"]["phone"]
+        cur.execute('INSERT INTO Client(Id, CellPhone, Address, Email, SSN, FirstName, LastName, BirthDate, NextPayload) VALUES(%s, %s, "","", "00000000000", "", "", "", "")', (id, phoneNumber)) 
+        conn.commit()    
+    
 if __name__ == '__main__':
     conn = pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
     cur = conn.cursor()
-    parseJSON("../sample_ext_to_srv.json")
+    with open("../sample_ext_to_srv.json", "r") as f:
+        data = f.read().replace('\n', '')
+    parseJSON(data)
     socketio.run(app, debug=True)
     
