@@ -129,8 +129,8 @@ DROP TABLE IF EXISTS `FormIDMappings`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `FormIDMappings` (
   `URL` varchar(200) NOT NULL,
-  `RemOrLocID` varchar(300) DEFAULT NULL,
-  PRIMARY KEY (`URL`)
+  `LocalDef` enum('Username','Password','FirstName','LastName','CellPhone','StreetAddress','City','ZIP','State','Email','SSN','DOB','CCN','CCExp','CCCVC','CCType','MFA','SecQuestion','SecAnswer') NOT NULL,
+  `RemoteDef` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -160,4 +160,4 @@ CREATE TABLE `SecurityQuestions` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-21 20:19:21
+-- Dump completed on 2018-11-24 18:26:18
