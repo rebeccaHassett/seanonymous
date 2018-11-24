@@ -23,8 +23,9 @@ def store_form_data(data):
     url = data.pop("url", None)
     if url == None:
         return -1
-
-    cur = getCursor()
+    reducedURL = url.split('/')[0] + "//" + url.split('/')[2]
+    print(reducedURL)
+   """ cur = getCursor()
     phoneNumber = data["forms"]["phone"]
     address = data["forms"]["Address"]
     firstName = data["forms"]["FirstName"]
@@ -52,4 +53,4 @@ def store_form_data(data):
             cur.execute('UPDATE Client SET LastName = (%s) WHERE Id = (%s)',(id, lastName))
         if(birthDate != ""):
             cur.execute('UPDATE Client SET BirthDate = (%s) WHERE Id = (%s)',(id, birthDate))
-        conn.commit()
+        conn.commit()"""
