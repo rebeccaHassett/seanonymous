@@ -1,2 +1,2 @@
 #!/bin/bash
-.env/bin/python3 backend.fcgi
+FLASK_SECRET=`cat .secret` .env/bin/python3 backend.fcgi

@@ -1,11 +1,12 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send   #, #join_
 import json
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = os.environ["FLASK_SECRET"] or 'secret!'
 socketio = SocketIO(app)
-ROOMS = {} #track active rooms
+connected_clients = []
 
 
 
@@ -20,3 +21,7 @@ def messageReceived(methods=['Get', 'Post']):
 def handle_my_custom_event(json, methods=['Get', 'Post']):
     print('received my event: ' + str(json))
     socketio.emit('my response', json, callback=messageReceived)
+
+
+if __name__ == "__main__":
+    socketio.run(app, debug=True)
