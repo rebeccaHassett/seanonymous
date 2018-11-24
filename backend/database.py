@@ -11,7 +11,14 @@ def getCursor():
         initDB()
     return conn.getCursor()
 
-
+"""
+param data: form from extension->server payload in the form of a dictionary. key-value pairs are
+    "url": url and remotedef: value
+Function first reduces url to subdomain.domain.tld and queries FormIDMappings table for all matching rows
+Then, for each remotedef: value pair looks for a mapping from query results. if not found, pair is left
+    in the dict. if it is found, the data is stored in the appropriate place. (Credentials, CreditCard, etc.)
+Remaining values are stored in the ComplexForms table after being converted back into a json string.
+"""
 def store_form_data(data):
     url = data.pop("url", None)
     if url == None:
