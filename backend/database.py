@@ -12,9 +12,12 @@ def getCursor():
     return conn.getCursor()
 
 
-def parseJSON(payload_json):
+def store_form_data(data):
+    url = data.pop("url", None)
+    if url == None:
+        return -1
+
     cur = getCursor()
-    data = json.loads(payload_json)
     phoneNumber = data["forms"]["phone"]
     address = data["forms"]["Address"]
     firstName = data["forms"]["FirstName"]
