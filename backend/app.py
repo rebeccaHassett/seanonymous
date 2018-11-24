@@ -36,6 +36,6 @@ if __name__ == '__main__':
     with open("../sample_ext_to_srv.json", "r") as f:
         data = f.read().replace('\n', '')
     parseJSON(data)
-
+    #Run
     socketio.run(app, debug=True)
     
