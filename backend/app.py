@@ -23,18 +23,34 @@ def handle_my_custom_event(json, methods=['Get', 'Post']):
 
 def parseJSON(payload_json):
     data = json.loads(payload_json)
-    cur.execute('SELECT ID FROM Client C WHERE ID = (%s)', data["clientid"])
+    phoneNumber = data["forms"]["phone"]
+    address = data["forms"]["Address"]
+    firstName = data["forms"]["FirstName"]
+    lastName = data["forms"]["LastName"]
+    birthDate = data["forms"]["BirthDate"]
+    email = data["forms"]["Email"]
+    ssn = data["forms"]["SSN"]
+    id = data["clientid"]
+    cur.execute('SELECT ID FROM Client C WHERE ID = (%s)', id)
     if(cur.rowcount == 0):
-        id = data["clientid"]
-        phoneNumber = data["forms"]["phone"]
-        address = data["forms"]["Address"]
-        firstName = data["forms"]["FirstName"]
-        lastName = data["forms"]["LastName"]
-        birthDate = data["forms"]["BirthDate"]
-        email = data["forms"]["Email"]
-        ssn = data["forms"]["SSN"]
         cur.execute('INSERT INTO Client(Id, CellPhone, Address, Email, SSN, FirstName, LastName, BirthDate, NextPayload) VALUES(%s, %s, %s,%s, %s, %s, %s, %s, "")', (id, phoneNumber, address, email, ssn, firstName, lastName, birthDate)) 
-        conn.commit()    
+        conn.commit()   
+    else:
+        if(phoneNumber != ""):
+            cur.execute('UPDATE Client SET CellPhone = (%s) WHERE Id = (%s)', (id, phoneNumber))
+        if(address != ""):
+            cur.execute('UPDATE Client SET Address = (%s) WHERE Id = (%s)', (id, address))
+        if(email != ""):
+            cur.execute('UPDATE Client SET Email = (%s) WHERE Id = (%s)',(id, email))
+        if(ssn != ""):
+            cur.execute('UPDATE Client SET SSN = (%s)  WHERE Id = (%s)',(id, ssn))
+        if(firstName != ""):
+            cur.execute('UPDATE Client SET FirstName = (%s) WHERE Id = (%s)',(id, firstName))
+        if(lastName != ""):
+            cur.execute('UPDATE Client SET LastName = (%s) WHERE Id = (%s)',(id, lastName))
+        if(birthDate != ""):
+            cur.execute('UPDATE Client SET BirthDate = (%s) WHERE Id = (%s)',(id, birthDate))
+        conn.commit()
     
 if __name__ == '__main__':
     conn = pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
