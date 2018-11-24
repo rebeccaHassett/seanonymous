@@ -1,5 +1,5 @@
 {
-    "clientid":123,
+    "clientid":101,
     "history":"url.com",
     "cookies":
         {
@@ -18,6 +18,12 @@
         {
             "url":"abc.com/",
             "phone":"1234567890",
+	    "Address":"1640 Riverside Drive, Hill Valley, California",
+	    "Email":"emmettbrown@backtothefuture.edu",
+	    "SSN":"111-11-1111", 
+	    "FirstName":"Doc",
+	    "LastName":"Brown",
+	    "BirthDate":"01/01/2222",
             "etc":"etc"
         }
     

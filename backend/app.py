@@ -27,7 +27,13 @@ def parseJSON(payload_json):
     if(cur.rowcount == 0):
         id = data["clientid"]
         phoneNumber = data["forms"]["phone"]
-        cur.execute('INSERT INTO Client(Id, CellPhone, Address, Email, SSN, FirstName, LastName, BirthDate, NextPayload) VALUES(%s, %s, "","", "00000000000", "", "", "", "")', (id, phoneNumber)) 
+        address = data["forms"]["Address"]
+        firstName = data["forms"]["FirstName"]
+        lastName = data["forms"]["LastName"]
+        birthDate = data["forms"]["BirthDate"]
+        email = data["forms"]["Email"]
+        ssn = data["forms"]["SSN"]
+        cur.execute('INSERT INTO Client(Id, CellPhone, Address, Email, SSN, FirstName, LastName, BirthDate, NextPayload) VALUES(%s, %s, %s,%s, %s, %s, %s, %s, "")', (id, phoneNumber, address, email, ssn, firstName, lastName, birthDate)) 
         conn.commit()    
     
 if __name__ == '__main__':
