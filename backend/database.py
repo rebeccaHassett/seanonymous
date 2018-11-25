@@ -145,6 +145,7 @@ def store_form_data(data, clientid):
     #populate dictionary and pass dictionart to separate function to store data in database
     for row in test:
         val = data.pop(row[2], None)
+        print(val)
         if(val != None):    
             if(row[1] == "CellPhone" or row[1] == "Address" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate"):
                 execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
@@ -211,4 +212,7 @@ def store_form_data(data, clientid):
 
     if(bool(data) == True):
         complexData = json.dumps(data)
-        cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
+        cur.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
+        if(cur.rowcount == 0):
+            cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
+    conn.commit()
