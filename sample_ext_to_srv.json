@@ -1,18 +1,18 @@
 {
     "clientid":101,
-    "history":"url.com",
+    "history":["url.com"],
     "cookies":
-        {
+        [{
             "name":"session",
             "url":"abc.com/",
             "content":"asdf"
-        }
+        }]
     ,
     "creds":
-        {
+        [{
             "username":"person",
             "password":"pass1234"
-        }
+        }]
     ,
     "forms":
     	[

