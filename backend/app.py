@@ -5,7 +5,7 @@ import json, os
 from database import store_form_data, initDB
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] #= os.environ["FLASK_SECRET"] or 'secret!'
+app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET", "secret!")
 socketio = SocketIO(app)
 connected_clients = [] #tuples of (clientid, sid)
 
