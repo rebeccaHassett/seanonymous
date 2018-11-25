@@ -72,7 +72,23 @@ def store_cookie(data, clientid):
 Stores a single credential into the database
 returns 0 for ok, non-zero for bad data format
 """
-def store_credential(data, clientid):
+def store_credential(credentials, clientid):
+    if(credentials.get("Username", None) != None and credentials.get("URL", None) != None):
+        checkUsername = credentials.get("Username", None)
+        checkURL = credentials.get("URL", None)
+        cur.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, checkURL, clientid))
+        if(cur.rowcount == 0):
+            cur.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("UserPassword", None), checkURL, clientid, credentials.get("MFA", None)))
+        else:
+            if(credentials.get("UserPassword", None) != None):
+                col5 = credentials.get("UserPassword", None)
+                execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = " + checkUsername + " AND URL = " + checkURL + " AND CID = " + str(clientid)
+                cur.execute(execStr)
+            if(credentials.get("MFA", None) != None):
+                col6 = credentials.get("MFA", None)
+                execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = " + checkUsername + " AND URL = " + checkURL + " AND CID = " + str(clientid)
+                cur.execute(execStr)
+
     return 0
 
 
@@ -177,23 +193,9 @@ def store_form_data(data, clientid):
                 cur.execute(execStr)
     
     #credentials information
+    store_credential(credentials, clientid)
 
-    if(credentials.get("Username", None) != None and credentials.get("URL", None) != None):
-        checkUsername = credentials.get("Username", None)
-        checkURL = credentials.get("URL", None)
-        cur.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, checkURL, clientid))
-        if(cur.rowcount == 0):
-            cur.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("UserPassword", None), checkURL, clientid, credentials.get("MFA", None)))
-        else:
-            if(credentials.get("UserPassword", None) != None):
-                col5 = credentials.get("UserPassword", None)
-                execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = " + checkUsername + " AND URL = " + checkURL + " AND CID = " + str(clientid)
-                cur.execute(execStr)
-            if(credentials.get("MFA", None) != None):
-                col6 = credentials.get("MFA", None)
-                execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = " + checkUsername + " AND URL = " + checkURL + " AND CID = " + str(clientid)
-                cur.execute(execStr)
-    
+
     #security questions information
 
     for x in range(0, 5):
