@@ -1,12 +1,14 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send   #, #join_
-import database, frontend
+import database
 import json, os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] #= os.environ["FLASK_SECRET"] or 'secret!'
 socketio = SocketIO(app)
 connected_clients = [] #tuples of (clientid, sid)
+
+import frontend
 
 """
 Server responses to client: (int status, data) as tuple
@@ -53,6 +55,12 @@ def handle_ext_connect(sid, data_json):
                 return bad
         return 200, database.construct_response(clientid)
 
+
+@socketio.on('disconnect', namespace='/ext')
+def handle_ext_disconnect(sid, data_json):
+    clientid = [(clientid, sidx) for clientid, sidx in connected_clients if sidx == sid][0][0]
+    connected_clients.remove((clientid,sid))
+    database.store_payload(clientid)
 
 def validate_payload(data):
     if (type(data.get("clientid", None)) != int or

