@@ -19,14 +19,23 @@
         {
             "url":"https://www.google.com/",
             "phone":"1234567890",
-	    "Address":"1640 Riverside Drive, Hill Valley, California",
-	    "Email":"emmettbrown@backtothefuture.edu",
-	    "SSN":"111-11-1111", 
+	    "StreetAddress":"1640 Riverside Drive, Hill Valley, California",
+	    "email":"emmettbrown@backtothefuture.edu",
+	    "ssn":"111-11-1111", 
 	    "FirstName":"Doc",
 	    "username":"SOSB",
 	    "password":"Trumpets2019",
 	    "LastName":"Brown",
-	    "BirthDate":"01/01/2222",
+	    "DOB":"01/01/2222",
+	    "city":"BrookStony",
+	    "Country":"ASU",
+	    "ZipCode":"11234",
+	    "state":"YorkNew",
+	    "mfa":"eyeball",
+	    "cvc":"123",
+	    "ccn":"5667",
+	    "exp":"1998-07-04",
+	    "type":"Visa",
             "etc":"etc"
         }
 	]

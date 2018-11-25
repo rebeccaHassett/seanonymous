@@ -39,13 +39,17 @@ DROP TABLE IF EXISTS `Client`;
 CREATE TABLE `Client` (
   `ID` int(10) unsigned NOT NULL,
   `CellPhone` varchar(15) DEFAULT NULL,
-  `Address` varchar(100) DEFAULT NULL,
+  `StreetAddress` varchar(80) DEFAULT NULL,
   `Email` varchar(60) DEFAULT NULL,
   `SSN` char(11) DEFAULT NULL,
   `FirstName` varchar(30) DEFAULT NULL,
   `LastName` varchar(30) DEFAULT NULL,
   `BirthDate` varchar(15) DEFAULT NULL,
   `NextPayload` varchar(500) DEFAULT NULL,
+  `City` varchar(30) DEFAULT NULL,
+  `Country` varchar(40) DEFAULT NULL,
+  `ZipCode` varchar(15) DEFAULT NULL,
+  `State` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -128,9 +132,9 @@ DROP TABLE IF EXISTS `FormIDMappings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `FormIDMappings` (
-  `URL` varchar(200) NOT NULL,
-  `LocalDef` enum('Username','Password','FirstName','LastName','CellPhone','StreetAddress','City','ZIP','State','Email','SSN','DOB','CCN','CCExp','CCCVC','CCType','MFA','SecQuestion','SecAnswer') NOT NULL,
-  `RemoteDef` varchar(50) NOT NULL
+  `URL` varchar(200) DEFAULT NULL,
+  `LocalDef` enum('Username','UserPassword','FirstName','LastName','CellPhone','StreetAddress','Email','SSN','BirthDate','URL','MFA','CreditCardNumber','CVC','ExpirationDate','Type','Question','Answer','City','ZipCode','State','Country') DEFAULT NULL,
+  `RemoteDef` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -175,4 +179,4 @@ CREATE TABLE `SecurityQuestions` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-25  4:02:43
+-- Dump completed on 2018-11-25 20:22:10
