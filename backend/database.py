@@ -72,21 +72,21 @@ def store_cookie(data, clientid):
 Stores a single credential into the database
 returns 0 for ok, non-zero for bad data format
 """
-def store_credential(credentials, clientid):
-    if(credentials.get("Username", None) != None and credentials.get("URL", None) != None):
+def store_credential(credentials, clientid, url):
+    cur = getCursor()
+    if(credentials.get("Username", None) != None and url != None):
         checkUsername = credentials.get("Username", None)
-        checkURL = credentials.get("URL", None)
-        cur.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, checkURL, clientid))
+        cur.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, url, clientid))
         if(cur.rowcount == 0):
-            cur.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("UserPassword", None), checkURL, clientid, credentials.get("MFA", None)))
+            cur.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("UserPassword", None), url, clientid, credentials.get("MFA", None)))
         else:
             if(credentials.get("UserPassword", None) != None):
                 col5 = credentials.get("UserPassword", None)
-                execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = " + checkUsername + " AND URL = " + checkURL + " AND CID = " + str(clientid)
+                execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url  + "' AND CID = " + str(clientid) 
                 cur.execute(execStr)
             if(credentials.get("MFA", None) != None):
                 col6 = credentials.get("MFA", None)
-                execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = " + checkUsername + " AND URL = " + checkURL + " AND CID = " + str(clientid)
+                execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url + "' AND CID = " + str(clientid)
                 cur.execute(execStr)
 
     return 0
@@ -145,7 +145,6 @@ def store_form_data(data, clientid):
     #populate dictionary and pass dictionart to separate function to store data in database
     for row in test:
         val = data.pop(row[2], None)
-        print(val)
         if(val != None):    
             if(row[1] == "CellPhone" or row[1] == "Address" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate"):
                 execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
@@ -182,19 +181,19 @@ def store_form_data(data, clientid):
         else:
             if(creditCard.get("CVC", None) != None):
                 col2 = creditCard.get("CVC", None)
-                execStr = "UPDATE CreditCard SET CVC = '" + col2 + "' WHERE CreditCardNumber = " + checkCreditCard
+                execStr = "UPDATE CreditCard SET CVC = '" + col2 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
                 cur.execute(execStr)
             if(creditCard.get("ExpirationDate", None) != None):
                 col3 = creditCard.get("ExpirationDate", None)
-                execStr = "UPDATE CreditCard SET ExpirationDate = '" + col3 + "' WHERE CreditCardNumber = " + checkCreditCard
+                execStr = "UPDATE CreditCard SET ExpirationDate = '" + col3 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
                 cur.execute(execStr)
             if(creditCard.get("Type", None) != None):
                 col4 = creditCard.get("Type", None)
-                execStr = "UPDATE CreditCard SET Type = '" + col4 + "' WHERE CreditCardNumber = " + checkCreditCard
+                execStr = "UPDATE CreditCard SET Type = '" + col4 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
                 cur.execute(execStr)
     
     #credentials information
-    store_credential(credentials, clientid)
+    store_credential(credentials, clientid, url)
 
 
     #security questions information
@@ -207,7 +206,7 @@ def store_form_data(data, clientid):
                 cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, checkQ, securityList[x].get("Answer", None), url))
             else:
                 col7 = securityList[x].get("Answer", None)
-                execStr = "UPDATE SecurityQuestions SET Answer = '" + col7 + "' WHERE CID = " + str(clientid) + " AND URL = " + checkURL + " AND Question = " + checkQ            
+                execStr = "UPDATE SecurityQuestions SET Answer = '" + col7 + "' WHERE CID = " + str(clientid) + " AND URL = '" + checkURL + "' AND Question = '" + checkQ + "'"            
                 execute(execStr)
 
     if(bool(data) == True):
