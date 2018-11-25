@@ -29,11 +29,14 @@ def store_form_data(data, clientid):
     cur.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) OR URL = (%s)', (reducedURL, "*"))
     test = cur.fetchall()
     #populate dictionary and pass dictionart to separate function to store data in database
+
     for row in test:
-        val = data.pop(test[0][2], None)
+        val = data.pop(test[1][2], None)
+        print(test[1][1])
         print(val)
-        cur.execute('UPDATE Client SET (%s) = (%s) WHERE Id = (%s)', (CellPhone, val, clientid))
-        cur.commit()
+        execStr = "UPDATE Client SET " + test[1][1] + " = '" + val + "' WHERE Id = " + str(clientid)
+        cur.execute(execStr)
+       # cur.commit()
 """ cur = getCursor()
 phoneNumber = data["forms"]["phone"]
 address = data["forms"]["Address"]
