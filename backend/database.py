@@ -104,12 +104,21 @@ def store_form_data(data, clientid):
     #populate dictionary and pass dictionart to separate function to store data in database
 
     for row in test:
-        val = data.pop(test[1][2], None)
-        print(test[1][1])
-        print(val)
-        execStr = "UPDATE Client SET " + test[1][1] + " = '" + val + "' WHERE Id = " + str(clientid)
-        cur.execute(execStr)
-        conn.commit()
+        val = data.pop(row[2], None)
+        if(row[1] == "CellPhone" or row[1] == "Address" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate"):
+            execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
+            cur.execute(execStr)
+            #cur.commit()
+        elif(row[1] == "CreditCardNumber" or row[1] == "CVC" or row[1] == "ExpirationDate" or row[1] == "Type"):
+            execStr = "UPDATE CreditCard SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
+            cur.execute(execStr)
+        elif(row[1] == "Username" or row[1] == "UserPassword" or row[1] == "URL" or row[1] == "MFA"):
+            execStr = "UPDATE Credentials SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
+            cur.execute(execStr)
+        elif(row[1] == "Question" or row[1] == "Answer" or row[1] == "URL"):
+            execStr = "UPDATE SecurityQuestions SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
+            cur.execute(execStr)
+
 """ cur = getCursor()
 phoneNumber = data["forms"]["phone"]
 address = data["forms"]["Address"]
