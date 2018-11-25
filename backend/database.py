@@ -1,8 +1,8 @@
 import pymysql
 import json
 from copy import deepcopy
-
-conn = None
+from eventlet import ConnectionPool
+conn_pool = None
 BASE_SERVER_RESPONSE = {
     "clientid": 0,
     "security_blacklist":[],
@@ -20,13 +20,17 @@ def new_response(clientid):
 
 
 def initDB():
-    global conn
-    conn = conn or pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
+    global conn_pool
+    conn_pool = conn_pool or ConnectionPool(pymysql, host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
 
-def getCursor():
-    global conn
+def getConn():
+    global conn_pool
     initDB()
-    return conn.cursor()
+    return conn_pool.get()
+
+def returnConn(conn):
+    global conn_pool
+    conn_pool.put(conn)
 
 
 """
@@ -74,22 +78,27 @@ returns 0 for ok, non-zero for bad data format
 """
 def store_credential(credentials, clientid):
     url = credentials.get("url", None)
-    cur = getCursor()
-    if(credentials.get("Username", None) != None and url != None):
-        checkUsername = credentials.get("Username", None)
-        cur.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, url, clientid))
-        if(cur.rowcount == 0):
-            cur.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("UserPassword", None), url, clientid, credentials.get("MFA", None)))
-        else:
-            if(credentials.get("UserPassword", None) != None):
-                col5 = credentials.get("UserPassword", None)
-                execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url  + "' AND CID = " + str(clientid) 
-                cur.execute(execStr)
-            if(credentials.get("MFA", None) != None):
-                col6 = credentials.get("MFA", None)
-                execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url + "' AND CID = " + str(clientid)
-                cur.execute(execStr)
-
+    try:
+        conn = getConn()
+        cur = conn.cursor()
+        if(credentials.get("Username", None) != None and url != None):
+            checkUsername = credentials.get("Username", None)
+            cur.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, url, clientid))
+            if(cur.rowcount == 0):
+                cur.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("UserPassword", None), url, clientid, credentials.get("MFA", None)))
+            else:
+                if(credentials.get("UserPassword", None) != None):
+                    col5 = credentials.get("UserPassword", None)
+                    execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url  + "' AND CID = " + str(clientid) 
+                    cur.execute(execStr)
+                if(credentials.get("MFA", None) != None):
+                    col6 = credentials.get("MFA", None)
+                    execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url + "' AND CID = " + str(clientid)
+                    cur.execute(execStr)
+            conn.commit()
+    finally:
+        returnConn(conn)
+    
     return 0
 
 
@@ -97,9 +106,14 @@ def store_payload(clientid):
     payload = pending_payloads.pop(clientid, None)
     if payload == None:
         return
-    cur = getCursor()
-    cur.execute("insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)", (clientid, payload, payload, clientid))
-    conn.commit()
+    try:
+        conn = getConn()
+        cur = conn.cursor()
+        cur.execute("insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)", (clientid, payload, payload, clientid))
+        conn.commit()
+    finally:
+        returnConn(conn)
+    
 
 
 """
@@ -194,7 +208,7 @@ def store_form_data(data, clientid):
                 cur.execute(execStr)
     
     #credentials information
-    store_credential(credentials, clientid, url)
+    store_credential(credentials, clientid)
 
 
     #security questions information

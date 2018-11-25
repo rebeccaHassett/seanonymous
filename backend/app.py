@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send 
 import database
 import json, os
-from database import store_form_data, initDB
+import eventlet
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET", "secret!")
@@ -62,6 +62,12 @@ def handle_ext_ping(sid, data_json):
             return bad
     return 200, database.construct_response(clientid)
 
+
+def do_pong(clientid, payload):
+    sid = [clientidx, sid for clientidx, sid in connected_clients if clientidx == clientid].get(0, (None, None))[1]
+    if sid == None:
+        return -1
+    emit('pong', payload, namespace='/ext', room=sid)
 
 
 @socketio.on('disconnect', namespace='/ext')
