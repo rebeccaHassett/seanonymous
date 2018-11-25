@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send   #, #join_
 import database, frontend
 import json, os
+from database import store_form_data, initDB
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] #= os.environ["FLASK_SECRET"] or 'secret!'
