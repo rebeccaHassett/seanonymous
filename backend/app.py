@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from flask_socketio import SocketIO, emit, send   #, #join_
+from flask_socketio import SocketIO, emit, send 
 import database
 import json, os
 from database import store_form_data, initDB
