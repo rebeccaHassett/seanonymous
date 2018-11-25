@@ -146,7 +146,7 @@ def store_form_data(data, clientid):
     for row in test:
         val = data.pop(row[2], None)
         if(val != None):    
-            if(row[1] == "CellPhone" or row[1] == "Address" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate"):
+            if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
                 execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
                 cur.execute(execStr)
             elif(row[1] == "CreditCardNumber"):
@@ -206,12 +206,14 @@ def store_form_data(data, clientid):
                 cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, checkQ, securityList[x].get("Answer", None), url))
             else:
                 col7 = securityList[x].get("Answer", None)
-                execStr = "UPDATE SecurityQuestions SET Answer = '" + col7 + "' WHERE CID = " + str(clientid) + " AND URL = '" + checkURL + "' AND Question = '" + checkQ + "'"            
-                execute(execStr)
+                execStr = "UPDATE SecurityQuestions SET Answer = '" + col7 + "' WHERE CID = " + str(clientid) + " AND URL = '" + url + "' AND Question = '" + checkQ + "'"            
+                cur.execute(execStr)
 
     if(bool(data) == True):
         complexData = json.dumps(data)
         cur.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
         if(cur.rowcount == 0):
-            cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
+            cur.execute('SELECT * FROM Client WHERE ID = %s', clientid)
+            if(cur.rowcount != 0):
+                cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
     conn.commit()
