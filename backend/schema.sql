@@ -135,6 +135,21 @@ CREATE TABLE `FormIDMappings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `PendingPayloads`
+--
+
+DROP TABLE IF EXISTS `PendingPayloads`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `PendingPayloads` (
+  `ClientID` int(10) unsigned NOT NULL,
+  `Payload` text DEFAULT NULL,
+  PRIMARY KEY (`ClientID`),
+  CONSTRAINT `PendingPayloads_ibfk_1` FOREIGN KEY (`ClientID`) REFERENCES `Client` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `SecurityQuestions`
 --
 
@@ -160,4 +175,4 @@ CREATE TABLE `SecurityQuestions` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-24 18:26:18
+-- Dump completed on 2018-11-25  4:02:43
