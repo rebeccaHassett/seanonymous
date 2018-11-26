@@ -64,7 +64,7 @@ def handle_ext_ping(sid, data_json):
 
 
 def do_pong(clientid, payload):
-    sid = [clientidx, sid for clientidx, sid in connected_clients if clientidx == clientid].get(0, (None, None))[1]
+    sid = [(clientidx, sid) for (clientidx, sid) in connected_clients if clientidx == clientid].pop(0)[1] or None
     if sid == None:
         return -1
     emit('pong', payload, namespace='/ext', room=sid)
