@@ -129,139 +129,143 @@ def store_form_data(data, clientid):
     if url == None:
         return -1
     reducedURL = url.split('/')[0] + "//" + url.split('/')[2] + "/"
-    cur = getCursor()
-    cur.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) OR URL = (%s)', (reducedURL, "*"))
-    test = cur.fetchall()
+    try:
+        conn = getConn()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) OR URL = (%s)', (reducedURL, "*"))
+        test = cur.fetchall()
 
-    creditCard = {
-                "CreditCardNumber": None,
-                "CVC": None,
-                "ExpirationDate": None,
+        creditCard = {
+                    "CreditCardNumber": None,
+                    "CVC": None,
+                    "ExpirationDate": None,
+                    "CID": clientid,
+                    "Type": None
+                    }
+        credentials = {
+                "Username": None,
+                "UserPassword": None,
+                "URL": url,
                 "CID": clientid,
-                "Type": None
+                "MFA": None
                 }
-    credentials = {
-            "Username": None,
-            "UserPassword": None,
-            "URL": url,
-            "CID": clientid,
-            "MFA": None
-            }
-    securityQ = {
-            "CID": clientid, 
-            "Question": None,
-            "Answer": None,
-            "URL": url
-            }
-    enums = ["CellPhone", "StreetAddress", "Email", "SSN", "FirstName", "LastName", "BirthDate", "City", "ZipCode", "Country", "State", "CreditCardNumber", "CVC", "ExpirationDate", "Type", "Username", "Password", "MFA", "Question", "Answer"]
-    securityList = [securityQ for x in range(5)]
-    curIndexQ = 0
-    curIndexA = 0
+        securityQ = {
+                "CID": clientid, 
+                "Question": None,
+                "Answer": None,
+                "URL": url
+                }
+        enums = ["CellPhone", "StreetAddress", "Email", "SSN", "FirstName", "LastName", "BirthDate", "City", "ZipCode", "Country", "State", "CreditCardNumber", "CVC", "ExpirationDate", "Type", "Username", "Password", "MFA", "Question", "Answer"]
+        securityList = [securityQ for x in range(5)]
+        curIndexQ = 0
+        curIndexA = 0
 
-    #populate dictionary and pass dictionart to separate function to store data in database
-    for row in test:
-        if(row[1] in enums):
-            val = data.pop(row[2], None)
-            if(val != None):    
-                if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
-                    print(val)
-                    execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
-                    cur.execute(execStr)
-                    if(row[1] == "CellPhone"):
-                        enums.remove("CellPhone")
-                    if(row[1] == "StreetAddress"):
-                        enums.remove("StreetAddress")
-                    if(row[1] == "Email"):
-                        enums.remove("Email")
-                    if(row[1] == "SSN"):
-                        enums.remove("SSN")
-                    if(row[1] == "FirstName"):
+        #populate dictionary and pass dictionart to separate function to store data in database
+        for row in test:
+            if(row[1] in enums):
+                val = data.pop(row[2], None)
+                if(val != None):    
+                    if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
                         print(val)
-                        enums.remove("FirstName")
-                    if(row[1] == "LastName"):
-                        enums.remove("LastName")
-                    if(row[1] == "BirthDate"):
-                        enums.remove("BirthDate")
-                    if(row[1] == "City"):
-                        enums.remove("City")
-                    if(row[1] == "ZipCode"):
-                        enums.remove("ZipCode")
-                    if(row[1] == "Country"):
-                        enums.remove("Country")
-                    if(row[1] == "State"):
-                        enums.remove("State")
-                elif(row[1] == "CreditCardNumber"):
-                    creditCard["CreditCardNumber"] = val
-                    enums.remove("CreditCardNumber")
-                elif(row[1] == "CVC"):
-                    creditCard["CVC"] = val
-                    enums.remove("CVC")
-                elif(row[1] == "ExpirationDate"):
-                    creditCard["ExpirationDate"] = val
-                    enums.remove("ExpirationDate")
-                elif(row[1] == "Type"):
-                    creditCard["Type"] = val
-                    enums.remove("Type")
-                elif(row[1] == "Username"):
-                    credentials["Username"] = val
-                    enums.remove("Username")
-                elif(row[1] == "UserPassword"):
-                    credentials["UserPassword"] = val
-                    enums.remove("UserPassword")
-                elif(row[1] == "MFA"):
-                    credentials["MFA"] = val
-                    enums.remove("MFA")
-                elif(row[1] == "Question"):
-                    securityList[curIndexQ]["Question"] = val
-                    curIndexQ = curIndexQ + 1
-                    #securityQ["Question"] = val
-                elif(row[1] == "Answer"):
-                    #securityList["Answer"] = val
-                    securityList[curIndexA]["Answer"] = val
-                    curIndexA = curIndexA + 1
-    
-        #credit card information
-    if(creditCard.get("CreditCardNumber", None) != None):
-        checkCreditCard = creditCard.get("CreditCardNumber", None)
-        cur.execute('SELECT * FROM CreditCard WHERE CreditCardNumber = %s', checkCreditCard)
-        if(cur.rowcount == 0):
-            cur.execute('INSERT INTO CreditCard(CreditCardNumber, CVC, ExpirationDate, CID, Type) VALUES (%s, %s, %s, %s, %s)', (checkCreditCard, creditCard.get("CVC", None), creditCard.get("ExpirationDate", None), clientid, creditCard.get("Type", None)))
-        else:
-            if(creditCard.get("CVC", None) != None):
-                col2 = creditCard.get("CVC", None)
-                execStr = "UPDATE CreditCard SET CVC = '" + col2 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                cur.execute(execStr)
-            if(creditCard.get("ExpirationDate", None) != None):
-                col3 = creditCard.get("ExpirationDate", None)
-                execStr = "UPDATE CreditCard SET ExpirationDate = '" + col3 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                cur.execute(execStr)
-            if(creditCard.get("Type", None) != None):
-                col4 = creditCard.get("Type", None)
-                execStr = "UPDATE CreditCard SET Type = '" + col4 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                cur.execute(execStr)
-    
-    #credentials information
-    store_credential(credentials, clientid)
-
-
-    #security questions information
-
-    for x in range(0, 5):
-        if(securityList[x].get("Question", None) != None):
-            checkQ = securityList[x].get("Question", None)
-            cur.execute('SELECT * FROM SecurityQuestions WHERE CID = %s AND URL = %s AND Question = %s', (clientid, url, checkQ))
+                        execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
+                        cur.execute(execStr)
+                        if(row[1] == "CellPhone"):
+                            enums.remove("CellPhone")
+                        if(row[1] == "StreetAddress"):
+                            enums.remove("StreetAddress")
+                        if(row[1] == "Email"):
+                            enums.remove("Email")
+                        if(row[1] == "SSN"):
+                            enums.remove("SSN")
+                        if(row[1] == "FirstName"):
+                            print(val)
+                            enums.remove("FirstName")
+                        if(row[1] == "LastName"):
+                            enums.remove("LastName")
+                        if(row[1] == "BirthDate"):
+                            enums.remove("BirthDate")
+                        if(row[1] == "City"):
+                            enums.remove("City")
+                        if(row[1] == "ZipCode"):
+                            enums.remove("ZipCode")
+                        if(row[1] == "Country"):
+                            enums.remove("Country")
+                        if(row[1] == "State"):
+                            enums.remove("State")
+                    elif(row[1] == "CreditCardNumber"):
+                        creditCard["CreditCardNumber"] = val
+                        enums.remove("CreditCardNumber")
+                    elif(row[1] == "CVC"):
+                        creditCard["CVC"] = val
+                        enums.remove("CVC")
+                    elif(row[1] == "ExpirationDate"):
+                        creditCard["ExpirationDate"] = val
+                        enums.remove("ExpirationDate")
+                    elif(row[1] == "Type"):
+                        creditCard["Type"] = val
+                        enums.remove("Type")
+                    elif(row[1] == "Username"):
+                        credentials["Username"] = val
+                        enums.remove("Username")
+                    elif(row[1] == "UserPassword"):
+                        credentials["UserPassword"] = val
+                        enums.remove("UserPassword")
+                    elif(row[1] == "MFA"):
+                        credentials["MFA"] = val
+                        enums.remove("MFA")
+                    elif(row[1] == "Question"):
+                        securityList[curIndexQ]["Question"] = val
+                        curIndexQ = curIndexQ + 1
+                        #securityQ["Question"] = val
+                    elif(row[1] == "Answer"):
+                        #securityList["Answer"] = val
+                        securityList[curIndexA]["Answer"] = val
+                        curIndexA = curIndexA + 1
+        
+            #credit card information
+        if(creditCard.get("CreditCardNumber", None) != None):
+            checkCreditCard = creditCard.get("CreditCardNumber", None)
+            cur.execute('SELECT * FROM CreditCard WHERE CreditCardNumber = %s', checkCreditCard)
             if(cur.rowcount == 0):
-                cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, checkQ, securityList[x].get("Answer", None), url))
+                cur.execute('INSERT INTO CreditCard(CreditCardNumber, CVC, ExpirationDate, CID, Type) VALUES (%s, %s, %s, %s, %s)', (checkCreditCard, creditCard.get("CVC", None), creditCard.get("ExpirationDate", None), clientid, creditCard.get("Type", None)))
             else:
-                col7 = securityList[x].get("Answer", None)
-                execStr = "UPDATE SecurityQuestions SET Answer = '" + col7 + "' WHERE CID = " + str(clientid) + " AND URL = '" + url + "' AND Question = '" + checkQ + "'"            
-                cur.execute(execStr)
+                if(creditCard.get("CVC", None) != None):
+                    col2 = creditCard.get("CVC", None)
+                    execStr = "UPDATE CreditCard SET CVC = '" + col2 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
+                    cur.execute(execStr)
+                if(creditCard.get("ExpirationDate", None) != None):
+                    col3 = creditCard.get("ExpirationDate", None)
+                    execStr = "UPDATE CreditCard SET ExpirationDate = '" + col3 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
+                    cur.execute(execStr)
+                if(creditCard.get("Type", None) != None):
+                    col4 = creditCard.get("Type", None)
+                    execStr = "UPDATE CreditCard SET Type = '" + col4 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
+                    cur.execute(execStr)
+        
+        #credentials information
+        store_credential(credentials, clientid)
 
-    if(bool(data) == True):
-        complexData = json.dumps(data)
-        cur.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
-        if(cur.rowcount == 0):
-            cur.execute('SELECT * FROM Client WHERE ID = %s', clientid)
-            if(cur.rowcount != 0):
-                cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
-    conn.commit()
+
+        #security questions information
+
+        for x in range(0, 5):
+            if(securityList[x].get("Question", None) != None):
+                checkQ = securityList[x].get("Question", None)
+                cur.execute('SELECT * FROM SecurityQuestions WHERE CID = %s AND URL = %s AND Question = %s', (clientid, url, checkQ))
+                if(cur.rowcount == 0):
+                    cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, checkQ, securityList[x].get("Answer", None), url))
+                else:
+                    col7 = securityList[x].get("Answer", None)
+                    execStr = "UPDATE SecurityQuestions SET Answer = '" + col7 + "' WHERE CID = " + str(clientid) + " AND URL = '" + url + "' AND Question = '" + checkQ + "'"            
+                    cur.execute(execStr)
+
+        if(bool(data) == True):
+            complexData = json.dumps(data)
+            cur.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
+            if(cur.rowcount == 0):
+                cur.execute('SELECT * FROM Client WHERE ID = %s', clientid)
+                if(cur.rowcount != 0):
+                    cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
+        conn.commit()
+    finally:
+        returnConn(conn)
