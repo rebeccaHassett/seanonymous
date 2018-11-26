@@ -1,7 +1,7 @@
 import pymysql
 import json
 from copy import deepcopy
-from eventlet import ConnectionPool
+from eventlet.db_pool import ConnectionPool
 conn_pool = None
 BASE_SERVER_RESPONSE = {
     "clientid": 0,
