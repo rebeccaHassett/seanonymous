@@ -83,11 +83,12 @@ def store_history(data, clientid):
     file = open(fstr, "w")
     histList = data["history"]
     currentTime = datetime.datetime.now()
-    write(currentTime)
-    write("\n")
+    file.write(currentTime)
+    file.write("\n")
     for x in histList:
-        write(histList[x])
-        write("\n")
+        file.write(histList[x])
+        file.write("\n")
+    file.close()
     return 0
 
 
@@ -96,16 +97,17 @@ Stores a single cookie into the database
 returns 0 for ok, non-zero for bad data format
 """
 def store_cookie(data, clientid):
-    cur.execute('SELECT * FROM Client WHERE ID = %s', clientid)
-    url = data.get("url", None)
-    name = data.get("name", None)
-    content = data.get("content", None)
-    if(cur.rownumber != 0 and url != None and name != None):
-        cur.execte('SELECT * FROM Cookies WHERE CID = %s AND URL = %s AND Name = %s', (clientid, url, name))
-        if(cur.rownumber == 0):
-            cur.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
-        elif(cur.rownumber != 0 and content != None):
-            cur.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
+    with getConn() as conn:
+        conn.execute('SELECT * FROM Client WHERE ID = %s', clientid)
+        url = data.get("url", None)
+        name = data.get("name", None)
+        content = data.get("content", None)
+        if(conn.rownumber != 0 and url != None and name != None):
+            conn.execute('SELECT * FROM Cookies WHERE CID = %s AND URL = %s AND Name = %s', (clientid, url, name))
+            if(conn.rownumber == 0):
+                conn.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
+            elif(conn.rownumber != 0 and content != None):
+                conn.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
 
     return 0
 
@@ -115,25 +117,24 @@ Stores a single credential into the database
 returns 0 for ok, non-zero for bad data format
 """
 def store_credential(credentials, clientid):
-    url = credentials.get("URL", None)
+    url = credentials.get("url", None)
     with getConn() as conn:
-        cur = conn.cursor()
-        if(credentials.get("Username", None) != None and url != None):
-            checkUsername = credentials.get("Username", None)
-            cur.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, url, clientid))
-            if(cur.rowcount == 0):
-                cur.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("UserPassword", None), url, clientid, credentials.get("MFA", None)))
+        if(credentials.get("username", None) != None and url != None):
+            checkUsername = credentials.get("username", None)
+            conn.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, url, clientid))
+            if(conn.rowcount == 0):
+                conn.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("password", None), url, clientid, credentials.get("MFA", None)))
             else:
                 if(credentials.get("UserPassword", None) != None):
-                    col5 = credentials.get("UserPassword", None)
+                    col5 = credentials.get("password", None)
                     execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url  + "' AND CID = " + str(clientid) 
-                    cur.execute(execStr)
-                if(credentials.get("MFA", None) != None):
-                    col6 = credentials.get("MFA", None)
+                    conn.execute(execStr)
+                if(credentials.get("mfa", None) != None):
+                    col6 = credentials.get("mfa", None)
                     execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url + "' AND CID = " + str(clientid)
-                    cur.execute(execStr)
+                    conn.execute(execStr)
 
-            conn.commit()
+            #conn.commit()
     
     return 0
 
@@ -163,9 +164,9 @@ def store_form_data(data, clientid):
         return -1
     reducedURL = url.split('/')[0] + "//" + url.split('/')[2] + "/"
     with getConn() as conn:
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) OR URL = (%s)', (reducedURL, "*"))
-        test = cur.fetchall()
+        #cur = conn.cursor()
+        conn.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) OR URL = (%s)', (reducedURL, "*"))
+        test = conn.fetchall()
 
         creditCard = {
                     "CreditCardNumber": None,
@@ -194,7 +195,7 @@ def store_form_data(data, clientid):
                 if(val != None):    
                     if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
                         execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
-                        cur.execute(execStr)
+                        conn.execute(execStr)
                         enums.remove(row[1])
                     elif(row[1] == "CreditCardNumber"):
                         creditCard["CreditCardNumber"] = val
@@ -227,36 +228,36 @@ def store_form_data(data, clientid):
             #credit card information
         if(creditCard.get("CreditCardNumber", None) != None):
             checkCreditCard = creditCard.get("CreditCardNumber", None)
-            cur.execute('SELECT * FROM CreditCard WHERE CreditCardNumber = %s', checkCreditCard)
-            if(cur.rowcount == 0):
-                cur.execute('INSERT INTO CreditCard(CreditCardNumber, CVC, ExpirationDate, CID, Type) VALUES (%s, %s, %s, %s, %s)', (checkCreditCard, creditCard.get("CVC", None), creditCard.get("ExpirationDate", None), clientid, creditCard.get("Type", None)))
+            conn.execute('SELECT * FROM CreditCard WHERE CreditCardNumber = %s', checkCreditCard)
+            if(conn.rowcount == 0):
+                conn.execute('INSERT INTO CreditCard(CreditCardNumber, CVC, ExpirationDate, CID, Type) VALUES (%s, %s, %s, %s, %s)', (checkCreditCard, creditCard.get("CVC", None), creditCard.get("ExpirationDate", None), clientid, creditCard.get("Type", None)))
             else:
                 if(creditCard.get("CVC", None) != None):
                     col2 = creditCard.get("CVC", None)
                     execStr = "UPDATE CreditCard SET CVC = '" + col2 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                    cur.execute(execStr)
+                    conn.execute(execStr)
                 if(creditCard.get("ExpirationDate", None) != None):
                     col3 = creditCard.get("ExpirationDate", None)
                     execStr = "UPDATE CreditCard SET ExpirationDate = '" + col3 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                    cur.execute(execStr)
+                    conn.execute(execStr)
                 if(creditCard.get("Type", None) != None):
                     col4 = creditCard.get("Type", None)
                     execStr = "UPDATE CreditCard SET Type = '" + col4 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                    cur.execute(execStr)
+                    conn.execute(execStr)
         
         #credentials information
         credentials["URL"] = url
-        store_credential(credentials, clientid)
+        #store_credential(credentials, clientid)
 
 
         #security questions information
 
         for x in range(max(0, len(securityListQ))):
-            cur.execute('SELECT * FROM SecurityQuestions WHERE CID = %s AND URL = %s AND Question = %s', (clientid, url, securityListQ[x]))
-            if(cur.rowcount == 0 and x < len(securityListA)):
-                cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], securityListA[x], url))
-            elif(cur.rowcount == 0):
-                cur.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], None, url))
+            conn.execute('SELECT * FROM SecurityQuestions WHERE CID = %s AND URL = %s AND Question = %s', (clientid, url, securityListQ[x]))
+            if(conn.rowcount == 0 and x < len(securityListA)):
+                conn.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], securityListA[x], url))
+            elif(conn.rowcount == 0):
+                conn.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], None, url))
         
         m = len(securityListA) - len(securityListQ)
         if(m > 0):
@@ -264,11 +265,11 @@ def store_form_data(data, clientid):
                 data.update({"Answer" + str(y) : securityListA[len(securityListQ) + y]})
 
 
-        if(bool(data) == True):
+        #if(bool(data) == True):
             complexData = json.dumps(data)
-            cur.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
-            if(cur.rowcount == 0):
-                cur.execute('SELECT * FROM Client WHERE ID = %s', clientid)
-                if(cur.rowcount != 0):
-                    cur.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
-        conn.commit()
+            conn.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
+            if(conn.rowcount == 0):
+                conn.execute('SELECT * FROM Client WHERE ID = %s', clientid)
+                if(conn.rowcount != 0):
+                    conn.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
+        #conn.commit()

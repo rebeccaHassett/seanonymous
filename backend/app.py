@@ -86,10 +86,11 @@ def validate_payload(data):
     return 1
 
 if __name__ == "__main__":
-    database.initDB()
     with open("../sample_ext_to_srv.json") as f:
         clientid = 123
         data = json.load(f)
-        database.store_form_data(data["forms"][0], clientid)
+        #database.store_form_data(data["forms"][0], clientid)
+        #database.store_credential(data["creds"][0], clientid)
+        database.store_cookie(data["cookies"][0], clientid)
     socketio.run(app, debug=True)
 
