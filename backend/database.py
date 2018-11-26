@@ -1,5 +1,6 @@
 import pymysql
 import json
+import datetime
 from copy import deepcopy
 from eventlet.db_pool import ConnectionPool
 conn_pool = None
@@ -57,6 +58,15 @@ file: ../history-files/<clientid>-hist.txt
 returns 0 for ok, non-zero for bad data format
 """
 def store_history(data, clientid):
+    fStr = "../history-files/" + str(clientid) +"-hist.txt"
+    file = open(fstr, "w")
+    histList = data["history"]
+    currentTime = datetime.datetime.now()
+    write(currentTime)
+    write("\n")
+    for x in histList:
+        write(histList[x])
+        write("\n")
     return 0
 
 
@@ -84,7 +94,7 @@ Stores a single credential into the database
 returns 0 for ok, non-zero for bad data format
 """
 def store_credential(credentials, clientid):
-    url = credentials.get("url", None)
+    url = credentials.get("URL", None)
     with getConn() as conn:
         cur = conn.cursor()
         if(credentials.get("Username", None) != None and url != None):
