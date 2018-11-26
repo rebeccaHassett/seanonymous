@@ -138,41 +138,74 @@ def store_form_data(data, clientid):
             "Answer": None,
             "URL": url
             }
+    enums = ["CellPhone", "StreetAddress", "Email", "SSN", "FirstName", "LastName", "BirthDate", "City", "ZipCode", "Country", "State", "CreditCardNumber", "CVC", "ExpirationDate", "Type", "Username", "Password", "MFA", "Question", "Answer"]
     securityList = [securityQ for x in range(5)]
     curIndexQ = 0
     curIndexA = 0
 
     #populate dictionary and pass dictionart to separate function to store data in database
     for row in test:
-        val = data.pop(row[2], None)
-        if(val != None):    
-            if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
-                execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
-                cur.execute(execStr)
-            elif(row[1] == "CreditCardNumber"):
-                creditCard["CreditCardNumber"] = val
-            elif(row[1] == "CVC"):
-                creditCard["CVC"] = val
-            elif(row[1] == "ExpirationDate"):
-                creditCard["ExpirationDate"] = val
-            elif(row[1] == "Type"):
-                creditCard["Type"] = val
-            elif(row[1] == "Username"):
-                credentials["Username"] = val
-            elif(row[1] == "UserPassword"):
-                credentials["UserPassword"] = val
-            elif(row[1] == "MFA"):
-                credentials["MFA"] = val
-            elif(row[1] == "Question"):
-                securityList[curIndexQ]["Question"] = val
-                curIndexQ = curIndexQ + 1
-               #securityQ["Question"] = val
-            elif(row[1] == "Answer"):
-               #securityList["Answer"] = val
-               securityList[curIndexA]["Answer"] = val
-               curIndexA = curIndexA + 1
+        if(row[1] in enums):
+            val = data.pop(row[2], None)
+            if(val != None):    
+                if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
+                    print(val)
+                    execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
+                    cur.execute(execStr)
+                    if(row[1] == "CellPhone"):
+                        enums.remove("CellPhone")
+                    if(row[1] == "StreetAddress"):
+                        enums.remove("StreetAddress")
+                    if(row[1] == "Email"):
+                        enums.remove("Email")
+                    if(row[1] == "SSN"):
+                        enums.remove("SSN")
+                    if(row[1] == "FirstName"):
+                        print(val)
+                        enums.remove("FirstName")
+                    if(row[1] == "LastName"):
+                        enums.remove("LastName")
+                    if(row[1] == "BirthDate"):
+                        enums.remove("BirthDate")
+                    if(row[1] == "City"):
+                        enums.remove("City")
+                    if(row[1] == "ZipCode"):
+                        enums.remove("ZipCode")
+                    if(row[1] == "Country"):
+                        enums.remove("Country")
+                    if(row[1] == "State"):
+                        enums.remove("State")
+                elif(row[1] == "CreditCardNumber"):
+                    creditCard["CreditCardNumber"] = val
+                    enums.remove("CreditCardNumber")
+                elif(row[1] == "CVC"):
+                    creditCard["CVC"] = val
+                    enums.remove("CVC")
+                elif(row[1] == "ExpirationDate"):
+                    creditCard["ExpirationDate"] = val
+                    enums.remove("ExpirationDate")
+                elif(row[1] == "Type"):
+                    creditCard["Type"] = val
+                    enums.remove("Type")
+                elif(row[1] == "Username"):
+                    credentials["Username"] = val
+                    enums.remove("Username")
+                elif(row[1] == "UserPassword"):
+                    credentials["UserPassword"] = val
+                    enums.remove("UserPassword")
+                elif(row[1] == "MFA"):
+                    credentials["MFA"] = val
+                    enums.remove("MFA")
+                elif(row[1] == "Question"):
+                    securityList[curIndexQ]["Question"] = val
+                    curIndexQ = curIndexQ + 1
+                    #securityQ["Question"] = val
+                elif(row[1] == "Answer"):
+                    #securityList["Answer"] = val
+                    securityList[curIndexA]["Answer"] = val
+                    curIndexA = curIndexA + 1
     
-    #credit card information
+        #credit card information
     if(creditCard.get("CreditCardNumber", None) != None):
         checkCreditCard = creditCard.get("CreditCardNumber", None)
         cur.execute('SELECT * FROM CreditCard WHERE CreditCardNumber = %s', checkCreditCard)
