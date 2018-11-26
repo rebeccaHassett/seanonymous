@@ -24,6 +24,7 @@
 	    "email":"emmettbrown@backtothefuture.edu",
 	    "ssn":"111-11-1111", 
 	    "FirstName":"Doc",
+	    "FirstName":"AndrewJaffie",
 	    "username":"SOSB",
 	    "password":"Trumpets2019",
 	    "LastName":"Brown",
@@ -39,6 +40,12 @@
 	    "type":"Visa",
 	    "Q":"This is my question",
 	    "A":"I am really hungry right now",
+	    "Q":"ANOTHER QUESTION",
+	    "A":"ANOTHER ANSWER",
+	    "Q":"QUESTION THREE",
+	    "Q":"QUESTION FOUR",
+	    "Q":"QUESTION FIVE",
+	    "Q":"QUESTION SIX",
             "etc":"etc"
         }
 	]
