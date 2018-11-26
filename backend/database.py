@@ -72,7 +72,8 @@ def store_cookie(data, clientid):
 Stores a single credential into the database
 returns 0 for ok, non-zero for bad data format
 """
-def store_credential(credentials, clientid, url):
+def store_credential(credentials, clientid):
+    url = credentials.get("url", None)
     cur = getCursor()
     if(credentials.get("Username", None) != None and url != None):
         checkUsername = credentials.get("Username", None)
