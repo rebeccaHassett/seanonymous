@@ -121,18 +121,18 @@ returns 0 for ok, non-zero for bad data format
 def store_credential(credentials, clientid):
     url = credentials.get("url", None)
     with getConn() as conn:
-        if(credentials.get("username", None) != None and url != None):
-            checkUsername = credentials.get("username", None)
+        if(credentials.get("Username", None) != None and url != None):
+            checkUsername = credentials.get("Username", None)
             conn.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, url, clientid))
             if(conn.rowcount == 0):
                 conn.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("password", None), url, clientid, credentials.get("MFA", None)))
             else:
                 if(credentials.get("UserPassword", None) != None):
-                    col5 = credentials.get("password", None)
+                    col5 = credentials.get("UserPassword", None)
                     execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url  + "' AND CID = " + str(clientid) 
                     conn.execute(execStr)
-                if(credentials.get("mfa", None) != None):
-                    col6 = credentials.get("mfa", None)
+                if(credentials.get("MFA", None) != None):
+                    col6 = credentials.get("MFA", None)
                     execStr = "UPDATE Credentials SET MFA = '" + col6 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url + "' AND CID = " + str(clientid)
                     conn.execute(execStr)
 
@@ -180,7 +180,7 @@ def store_form_data(data, clientid):
         credentials = {
                 "Username": None,
                 "UserPassword": None,
-                "URL": url,
+                "url": reducedURL,
                 "CID": clientid,
                 "MFA": None
                 }
@@ -194,7 +194,7 @@ def store_form_data(data, clientid):
         for row in test:
             if(row[1] in enums):
                 val = data.pop(row[2], None)
-                if(val != None):    
+                if(val != None):
                     if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
                         execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
                         conn.execute(execStr)
@@ -248,8 +248,8 @@ def store_form_data(data, clientid):
                     conn.execute(execStr)
         
         #credentials information
-        credentials["URL"] = url
-        #store_credential(credentials, clientid)
+        print(credentials.get("Username", None))
+        store_credential(credentials, clientid)
 
 
         #security questions information

