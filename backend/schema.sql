@@ -30,6 +30,15 @@ CREATE TABLE `BlacklistedWebsites` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `BlacklistedWebsites`
+--
+
+LOCK TABLES `BlacklistedWebsites` WRITE;
+/*!40000 ALTER TABLE `BlacklistedWebsites` DISABLE KEYS */;
+/*!40000 ALTER TABLE `BlacklistedWebsites` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Client`
 --
 
@@ -37,7 +46,7 @@ DROP TABLE IF EXISTS `Client`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Client` (
-  `ID` int(10) unsigned NOT NULL,
+  `ID` int(10) unsigned AUTO_INCREMENT NOT NULL,
   `CellPhone` varchar(15) DEFAULT NULL,
   `StreetAddress` varchar(80) DEFAULT NULL,
   `Email` varchar(60) DEFAULT NULL,
@@ -55,6 +64,15 @@ CREATE TABLE `Client` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Client`
+--
+
+LOCK TABLES `Client` WRITE;
+/*!40000 ALTER TABLE `Client` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Client` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ComplexForms`
 --
 
@@ -65,9 +83,18 @@ CREATE TABLE `ComplexForms` (
   `CID` int(10) unsigned NOT NULL,
   `JSONFORM` varchar(400) NOT NULL,
   PRIMARY KEY (`CID`,`JSONFORM`),
-  CONSTRAINT `ComplexForms_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`)
+  CONSTRAINT `ComplexForms_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ComplexForms`
+--
+
+LOCK TABLES `ComplexForms` WRITE;
+/*!40000 ALTER TABLE `ComplexForms` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ComplexForms` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Cookies`
@@ -82,9 +109,18 @@ CREATE TABLE `Cookies` (
   `Content` varchar(300) DEFAULT NULL,
   `Name` varchar(80) NOT NULL,
   PRIMARY KEY (`CID`,`URL`,`Name`),
-  CONSTRAINT `Cookies_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`)
+  CONSTRAINT `Cookies_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Cookies`
+--
+
+LOCK TABLES `Cookies` WRITE;
+/*!40000 ALTER TABLE `Cookies` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Cookies` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Credentials`
@@ -101,9 +137,18 @@ CREATE TABLE `Credentials` (
   `MFA` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`Username`,`URL`,`CID`),
   KEY `CID` (`CID`),
-  CONSTRAINT `Credentials_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`)
+  CONSTRAINT `Credentials_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Credentials`
+--
+
+LOCK TABLES `Credentials` WRITE;
+/*!40000 ALTER TABLE `Credentials` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Credentials` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `CreditCard`
@@ -120,9 +165,18 @@ CREATE TABLE `CreditCard` (
   `Type` enum('American Express','Discover Card','Mastercard','VISA') DEFAULT NULL,
   PRIMARY KEY (`CreditCardNumber`),
   KEY `CID` (`CID`),
-  CONSTRAINT `CreditCard_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`)
+  CONSTRAINT `CreditCard_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CreditCard`
+--
+
+LOCK TABLES `CreditCard` WRITE;
+/*!40000 ALTER TABLE `CreditCard` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CreditCard` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `FormIDMappings`
@@ -137,6 +191,16 @@ CREATE TABLE `FormIDMappings` (
   `RemoteDef` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FormIDMappings`
+--
+
+LOCK TABLES `FormIDMappings` WRITE;
+/*!40000 ALTER TABLE `FormIDMappings` DISABLE KEYS */;
+INSERT INTO `FormIDMappings` VALUES ('*','FirstName','FirstName'),('*','LastName','LastName'),('*','CellPhone','phone'),('*','StreetAddress','StreetAddress'),('*','Email','email'),('*','SSN','ssn'),('*','BirthDate','DOB'),('*','URL','url'),('*','CreditCardNumber','ccn'),('*','CVC','cvc'),('*','ExpirationDate','exp'),('*','Type','type'),('*','Question','Q'),('*','Answer','A'),('*','City','city'),('*','State','state'),('*','ZipCode','ZipCode'),('*','Country','Country'),('*','Question','Q2'),('*','Question','Q3'),('*','FirstName','FirstName2'),('*','Country','Country2'),('*','Question','Q5'),('*','Question','Q4'),('*','Answer','A1'),('*','Answer','A2'),('*','Answer','A3'),('*','Username','username'),('*','MFA','mfa');
+/*!40000 ALTER TABLE `FormIDMappings` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `PendingPayloads`
@@ -154,6 +218,15 @@ CREATE TABLE `PendingPayloads` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `PendingPayloads`
+--
+
+LOCK TABLES `PendingPayloads` WRITE;
+/*!40000 ALTER TABLE `PendingPayloads` DISABLE KEYS */;
+/*!40000 ALTER TABLE `PendingPayloads` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `SecurityQuestions`
 --
 
@@ -166,9 +239,18 @@ CREATE TABLE `SecurityQuestions` (
   `Answer` varchar(80) DEFAULT NULL,
   `URL` varchar(200) NOT NULL,
   PRIMARY KEY (`CID`,`Question`,`URL`),
-  CONSTRAINT `SecurityQuestions_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`)
+  CONSTRAINT `SecurityQuestions_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `SecurityQuestions`
+--
+
+LOCK TABLES `SecurityQuestions` WRITE;
+/*!40000 ALTER TABLE `SecurityQuestions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `SecurityQuestions` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -179,4 +261,4 @@ CREATE TABLE `SecurityQuestions` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-25 20:22:10
+-- Dump completed on 2018-11-27 22:45:41
