@@ -80,13 +80,12 @@ returns 0 for ok, non-zero for bad data format
 """
 def store_history(data, clientid):
     fStr = "../history-files/" + str(clientid) +"-hist.txt"
-    file = open(fstr, "w")
-    histList = data["history"]
+    file = open(fStr, "w")
     currentTime = datetime.datetime.now()
-    file.write(currentTime)
+    file.write(str(currentTime))
     file.write("\n")
-    for x in histList:
-        file.write(histList[x])
+    for x in data:
+        file.write(x)
         file.write("\n")
     file.close()
     return 0
@@ -99,16 +98,17 @@ returns 0 for ok, non-zero for bad data format
 def store_cookie(data, clientid):
     with getConn() as conn:
         conn.execute('SELECT * FROM Client WHERE ID = %s', clientid)
+        conn.fetchall()
         url = data.get("url", None)
         name = data.get("name", None)
         content = data.get("content", None)
         if(conn.rownumber != 0 and url != None and name != None):
             conn.execute('SELECT * FROM Cookies WHERE CID = %s AND URL = %s AND Name = %s', (clientid, url, name))
+            conn.fetchall()
             if(conn.rownumber == 0):
                 conn.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
             elif(conn.rownumber != 0 and content != None):
                 conn.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
-
     return 0
 
 
