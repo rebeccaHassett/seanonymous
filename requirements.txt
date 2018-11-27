@@ -24,3 +24,4 @@ Werkzeug==0.14.1
 Flask-Login==0.4.1
 Flask-WTF==0.14.2
 WTForms==2.2.1g
+pkg-resources==0.0.0
