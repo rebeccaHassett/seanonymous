@@ -21,14 +21,15 @@ def new_response(clientid):
 
 
 def initDB():
-    global conn_pool
-    conn_pool = conn_pool or ConnectionPool(pymysql, host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
+    #global conn_pool
+    #conn_pool = conn_pool or ConnectionPool(pymysql, host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
+
 
 def getConn():
-    global conn_pool
-    initDB()
-    return conn_pool.get()
-
+    #global conn_pool
+    #initDB()
+    #return conn_pool.get()
+    return pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
 
 """
 Gets pending payload or constructs a new one and populates based on defaults from the database.

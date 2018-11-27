@@ -6,7 +6,7 @@ import eventlet
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET", "secret!")
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='eventlet')
 connected_clients = [] #tuples of (clientid, sid)
 
 #import frontend
