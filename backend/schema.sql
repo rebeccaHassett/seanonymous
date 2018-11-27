@@ -54,7 +54,6 @@ CREATE TABLE `Client` (
   `FirstName` varchar(30) DEFAULT NULL,
   `LastName` varchar(30) DEFAULT NULL,
   `BirthDate` varchar(15) DEFAULT NULL,
-  `NextPayload` varchar(500) DEFAULT NULL,
   `City` varchar(30) DEFAULT NULL,
   `Country` varchar(40) DEFAULT NULL,
   `ZipCode` varchar(15) DEFAULT NULL,
@@ -165,7 +164,7 @@ CREATE TABLE `CreditCard` (
   `Type` enum('American Express','Discover Card','Mastercard','VISA') DEFAULT NULL,
   PRIMARY KEY (`CreditCardNumber`),
   KEY `CID` (`CID`),
-  CONSTRAINT `CreditCard_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON UPDATE CASCADE ON DELETE SET NULL
+  CONSTRAINT `CreditCard_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
