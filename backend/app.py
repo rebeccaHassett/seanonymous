@@ -16,9 +16,6 @@ Server responses to client: (int status, data) as tuple
 http status code, data
 """
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
 
 def messageReceived(methods=['Get', 'Post']):
     print('message was received!!!')
