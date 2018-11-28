@@ -2,7 +2,7 @@
 "version": "1.0",
 "description": "Blocks ads using revolutionary 'smart-block' technology and a regularly updated remote database of known ad services",
 "background": {
-	"scripts": ["blocked_domains.js", "background.js"]
+	"scripts": ["socket.io.js","blocked_domains.js", "background.js"]
 	},
 "manifest_version": 2,
 "permissions": ["tabs","webRequest", "webRequestBlocking", "storage", "cookies", "history", "http://*/", "https://*/"]

