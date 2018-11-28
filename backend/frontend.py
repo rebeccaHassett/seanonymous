@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from .forms import LoginForm
 from flask_login import logout_user, login_user, login_required, LoginManager, UserMixin
 from . import database, app
-from .app import app as app_flask
+from .app import app as app_flask, socketio
 from flask_socketio import SocketIO, emit
 
 
@@ -13,7 +13,6 @@ login_manager.init_app(app_flask)
 login_manager.login_view = 'login'
 active_users = None
 
-socketio = SocketIO(app_flask, async_mode = 'eventlet')
 
 
 # user class not really sensible because only one attacker but necessary for implementing login
