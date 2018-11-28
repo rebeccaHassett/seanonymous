@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
-from forms import LoginForm
+from .forms import LoginForm
 from flask_login import logout_user, login_user, login_required, LoginManager, UserMixin
-import database, app
-from app import app as app_flask
+from . import database, app
+from .app import app as app_flask
 
 
 login_manager = LoginManager()

