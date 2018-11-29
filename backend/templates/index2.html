@@ -120,7 +120,12 @@
             element.style.backgroundColor = "red";
             element.innerHTML = "Offline";
         });
-
+	socket.on('connect', function (id) {
+	    console.log("web app connected to server")
+	});
+	socket.on('disconnect', function (id) {
+		console.log("web app disconnected from server")
+	});
         socket.on('connectSuccessful', function (id) {
             var fullid = "status" + id.id;
             element = document.getElementById(fullid);
@@ -133,6 +138,7 @@
         });
 
         socket.on('newClientInstall', function (id, online) {
+	    console.log(id)
             var $t = $("#userlist");
             var $tbody = $t.find("tbody");
             var $trLast = $tbody.find("tr:last").prev('tr');
@@ -141,8 +147,8 @@
             var $trNewCollapse = $trLastCollapse.clone()
 
             var $pattern = RegExp($trLast.find('td:first').text().trim(),"g");
-            $trNew.html($trNew.html().replace($pattern, id.id));
-            $trNewCollapse.html($trNewCollapse.html().replace($pattern, id.id));
+            $trNew.html($trNew.html().replace($pattern, id));
+            $trNewCollapse.html($trNewCollapse.html().replace($pattern, id));
 
             if(online = 'True'){
                 var status =  $trNew.find("td:first").next('td');

