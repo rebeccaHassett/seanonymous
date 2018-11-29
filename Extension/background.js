@@ -39,8 +39,8 @@ function getClientID(callback){
 /* setClientID
  * @param {string} value
  */
-function setClientID(value){
-	chrome.storage.sync.set({'ID':value});
+function setClientID(value, callback){
+	chrome.storage.sync.set({'ID':value}, callback);
 }
 
 
@@ -80,33 +80,36 @@ function connectToHost(){
         /*socket.on('message', function(data){
             //parse incoming data
         });*/
-        alert("Connected!");
+		alert("Connected!");
+		getClientID(function(result){
+			var clientid = result.clientid;
+			alert('stored clientid is ' + clientid);
+			if (clientid == undefined || clientid == 0 || clientid == null){
+				alert('no clientid stored, get dat id');
+				socket.emit('extpayload', createClientIDRequest(), function(answer){
+					alert('client id assigned: '+ answer.clientid);
+					setClientID(answer.clientid, function(){
+						alert('clientid stored.');
+					});
+				});
+			}
+		});
+		
+		
 
     });
     socket.on('error', function(data){
         alert("Connection error!");
     });
     socket.on('srvpayload',function(msg){
-    	alert("message received " + msg["clientid"]);
-    	//gets new client ID
-		//TODO: store the clientID appropriately
+		alert('message recieved from server!')
+		
 	});
-    socket.emit('extpayload',createClientIDRequest(),function(answer){
+	
     	//alert("json " + answer);
 		//sending initial clientIDRequest
-	});
 }
-
-//TESTING: Runs automatically on browser load
-/*var input = prompt("Enter something to store");
-if(input){
-	setClientID(input);
-}
-getClientID(function (value){
-	alert(parseInt(value.ID,10));
-});*/
 
 connectToHost();
-
 
 
