@@ -98,26 +98,29 @@
 </div>
 <script>
     $(document).ready(function () {
-        var socket = io.connect();
+        var socket = io.connect("https://cse331.andrewjaffie.me/socket.io");
         socket.on('disconnect', function (id) {
-            var fullid = "status" + id.id;
+	    console.log("disconnect")
+            var fullid = "status" + id;
             element = document.getElementById(fullid);
             element.style.backgroundColor = "red";
             element.innerHTML = "Offline";
-        })
-
-        socket.on('connect', function (id) {
-            console.log(id.id);
-            var fullid = "status" + id.id;
+        });
+	socket.on('connect', function(id) {
+		console.log("connect")
+	});
+        socket.on('client', function (id) {
+	    console.log("clientconnect")
+            console.log(id);
+            var fullid = "status" + id;
             element = document.getElementById(fullid);
             element.style.backgroundColor = "green";
             element.innerHTML = "Online"});
-
-        socket.on('ping', function (id) {
-            console.log(id.id);
+	});
+        /*socket.on('ping', function (id) {
+            console.log(id);
             get_info_display_same_page(id.id);
-        })
-    })
+        })*/
 </script>
 <script>
     function call_javascript(person) {
