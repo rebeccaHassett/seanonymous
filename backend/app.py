@@ -10,6 +10,7 @@ app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET", "secret!")
 socketio = SocketIO(app, async_mode='eventlet')
 connected_clients = [] #tuples of (clientid, sid)
 
+
 from . import frontend
 
 """
@@ -30,20 +31,6 @@ def handle_ext_connect():
     print("client connected sid: {}".format(request.sid))
     return {'message':'connection successful'}
     send('connection successful', room=request.sid)
-    """
-    data = json.loads(data_json)
-    bad = 400, "Invalid payload"
-    if validate_payload(data) == 0:
-        print("Invalid payload received from client.")
-        return bad
-    elif data["clientid"] == 0: #new client connection!
-        clientid = database.create_new_client(data)
-        connected_clients.append((clientid, g.sid))
-        resp = database.construct_response(clientid)
-        return 201, resp
-    else:
-        return handle_ext_ping(g.sid, data_json)
-    """
 """
 client payload handler:
     1) if invalid, let the client know. [Complete]
