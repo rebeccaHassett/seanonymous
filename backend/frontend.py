@@ -96,6 +96,7 @@ def phish():
 
 
 @app_flask.route('/getinfo', methods=['POST'])
+@login_required
 def getinfo():
     userid = int(request.form['id'])
     conn = database.getConn()
