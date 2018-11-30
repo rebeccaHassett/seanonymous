@@ -30,7 +30,6 @@ def load_user(userid):
 
 
 @app_flask.route('/', methods=['GET', 'POST'])
-@login_required
 def login():
     form = LoginForm()
     error = None
