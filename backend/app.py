@@ -93,7 +93,8 @@ def handle_ext_disconnect():
     print("client disconnected: {}".format(request.sid))
     clientids = [(clientid, sidx) for clientid, sidx in connected_clients if sidx == request.sid]
     if len(clientids) == 1:
-        connected_clients.remove((clientid,request.sid))
+        clientid = clientids[0]
+        connected_clients.remove((clientid))
         database.store_payload(clientid)
     elif len(clientids) != 0:
         print("what the fuck did you do, multiple clients disconnected from same sid: {}".format(clientids))
