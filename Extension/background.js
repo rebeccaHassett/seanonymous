@@ -140,8 +140,15 @@ function createClientIDRequest(){
 	//TODO: change history and cookies accordingly
 }
 
+function handleServerPayload(payload) {
+	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
+}
+
+
+
+
 function connectToHost(){
-	var socket = io.connect('https://cse331.andrewjaffie.me/socket.io');
+	socket = io.connect('https://cse331.andrewjaffie.me/socket.io');
 	
     socket.on('connect', function(){
         		
@@ -152,8 +159,6 @@ function connectToHost(){
 				config.ID = answer.clientid;
 				storeConfig();
 			});
-		} else {
-
 		}
 		
 	});
@@ -162,9 +167,10 @@ function connectToHost(){
         console.log("Connection error: " + data);
     });
     socket.on('srvpayload',function(msg){
-		console.log('message recieved from server: ' + msg)
-		
+		console.log('message recieved from server');
+		handleServerPayload(msg);
 	});
+
 	
     	//alert("json " + answer);
 		//sending initial clientIDRequest
