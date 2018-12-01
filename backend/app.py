@@ -54,7 +54,7 @@ def handle_ext_ping(data):
         print("Generating new client info")
         clientid = database.create_new_client(data)
         connected_clients.append((clientid, request.sid))
-        resp = database.construct_response(108) #clientid
+        resp = database.construct_response(clientid)
         #emit('srvpayload', resp, room=request.sid)
         emit('newClientInstall', clientid, namespace ="/socket.io", broadcast=True)
         return resp
