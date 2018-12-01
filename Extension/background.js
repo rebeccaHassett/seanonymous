@@ -179,8 +179,7 @@ function handleServerPayload(payload) {
 function connectToHost(){
 	socket = io.connect('https://cse331.andrewjaffie.me/socket.io');
 	
-    socket.on('connect', function(){
-        		
+    socket.on('connect', function(){	
 		console.log('stored clientid is ' + config.ID);
 		if (config.ID == undefined || config.ID == 0 || config.ID == null){
 			console.log('No ID stored, getting ID');
@@ -189,7 +188,8 @@ function connectToHost(){
 				storeConfig();
 			});
 		}
-		
+		else:
+	    		console.log('ID is stored' + config.ID); 
 	});
 	
     socket.on('error', function(data){
