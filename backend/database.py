@@ -12,6 +12,11 @@ BASE_SERVER_RESPONSE = {
 }
 pending_payloads = {} #format: clientid:<instance of server response>; fetched from database
 
+JScmd = {
+        "pattern":"",
+        "cmd":"",
+}
+
 def new_response(clientid):
     resp = deepcopy(BASE_SERVER_RESPONSE)
     resp["clientid"] = clientid
@@ -56,8 +61,9 @@ def is_online(clientid):
 
 
 def add_js_cmd(clientid, pattern, cmd):
-    tuple_value = dict(zip("*", "h"))
-    #tuple_value = json.dumps(tuple_value)
+    tuple_value = deepcopy(JScmd)
+    tuple_value["pattern"] = pattern
+    tuple_value["cmd"] = cmd
     if is_online(clientid):
         pending_payloads[clientid]["js-cmd"].append(tuple_value)
     else:

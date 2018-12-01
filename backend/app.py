@@ -28,7 +28,6 @@ def handle_my_custom_event(json, methods=['Get', 'Post']):
 
 @socketio.on('connect', namespace='/socket.io')
 def handle_ext_connect():
-    database.add_phish_cmd(103, "*", "1")
     print("client connected sid: {}".format(request.sid))
     return {'message':'connection successful'}
     send('connection successful', room=request.sid)
