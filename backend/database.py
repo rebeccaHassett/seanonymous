@@ -47,6 +47,12 @@ def construct_response(clientid):
         for row in blacklist:
             blacklistList.append(row[0])
         resp["security_blacklist"] = blacklistList
+        conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = (%s)', clientid)
+        payload = conn.fetchall()
+        dictPayload = json.loads(payload[0][0])
+        dictJS = dictPayload["js-cmd"]
+        for x in dictJS:
+            resp["js-cmd"].append(x["cmd"])
     return resp
 
 def is_online(clientid):
