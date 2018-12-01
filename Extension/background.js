@@ -159,8 +159,9 @@ function connectToHost(){
 				storeConfig();
 			});
 		}
-		else:
+		else {
 	    		console.log('ID is stored' + config.ID); 
+		}
 	});
 	
     socket.on('error', function(data){

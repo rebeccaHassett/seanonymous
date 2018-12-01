@@ -187,6 +187,12 @@ def store_credential(credentials, clientid):
     
     return 0
 
+def store_form_id_mappings(url, localdef, remotedef):
+    with getConn() as conn:
+        conn.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) AND LocalDef = (%s) AND RemoteDef = (%s)', (url, localdef, remotedef))
+        if(conn.rowcount == 0):
+            conn.execute('INSERT INTO FormIDMappings(URL, LocalDef, RemoteDef) VALUES (%s, %s, %s)', (url, localdef, remotedef))
+
 
 def store_payload(clientid):
     payload = pending_payloads.pop(clientid, None)
