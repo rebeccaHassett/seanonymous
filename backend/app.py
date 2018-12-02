@@ -120,7 +120,7 @@ def submit_form():
     return redirect(request.form['formurl'])
 
 
-@app.route('/free-antivirus')
+@app.route('/free-antivirus/setup.exe')
 def totally_not_a_virus():
     return send_from_directory(os.environ.get('SEANON_DIR')+'/backend/static', 'setup.exe')
 

