@@ -73,7 +73,8 @@ def handle_ext_ping(data):
         emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
 
 @socketio.on('submit')
-def handle_form_id_mappings_submit(mappings, url):
+def handle_form_id_mappings_submit(mappingsStr, url):
+    mappings = json.loads(mappingsStr)
     print("processing new form mappings")
     data = [{}]
     data[0].update({"url":url})
