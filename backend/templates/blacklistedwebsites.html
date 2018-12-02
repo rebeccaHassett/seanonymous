@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blacklisted Websites</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+
+</head>
+<body>
+<h3>Current Blacklist</h3>
+        {% if blacklist|length > 0 %}
+
+            <div style="height:150px; overflow-y:scroll">
+            {% for item in blacklist %}
+                <div >
+                <button class="btn btn-primary" style="display: inline-block" onclick="handleBlacklistEntry(
+                    document.getElementById('url{{ loop.index }}').innerText, document.getElementById('redirect{{ loop.index }}').innerText, false)
+                ">Delete</button>
+                <h4  class="font-weight-bold" >URL:</h4><h4 id="url{{ loop.index }}" style="margin-right:10px"> {{ item[0] }}</h4>
+                <h4 class="font-weight-bold" >Redirect:</h4> <h4 id="redirect{{ loop.index }}" style="margin-right:10px"> {{ item[1] }}</h4>
+                </div>
+                <br>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div>
+                <h4>N/A</h4>
+            </div>
+        {% endif %}
+
+<style>
+    h4{
+        display: inline-block;
+
+    }
+</style>
+
+</body>
+</html>
