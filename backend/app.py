@@ -37,9 +37,6 @@ client payload handler:
 """
 @socketio.on('extpayload', namespace='/socket.io')
 def handle_ext_ping(data):
-    url = "https://www.facebook.com/"
-    redirectURL = "https://www.blackboard.com/"
-    database.delete_blacklisted_website(url, redirectURL)
     print("client ping sid: {} data: {}".format(request.sid, data))
     clientid = data["clientid"]
     bad = 400, "Invalid payload"
