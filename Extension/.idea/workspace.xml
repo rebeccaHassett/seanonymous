@@ -14,8 +14,8 @@
       <file leaf-file-name="background.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/background.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
-              <caret line="118" column="64" lean-forward="true" selection-start-line="118" selection-start-column="64" selection-end-line="118" selection-end-column="64" />
+            <state relative-caret-position="383">
+              <caret line="107" column="53" lean-forward="true" selection-start-line="107" selection-start-column="53" selection-end-line="107" selection-end-column="53" />
             </state>
           </provider>
         </entry>
@@ -61,6 +61,8 @@
       <find>TODO</find>
       <find>foreach</find>
       <find>forEach</find>
+      <find>clearQ</find>
+      <find>sync</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -81,7 +83,7 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="width" value="1600" />
     <option name="height" value="1728" />
   </component>
@@ -181,12 +183,12 @@
       <workItem from="1543341603136" duration="14825000" />
       <workItem from="1543682429335" duration="16835000" />
       <workItem from="1543717866774" duration="3877000" />
-      <workItem from="1543732707465" duration="12332000" />
+      <workItem from="1543732707465" duration="19636000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="57151000" />
+    <option name="totallyTimeSpent" value="64455000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="800" height="864" extended-state="0" />
@@ -453,8 +455,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/background.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
-          <caret line="118" column="64" lean-forward="true" selection-start-line="118" selection-start-column="64" selection-end-line="118" selection-end-column="64" />
+        <state relative-caret-position="383">
+          <caret line="107" column="53" lean-forward="true" selection-start-line="107" selection-start-column="53" selection-end-line="107" selection-end-column="53" />
         </state>
       </provider>
     </entry>

