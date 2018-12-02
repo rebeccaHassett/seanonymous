@@ -63,7 +63,7 @@
             });
 
 
-            var socket = io.connect();
+            var socket = io.connect("https://cse331.andrewjaffie.me/socket.io");
 
             socket.on('disconnectSuccessful', function (id) {
                 var fullid = "status" + id;
