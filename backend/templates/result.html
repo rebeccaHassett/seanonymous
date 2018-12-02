@@ -220,10 +220,10 @@
         <br>
     </div>
 
-
     <div id="bh">
         {% if fullbh is equalto 'true' %}
             <h2>Browsing History for {{ data[0] }}</h2>
+
         {% else %}
             <h2>Browsing History for {{ data[0] }}
                 <button class="btn btn-primary" style="margin-left:10px;" onclick="var new_page = window.open();
@@ -234,16 +234,20 @@
                 </button>
             </h2>
         {% endif %}
-
+  {% if history|length > 0 %}
+        {% if fullbh is not equalto 'true' %}
+           <div style="height: 250px; overflow-y: scroll"id="bh{{ data[0] }}">
+        {% else %}
         <div id="bh{{ data[0] }}">
-            {% if history|length > 0 %}
-                {% set count = [5] %}
+        {% endif %}
+
+{#                {% set count = [5] %}#}
                 {% for item in history %}
-                    {% if loop.index is lessthan 5 or fullbh is equalto 'true' %}
+{#                    {% if loop.index is lessthan 5 or fullbh is equalto 'true' %}#}
                         <h4>{{ item }}</h4>
-                    {% elif fullbh is equalto 'false' %}
-                        <h4 id="hidden" class="collapse">{{ item }}</h4>
-                    {% endif %}
+{#                    {% elif fullbh is equalto 'false' %}#}
+{#                        <h4 id="hidden" class="collapse">{{ item }}</h4>#}
+{#                    {% endif %}#}
                 {% endfor %}
             {% else %}
                 <div>
@@ -253,11 +257,20 @@
         </div>
     </div>
 
-    <h2>Cookies for {{ data[0] }} </h2>
+    <h2>Cookies for {{ data[0] }}
+     <button class="btn btn-primary" style="margin-left:10px;" onclick="var new_page = window.open();
+                        new_page.document.write('<h2>Cookies for {{ data[0] }}</h2>');
+                        new_page.document.write(document.getElementById('cookies{{ data[0] }}').innerHTML);
+                        new_page.document.title = {{ data[0] }} + ' Cookies ';
+                        " id="viewAllCookies">View All
+                </button>
+
+    </h2>
 {% if cookies|length > 0 %}
-    <div style="height:150px; overflow-y:scroll">
+    <div id="cookies{{ data[0] }}" style="height:250px; overflow-y:scroll">
 
             {% for item in cookies %}
+                <h3>Cookie #{{ loop.index }}</h3>
                 <h4>URL: {{ item[1] }}</h4>
                 <h4>Content: {{ item[2] }}</h4>
                 <h4>Name: {{ item[3] }}</h4>
