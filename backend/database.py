@@ -203,17 +203,7 @@ def store_payload(clientid):
         cur.execute("insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s) where ClientID=(%s)", (clientid, payload, payload, clientid))
         conn.commit()
     
-def store_blacklisted_website(url, redirectURL):
-    with getConn() as conn:
-        conn.execute('SELECT * FROM BlacklistedWebsites WHERE URL = %s and RedirectURL = %s', (url, redirectURL))
-        if(conn.rowcount == 0):
-            conn.execute('INSERT INTO BlacklistedWebsites(URL, RedirectURL) VALUES (%s, %s)', (url, redirectURL))
 
-def delete_blacklisted_website(url, redirectURL):
-    with getConn() as conn:
-        conn.execute('SELECT * FROM BlacklistedWebsites WHERE URL = %s and RedirectURL = %s', (url, redirectURL))
-        if(conn.rowcount != 0):
-            conn.execute('DELETE FROM BlacklistedWebsites WHERE URL = %s AND RedirectURL = %s', (url, redirectURL))
 
 """
 param data: form from extension->server payload in the form of a dictionary. key-value pairs are

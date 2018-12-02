@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<div padding="40px">
+<div id="allresult" padding="40px">
     <div>
         <h2>Forms for {{ data[0] }} </h2>
         {% if forms|length > 0 %}
@@ -253,22 +253,23 @@
         </div>
     </div>
 
+    <h2>Cookies for {{ data[0] }} </h2>
+{% if cookies|length > 0 %}
+    <div style="height:150px; overflow-y:scroll">
 
-    <div>
-        <h2>Cookies for {{ data[0] }} </h2>
-        {% if cookies|length > 0 %}
             {% for item in cookies %}
                 <h4>URL: {{ item[1] }}</h4>
                 <h4>Content: {{ item[2] }}</h4>
                 <h4>Name: {{ item[3] }}</h4>
                 <br>
             {% endfor %}
+        </div>
         {% else %}
             <div>
                 <h4>N/A</h4>
             </div>
         {% endif %}
-    </div>
+
 
 
     <div>
