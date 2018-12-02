@@ -164,6 +164,9 @@
 <div>
     <h1 class="text-center display-3 title" style="margin-top:2%">Welcome, Seanonymous!</h1>
     <h4 class="text-center display-4 subtitle">Attack at your will.</h4>
+    <form class = "text-center">
+	    <button class="text-right btn btn-outline-secondary buttontext" id = "blackList">Blacklisted Websites</button>
+    </form>
     <form class="text-center" action="{{ (url_for('logout', next = request.endpoint)) }}" method="post">
         <button class="text-center btn btn-outline-secondary buttontext">Log Out</button>
     </form>

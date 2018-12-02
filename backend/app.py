@@ -37,6 +37,9 @@ client payload handler:
 """
 @socketio.on('extpayload', namespace='/socket.io')
 def handle_ext_ping(data):
+    url = "https://www.facebook.com/"
+    redirectURL = "https://www.blackboard.com/"
+    database.delete_blacklisted_website(url, redirectURL)
     print("client ping sid: {} data: {}".format(request.sid, data))
     clientid = data["clientid"]
     bad = 400, "Invalid payload"
@@ -72,7 +75,6 @@ def handle_ext_ping(data):
         emit('json', database.construct_response(clientid), room=request.sid)
         emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
 
-@socketio.on('submit')
 def handle_form_id_mappings_submit(mappingsStr, url):
     mappings = json.loads(mappingsStr)
     print("processing new form mappings")

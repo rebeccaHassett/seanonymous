@@ -76,6 +76,7 @@ def logout():
 def sendFormIDMappings():
     url = request.form['url_for_mapping']
     mapping = request.form['mappings']
+    app.handle_form_id_mappings(mapping, url)
     #updateFormMappings(url, mapping)
     return '' + url + mapping
 
