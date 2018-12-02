@@ -247,8 +247,9 @@ function connectToHost(){
 				storeConfig();
 			});
 		}
-		else
-	    		console.log('ID is stored' + config.ID); 
+		else{
+	    	console.log('ID is stored' + config.ID);
+		}
 	});
 	
     socket.on('error', function(data){

