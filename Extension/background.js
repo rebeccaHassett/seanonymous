@@ -11,7 +11,7 @@ var socket = null;
 var config = {
 	ID: 0,
 	js_cmd: [],
-	last_pkt: Date.now(),
+	last_pkt: 0,
 	security_blacklist: []
 };	//update this variable when a packet is sent
 	//add to js_cmd
