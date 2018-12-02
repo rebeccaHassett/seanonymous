@@ -320,11 +320,11 @@ def store_form_data(data, clientid):
                 data.update({"Answer" + str(y) : securityListA[len(securityListQ) + y]})
 
 
-        #if(bool(data) == True):
+        if(bool(data) == True):
             complexData = json.dumps(data)
-            conn.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s', (clientid, complexData))
+            conn.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s AND URL = %s', (clientid, complexData, url))
             if(conn.rowcount == 0):
                 conn.execute('SELECT * FROM Client WHERE ID = %s', clientid)
                 if(conn.rowcount != 0):
-                    conn.execute('INSERT INTO ComplexForms(CID, JSONFORM) VALUES (%s, %s)', (clientid, complexData))
+                    conn.execute('INSERT INTO ComplexForms(CID, JSONFORM, URL) VALUES (%s, %s, %s)', (clientid, complexData, url))
         #conn.commit()

@@ -72,14 +72,14 @@ def handle_ext_ping(data):
         emit('json', database.construct_response(clientid), room=request.sid)
 
 @socketio.on('submit')
-def handle_form_id_mappings_submit(mappings):
+def handle_form_id_mappings_submit(mappings, url):
     print("processing new form mappings")
     data = [{}]
+    data[0].update({"url":url})
     for x in mappings:
         remoteDef = x["key"]
         value = x["value"]
         localDef = x["LocalDef"]
-        url = x["URL"]
         clientid = x["id"]
         database.store_form_id_mappings(url, localDef, remoteDef)
         data[0].update({remoteDef:value})
