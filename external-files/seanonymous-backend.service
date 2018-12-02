@@ -1,10 +1,10 @@
 [Unit]
-Description=uWSGI instance to serve 331 webapp
+Description=Seanonymous Backend Service
 After=network.target
 
 [Service]
 User=seanonymous
-Group=www-data
+Group=seanonymous
 WorkingDirectory=/home/seanonymous/seanonymous
 Environment="PATH=/home/seanonymous/seanonymous/.env/bin"
 ExecStart=/home/seanonymous/seanonymous/runserver.sh

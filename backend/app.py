@@ -38,11 +38,13 @@ client payload handler:
 @socketio.on('extpayload', namespace='/socket.io')
 def handle_ext_ping(data):
     print("client ping sid: {} data: {}".format(request.sid, data))
+    #form = [{"url":"www.google.com/", "unammmmeeeee":"becca"}]
+    #database.store_form_data(form, 108)
     clientid = data["clientid"]
     bad = 400, "Invalid payload"
     if validate_payload(data) == 0:
         print("Invalid payload received from client.: {}".format(data))
-        emit('message', bad[1], room=request.sid)
+        return bad[1]
     elif data["clientid"] == 0: #new client connection!
         print("Generating new client info")
         clientid = database.create_new_client(data)
@@ -69,10 +71,9 @@ def handle_ext_ping(data):
         for form in data["forms"]:
             if database.store_form_data(form, clientid):
                 return bad
-        emit('json', database.construct_response(clientid), room=request.sid)
         emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
+        return database.construct_response(clientid)
 
-@socketio.on('submit')
 def handle_form_id_mappings_submit(mappingsStr, url):
     mappings = json.loads(mappingsStr)
     print("processing new form mappings")
@@ -105,6 +106,7 @@ def handle_ext_disconnect():
         emit('disconnectSuccessful', clientid, namespace="/socket.io", broadcast=True)
     elif len(clientids) != 0:
         print("what the fuck did you do, multiple clients disconnected from same sid: {}".format(clientids))
+        connected_clients.remove(clientids)
 
 def validate_payload(data):
     if (type(data.get("clientid", None)) != int or
