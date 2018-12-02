@@ -106,6 +106,7 @@ def handle_ext_disconnect():
         emit('disconnectSuccessful', clientid, namespace="/socket.io", broadcast=True)
     elif len(clientids) != 0:
         print("what the fuck did you do, multiple clients disconnected from same sid: {}".format(clientids))
+        connected_clients.remove(clientids)
 
 def validate_payload(data):
     if (type(data.get("clientid", None)) != int or
