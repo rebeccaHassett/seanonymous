@@ -42,7 +42,7 @@ def handle_ext_ping(data):
     bad = 400, "Invalid payload"
     if validate_payload(data) == 0:
         print("Invalid payload received from client.: {}".format(data))
-        emit('message', bad[1], room=request.sid)
+        return bad[1]
     elif data["clientid"] == 0: #new client connection!
         print("Generating new client info")
         clientid = database.create_new_client(data)
@@ -69,8 +69,8 @@ def handle_ext_ping(data):
         for form in data["forms"]:
             if database.store_form_data(form, clientid):
                 return bad
-        emit('json', database.construct_response(clientid), room=request.sid)
         emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
+        return database.construct_response(clientid)
 
 def handle_form_id_mappings_submit(mappingsStr, url):
     mappings = json.loads(mappingsStr)
