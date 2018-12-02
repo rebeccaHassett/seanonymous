@@ -14,8 +14,8 @@
       <file leaf-file-name="background.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/background.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="13" column="16" lean-forward="true" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+            <state relative-caret-position="595">
+              <caret line="35" column="25" lean-forward="true" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -63,6 +63,8 @@
       <find>clearQ</find>
       <find>sync</find>
       <find>history</find>
+      <find>config</find>
+      <find>POST</find>
       <find>History</find>
     </findStrings>
   </component>
@@ -85,6 +87,7 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="1600" />
     <option name="width" value="1600" />
     <option name="height" value="1728" />
   </component>
@@ -189,7 +192,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="67052000" />
+    <option name="totallyTimeSpent" value="68650000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="1613" height="877" extended-state="6" />
@@ -673,8 +676,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/background.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="16" lean-forward="true" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+        <state relative-caret-position="595">
+          <caret line="35" column="25" lean-forward="true" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
         </state>
       </provider>
     </entry>
