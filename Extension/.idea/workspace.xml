@@ -14,8 +14,8 @@
       <file leaf-file-name="background.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/background.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="463">
-              <caret line="333" column="9" selection-start-line="333" selection-start-column="9" selection-end-line="333" selection-end-column="9" />
+            <state relative-caret-position="232">
+              <caret line="118" column="64" lean-forward="true" selection-start-line="118" selection-start-column="64" selection-end-line="118" selection-end-column="64" />
             </state>
           </provider>
         </entry>
@@ -59,6 +59,8 @@
       <find>main_fr</find>
       <find>History</find>
       <find>TODO</find>
+      <find>foreach</find>
+      <find>forEach</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -80,7 +82,6 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1600" />
     <option name="width" value="1600" />
     <option name="height" value="1728" />
   </component>
@@ -180,15 +181,15 @@
       <workItem from="1543341603136" duration="14825000" />
       <workItem from="1543682429335" duration="16835000" />
       <workItem from="1543717866774" duration="3877000" />
-      <workItem from="1543732707465" duration="8122000" />
+      <workItem from="1543732707465" duration="12332000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52941000" />
+    <option name="totallyTimeSpent" value="57151000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="800" y="0" width="800" height="864" extended-state="0" />
+    <frame x="0" y="0" width="800" height="864" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
@@ -196,7 +197,7 @@
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" visible="true" weight="0.0" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
@@ -254,6 +255,11 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/.." />
+    </ignored-roots>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/background.js">
@@ -447,8 +453,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/background.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="333" column="9" selection-start-line="333" selection-start-column="9" selection-end-line="333" selection-end-column="9" />
+        <state relative-caret-position="232">
+          <caret line="118" column="64" lean-forward="true" selection-start-line="118" selection-start-column="64" selection-end-line="118" selection-end-column="64" />
         </state>
       </provider>
     </entry>
