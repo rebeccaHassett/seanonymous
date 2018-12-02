@@ -6,4 +6,7 @@ __pycache__/
 history-files/
 .user
 .pass
+Extension/.idea/
+.idea/
+Extension/.idea/workspace.xml
 Extension/.idea/workspace.xml

