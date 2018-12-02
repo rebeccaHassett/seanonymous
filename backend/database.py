@@ -152,12 +152,9 @@ def store_cookie(data, clientid):
         name = data.get("name", None)
         content = data.get("content", None)
         if(conn.rownumber != 0 and url != None and name != None):
-            conn.execute('SELECT * FROM Cookies WHERE CID = %s AND URL = %s AND Name = %s', (clientid, url, name))
-            conn.fetchall()
-            if(conn.rownumber == 0):
-                conn.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
-            elif(conn.rownumber != 0 and content != None):
-                conn.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)', (clientid, url, content, name))
+            conn.execute('INSERT INTO Cookies(CID, URL, Content, Name) VALUES (%s, %s, %s, %s)' + 
+            ' on duplicate key update set Content = %s where CID=%s and URL=%s and Name=%s', 
+            (clientid, url, content, name, content, clientid, url, name))
     return 0
 
 
