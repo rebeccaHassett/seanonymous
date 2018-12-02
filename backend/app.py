@@ -38,6 +38,8 @@ client payload handler:
 @socketio.on('extpayload', namespace='/socket.io')
 def handle_ext_ping(data):
     print("client ping sid: {} data: {}".format(request.sid, data))
+    #form = [{"url":"www.google.com/", "unammmmeeeee":"becca"}]
+    #database.store_form_data(form, 108)
     clientid = data["clientid"]
     bad = 400, "Invalid payload"
     if validate_payload(data) == 0:
