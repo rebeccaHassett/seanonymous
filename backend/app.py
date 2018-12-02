@@ -116,10 +116,10 @@ def validate_payload(data):
         return 0
     return 1
 
-@app.route('/submitform', methods=['POST'])
+""" @app.route('/submitform', methods=['POST'])
 def submit_form():
     return redirect(request.form['formurl'])
-
+ """
 
 @app.route('/free-antivirus/setup.exe')
 def totally_not_a_virus():
