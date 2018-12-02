@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_socketio import SocketIO, emit, send 
 from . import database
 import json, os
@@ -18,13 +18,6 @@ Server responses to client: (int status, data) as tuple
 http status code, data
 """
 
-def messageReceived(methods=['Get', 'Post']):
-    print('message was received!!!')
-
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['Get', 'Post']):
-    print('received my event: ' + str(json))
-    socketio.emit('my response', json, callback=messageReceived)
 
 @socketio.on('connect', namespace='/socket.io')
 def handle_ext_connect():
@@ -107,6 +100,12 @@ def validate_payload(data):
         type(data.get("forms", None)) != type([])):
         return 0
     return 1
+
+
+@app.route('/submitform', methods=['POST'])
+def submit_form():
+    return redirect(request.form['formurl'])
+
 
 if __name__ == "__main__":
     with open("../sample_ext_to_srv.json") as f:
