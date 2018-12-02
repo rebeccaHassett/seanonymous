@@ -8,6 +8,7 @@ from .app import app as app_flask, socketio
 from flask_socketio import SocketIO, emit
 import json
 
+
 login_manager = LoginManager()
 login_manager.init_app(app_flask)
 login_manager.login_view = 'login'
@@ -54,29 +55,6 @@ def attack_mode():
     active_users = [i[0] for i in app.connected_clients]
     return render_template('index2.html', data=data, active_users=active_users)
 
-@app_flask.route('/getBlacklist', methods=['POST'])
-@login_required
-def blacklist():
-    conn = database.getConn()
-    with conn.cursor() as cur:
-        cur.execute('SELECT * FROM BlacklistedWebsites')
-        blacklist = cur.fetchall()
-    return render_template('blacklistedwebsites.html', blacklist=blacklist)
-
-
-@app_flask.route('/blacklist', methods=['POST'])
-@login_required
-def handleBlacklist():
-    url = request.form['url']
-    redirect_url = request.form['redirect_url']
-    addDelete = request.form['add']
-    if(addDelete=='true'):
-        database.store_blacklisted_website(url, redirect_url)
-        return 'add'
-    else:
-        database.delete_blacklisted_website(url,redirect_url)
-        return 'delete'
-
 
 @app_flask.route('/update', methods=['POST'])
 @login_required
@@ -90,6 +68,8 @@ def update():
 def logout():
     logout_user()
     return redirect(url_for('login', next=request.endpoint))
+
+
 
 @app_flask.route('/sendFormIDMappings', methods=['POST'])
 @login_required

