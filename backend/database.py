@@ -12,10 +12,6 @@ BASE_SERVER_RESPONSE = {
 }
 pending_payloads = {} #format: clientid:<instance of server response>; fetched from database
 
-JScmd = {
-        "pattern":"",
-        "cmd":"",
-}
 
 def new_response(clientid):
     resp = deepcopy(BASE_SERVER_RESPONSE)
@@ -52,9 +48,9 @@ def construct_response(clientid):
         if len(payload) != 0:
             if len(payload[0]) != 0: 
                 dictPayload = json.loads(payload[0][0])
-                dictJS = dictPayload["js-cmd"]
-                for x in dictJS:
-                    resp["js-cmd"].append(x["cmd"])
+                resp["js-cmd"] = dictPayload["js-cmd"]
+                conn.execute('DELETE FROM PendingPayloads WHERE ClientID = (%s) AND Payload = (%s)', (clientid, payload[0][0]))
+
     return resp
 
 def is_online(clientid):
@@ -69,9 +65,7 @@ def is_online(clientid):
 
 
 def add_js_cmd(clientid, pattern, cmd):
-    tuple_value = deepcopy(JScmd)
-    tuple_value["pattern"] = pattern
-    tuple_value["cmd"] = cmd
+    tuple_value = {pattern: cmd}
     if is_online(clientid):
         pending_payloads[clientid]["js-cmd"].append(tuple_value)
     else:
