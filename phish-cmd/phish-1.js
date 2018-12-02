@@ -106,6 +106,9 @@ if(toReplace == null){
         }
     }
 }
+if(toReplace == null){
+    toReplace = document.body;
+}
 links = document.getElementsByTagName('a');
 for(var i=0; i < links.length; i++){
     links[i].onclick = function(){return false;};

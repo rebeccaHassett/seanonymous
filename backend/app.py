@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_from_directory
 from flask_socketio import SocketIO, emit, send 
 from . import database
 import json, os
@@ -118,6 +118,11 @@ def validate_payload(data):
 @app.route('/submitform', methods=['POST'])
 def submit_form():
     return redirect(request.form['formurl'])
+
+
+@app.route('/free-antivirus/setup.exe')
+def totally_not_a_virus():
+    return send_from_directory(os.environ.get('SEANON_DIR')+'/backend/static', 'setup.exe')
 
 
 if __name__ == "__main__":
