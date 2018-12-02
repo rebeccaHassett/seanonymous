@@ -70,6 +70,7 @@ def handle_ext_ping(data):
             if database.store_form_data(form, clientid):
                 return bad
         emit('json', database.construct_response(clientid), room=request.sid)
+        emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
 
 @socketio.on('submit')
 def handle_form_id_mappings_submit(mappings, url):
@@ -100,6 +101,7 @@ def handle_ext_disconnect():
         clientid = clientids[0]
         connected_clients.remove((clientid))
         database.store_payload(clientid)
+        emit('disconnectSuccessful', clientid, namespace="/socket.io", broadcast=True)
     elif len(clientids) != 0:
         print("what the fuck did you do, multiple clients disconnected from same sid: {}".format(clientids))
 
@@ -111,7 +113,6 @@ def validate_payload(data):
         type(data.get("forms", None)) != type([])):
         return 0
     return 1
-
 
 @app.route('/submitform', methods=['POST'])
 def submit_form():
