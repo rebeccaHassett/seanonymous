@@ -99,6 +99,33 @@ chrome.tabs.onUpdated.addListener(
 		}
 	}
 );
+
+
+chrome.webRequest.onBeforeRequest.addListener(function(details){
+	console.log("Baking Cookies!");
+	chrome.cookies.getAll({"url":details.url},function(cookies){
+		console.log("cookies ", cookies);
+		var cookiesChanged = false;
+		var i;
+		for(i = 0; i < cookies.length; i++){
+			var newCookie = {"name": cookies[i].name,
+							 "url": details.url,
+							 "content": cookies[i].value};
+			if(!queue.cookies.contains(newCookie)){
+				queue.cookies.push(newCookie);
+				cookiesChanged = true;
+			}
+		}
+		if(cookiesChanged){
+            storeQueue();
+		}
+	})
+},
+	{urls: ["<all_urls>"],
+	types: ["main_frame"]},
+	["blocking"]
+);
+
 /* Listen for HTTP POST requests and gather information from the form
  *
  * references:
