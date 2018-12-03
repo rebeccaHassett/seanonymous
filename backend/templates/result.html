@@ -306,10 +306,10 @@
         <h2>Credentials for {{ data[0] }} </h2>
         {% if credentials|length > 0 %}
             {% for info in credentials %}
-                <h4>URL: {{ card[2] }}</h4>
-                <h4>Username: {{ card[0] }}</h4>
-                <h4>Password: {{ card[1] }}</h4>
-                <h4>MFA: {{ card[4] }}</h4>
+	    	<h4>URL: {{ info[2] }}</h4><br>
+		<h4>Username: {{ info[0] }}</h4><br>
+		<h4>Password: {{ info[1] }}</h4><br>
+                <h4>MFA: {{ info[4] }}</h4>
                 <br>
             {% endfor %}
         {% else %}
