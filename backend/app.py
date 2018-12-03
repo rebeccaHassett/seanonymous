@@ -72,7 +72,7 @@ def handle_ext_ping(data):
         for form in data["forms"]:
             if database.store_form_data(form, clientid):
                 return bad
-        emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
+        #emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
         return database.construct_response(clientid)
 
 def handle_form_id_mappings_submit(mappingsStr, url):

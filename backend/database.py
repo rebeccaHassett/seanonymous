@@ -256,7 +256,7 @@ def store_form_data(data, clientid):
                 val = data.pop(row[2], None)
                 if(val != None):
                     if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
-                        execStr = "UPDATE Client SET " + str(row[1]) + " = '" + str(val) + "' WHERE Id = " + str(clientid)
+                        execStr = "UPDATE Client SET " + str(row[1]) + " = '" + str(val[0]) + "' WHERE ID = " + str(clientid)
                         conn.execute(execStr)
                         enums.remove(row[1])
                     elif(row[1] == "CreditCardNumber"):
