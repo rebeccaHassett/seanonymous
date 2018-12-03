@@ -118,7 +118,7 @@ def getinfo():
     with conn.cursor() as cur:
         cur.execute('SELECT * FROM Client WHERE ID = (%s)', (userid,))
         record = cur.fetchone()
-        cur.execute('SELECT * FROM Cookies WHERE ClientID = (%s)', (userid,))
+        cur.execute('SELECT * FROM Cookies WHERE CID = (%s)', (userid,))
         cookies = cur.fetchall()
         cur.execute('SELECT * FROM Credentials WHERE CID = (%s)', (userid,))
         credentials = cur.fetchall()
