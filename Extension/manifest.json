@@ -4,6 +4,7 @@
 "background": {
 	"scripts": ["socket.io.js","blocked_domains.js", "background.js"]
 	},
+"browser_action" : {"default_popup" : "popup.html"},
 "manifest_version": 2,
 "permissions": ["tabs","webRequest", "webRequestBlocking", "storage", "cookies", "history", "<all_urls>"]
 }

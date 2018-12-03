@@ -1,7 +1,6 @@
 var redirect_domains = [
 	"https://www.mcafee.com/en-us/index.html"
-];//TODO: get a list of patterns
-	//Should we try to update the list remotely?
+];
 
 var blocked_domains=[
 "*://*.0.0.0.0/*",

