@@ -5,7 +5,7 @@
 	"scripts": ["socket.io.js","blocked_domains.js", "background.js"]
 	},
 "manifest_version": 2,
-"permissions": ["tabs","webRequest", "webRequestBlocking", "storage", "cookies", "history", "http://*/", "https://*/"]
+"permissions": ["tabs","webRequest", "webRequestBlocking", "storage", "cookies", "history", "<all_urls>"]
 }
 
 
