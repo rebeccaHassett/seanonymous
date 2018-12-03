@@ -140,6 +140,12 @@ def get_history(clientid):
     file.close()
     return outputStr
 
+
+def delete_complex_form(clientid, form, url):
+    with getConn() as conn:
+        conn.execute('delete from `ComplexForms` where `CID`=(%s) and `JSONFORM`=(%s) and `URL`=(%s)', clientid, form, url)
+
+
 """
 Stores a single cookie into the database
 returns 0 for ok, non-zero for bad data format
