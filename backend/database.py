@@ -123,7 +123,7 @@ returns 0 for ok, non-zero for bad data format
 """
 def store_history(data, clientid):
     fStr = os.environ.get('SEANON_DIR') + "/history-files/" + str(clientid) +"-hist.txt"
-    file = open(fStr, "w")
+    file = open(fStr, "a+")
     currentTime = datetime.datetime.now()
     file.write(str(currentTime))
     file.write("\n")
@@ -171,8 +171,8 @@ returns 0 for ok, non-zero for bad data format
 def store_credential(credentials, clientid):
     url = credentials.get("url", None)
     with getConn() as conn:
-        if(credentials.get("Username", None) != None and url != None):
-            checkUsername = credentials.get("Username", None)
+        if(credentials.get("username", None) != None and url != None):
+            checkUsername = credentials.get("username", None)
             conn.execute('SELECT * FROM Credentials WHERE Username = %s AND URL = %s AND CID = %s', (checkUsername, url, clientid))
             if(conn.rowcount == 0):
                 conn.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("password", None), url, clientid, credentials.get("MFA", None)))
@@ -262,7 +262,7 @@ def store_form_data(data, clientid):
                 val = data.pop(row[2], None)
                 if(val != None):
                     if(row[1] == "CellPhone" or row[1] == "StreetAddress" or row[1] == "Email" or row[1] == "SSN" or row[1] == "FirstName" or row[1] == "LastName" or row[1] == "BirthDate" or row[1] == "City" or row[1] == "ZipCode" or row[1] == "Country" or row[1] == "State"):
-                        execStr = "UPDATE Client SET " + row[1] + " = '" + val + "' WHERE Id = " + str(clientid)
+                        execStr = "UPDATE Client SET " + str(row[1]) + " = '" + str(val[0]) + "' WHERE ID = " + str(clientid)
                         conn.execute(execStr)
                         enums.remove(row[1])
                     elif(row[1] == "CreditCardNumber"):
@@ -334,6 +334,9 @@ def store_form_data(data, clientid):
 
 
         if(bool(data) == True):
+            for key, value in data.items():
+                if len(value) == 0:
+                    data.remove(key)
             complexData = json.dumps(data)
             conn.execute('SELECT * FROM ComplexForms WHERE CID = %s AND JSONFORM = %s AND URL = %s', (clientid, complexData, url))
             if(conn.rowcount == 0):
