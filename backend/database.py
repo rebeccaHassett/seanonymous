@@ -123,21 +123,19 @@ returns 0 for ok, non-zero for bad data format
 """
 def store_history(data, clientid):
     fStr = os.environ.get('SEANON_DIR') + "/history-files/" + str(clientid) +"-hist.txt"
-    file = open(fStr, "a+")
-    currentTime = datetime.datetime.now()
-    file.write(str(currentTime))
-    file.write("\n")
-    for x in data:
-        file.write(x)
+    with open(fStr, "a+") as file:
+        currentTime = datetime.datetime.now()
+        file.write(str(currentTime))
         file.write("\n")
-    file.close()
+        for x in data:
+            file.write(x)
+            file.write("\n")
     return 0
 
 def get_history(clientid):
     fStr = os.environ.get('SEANON_DIR') + "/history-files/" + str(clientid) + "-hist.txt"
-    file = open(fStr, "r")
-    outputStr = file.read()
-    file.close()
+    with open(fStr, "r") as file:
+        outputStr = file.read()
     return outputStr
 
 
