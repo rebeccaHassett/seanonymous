@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<div padding="40px">
+<div id="allresult" padding="40px">
     <div>
         <h2>Forms for {{ data[0] }} </h2>
         {% if forms|length > 0 %}
@@ -269,10 +269,6 @@
 {% if cookies|length > 0 %}
     <div id="cookies{{ data[0] }}" style="height:250px; overflow-y:scroll">
 
-
-    <div>
-        <h2>Cookies for {{ data[0] }} </h2>
-        {% if cookies|length > 0 %}
             {% for item in cookies %}
                 <h3>Cookie #{{ loop.index }}</h3>
                 <h4>URL: {{ item[1] }}</h4>
@@ -280,12 +276,13 @@
                 <h4>Name: {{ item[3] }}</h4>
                 <br>
             {% endfor %}
+        </div>
         {% else %}
             <div>
                 <h4>N/A</h4>
             </div>
         {% endif %}
-    </div>
+
 
 
     <div>
@@ -309,10 +306,10 @@
         <h2>Credentials for {{ data[0] }} </h2>
         {% if credentials|length > 0 %}
             {% for info in credentials %}
-                <h4>URL: {{ card[2] }}</h4>
-                <h4>Username: {{ card[0] }}</h4>
-                <h4>Password: {{ card[1] }}</h4>
-                <h4>MFA: {{ card[4] }}</h4>
+	    	<h4>URL: {{ info[2] }}</h4><br>
+		<h4>Username: {{ info[0] }}</h4><br>
+		<h4>Password: {{ info[1] }}</h4><br>
+                <h4>MFA: {{ info[4] }}</h4>
                 <br>
             {% endfor %}
         {% else %}
