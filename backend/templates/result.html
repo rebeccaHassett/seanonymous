@@ -33,7 +33,6 @@
 
                         a.className='col-md-12 text-center';
                         a.style.display='block';
-                        console.log(a.classList)
                         }
                         else if(a.classList.contains('edit')){
                         a.classList.remove('edit');
@@ -127,8 +126,6 @@
 
                             var mappingTest = [];
                             for(var i=1; i<this.getElementsByTagName('select').length+1;i++){
-                            console.log(i);
-
                             if(this[i-1].value!=''){
                             var newMappingAsString = '{';
                             var dict ={};
@@ -145,7 +142,6 @@
                             {#newMappings.push(newMappingAsString)#}
                             }
                             }
-                            console.log(mappingTest)
                             this.reset();
                             if(mappingTest.length>0)
                             submitFormIDMappings(this.classList[1], mappingTest);
@@ -239,7 +235,7 @@
         {% if fullbh is not equalto 'true' %}
            <div style="display:none; height: 250px; overflow-y: scroll"id="bh{{ data[0] }}">
         {% else %}
-        <div style="display:none" id="bh{{ data[0] }}">
+        <div id="bh{{ data[0] }}">
         {% endif %}
 {#                {% set count = [5] %}#}
                 {% for item in history %}

