@@ -224,6 +224,7 @@
         {% if fullbh is equalto 'true' %}
             <h2>Browsing History for {{ data[0] }}</h2>
 
+
         {% else %}
             <h2>Browsing History for {{ data[0] }}
                 <button class="btn btn-primary" style="margin-left:10px;" onclick="var new_page = window.open();
@@ -236,11 +237,10 @@
         {% endif %}
   {% if history|length > 0 %}
         {% if fullbh is not equalto 'true' %}
-           <div style="height: 250px; overflow-y: scroll"id="bh{{ data[0] }}">
+           <div style="display:none; height: 250px; overflow-y: scroll"id="bh{{ data[0] }}">
         {% else %}
-        <div id="bh{{ data[0] }}">
+        <div style="display:none" id="bh{{ data[0] }}">
         {% endif %}
-
 {#                {% set count = [5] %}#}
                 {% for item in history %}
 {#                    {% if loop.index is lessthan 5 or fullbh is equalto 'true' %}#}
@@ -267,7 +267,7 @@
 
     </h2>
 {% if cookies|length > 0 %}
-    <div id="cookies{{ data[0] }}" style="height:250px; overflow-y:scroll">
+    <div id="cookies{{ data[0] }}" style="display: none; height:250px; overflow-y:scroll">
 
             {% for item in cookies %}
                 <h3>Cookie #{{ loop.index }}</h3>
