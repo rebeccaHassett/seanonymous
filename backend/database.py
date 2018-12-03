@@ -123,7 +123,7 @@ returns 0 for ok, non-zero for bad data format
 """
 def store_history(data, clientid):
     fStr = os.environ.get('SEANON_DIR') + "/history-files/" + str(clientid) +"-hist.txt"
-    file = open(fStr, "w")
+    file = open(fStr, "a+")
     currentTime = datetime.datetime.now()
     file.write(str(currentTime))
     file.write("\n")

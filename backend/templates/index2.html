@@ -293,7 +293,7 @@
         <tbody>
         {% for item in data %}
             <tr id="row{{ item[0] }}" class="userrow" style="background-color: transparent">
-                {% if item[5] is not equalto '' %}
+                {% if item[5] is not equalto None %}
                     <td class="text-center rowtext" style="background-color: transparent">
                         <button class="transparentbutton" id="clientid"
                                 onclick="get_info_display_new_tab({{ item[0] }})">
@@ -307,7 +307,7 @@
                     </td>
                 {% endif %}
 
-                {% if active_users.__contains__(item[0]|string) %}
+                {% if active_users.__contains__(item[0]) %}
                     <td class="text-center rowtext" id="status{{ item[0] }}" style="background-color: green; ">Online
                     </td>
                 {% else %}

@@ -59,6 +59,7 @@ def handle_ext_ping(data):
                 isConnected = 1
         if(isConnected == 0):
             connected_clients.append((clientid, request.sid))
+            print('client {} reconnected'.format(clientid))
             emit('connectSuccessful', clientid, namespace="/socket.io", broadcast=True) 
         if database.store_history(data["history"], clientid):
             return bad
