@@ -175,8 +175,8 @@ def store_credential(credentials, clientid):
             if(conn.rowcount == 0):
                 conn.execute('INSERT INTO Credentials(Username, UserPassword, URL, CID, MFA) VALUES (%s, %s, %s, %s, %s)', (checkUsername, credentials.get("password", None), url, clientid, credentials.get("MFA", None)))
             else:
-                if(credentials.get("UserPassword", None) != None):
-                    col5 = credentials.get("UserPassword", None)
+                if(credentials.get("password", None) != None):
+                    col5 = credentials.get("password", None)
                     execStr = "UPDATE Credentials SET UserPassword = '" + col5 + "' WHERE Username = '" + checkUsername + "' AND URL = '" + url  + "' AND CID = " + str(clientid) 
                     conn.execute(execStr)
                 if(credentials.get("MFA", None) != None):
@@ -190,6 +190,7 @@ def store_credential(credentials, clientid):
 
 def store_form_id_mappings(url, localdef, remotedef):
     with getConn() as conn:
+        url = url.split('/')[0] + "//" + url.split('/')[2] + "/"
         conn.execute('SELECT * FROM FormIDMappings WHERE URL = (%s) AND LocalDef = (%s) AND RemoteDef = (%s)', (url, localdef, remotedef))
         if(conn.rowcount == 0):
             conn.execute('INSERT INTO FormIDMappings(URL, LocalDef, RemoteDef) VALUES (%s, %s, %s)', (url, localdef, remotedef))
@@ -276,10 +277,10 @@ def store_form_data(data, clientid):
                         creditCard["Type"] = val
                         enums.remove("Type")
                     elif(row[1] == "Username"):
-                        credentials["Username"] = val
+                        credentials["username"] = val
                         enums.remove("Username")
                     elif(row[1] == "UserPassword"):
-                        credentials["UserPassword"] = val
+                        credentials["password"] = val
                         enums.remove("UserPassword")
                     elif(row[1] == "MFA"):
                         credentials["MFA"] = val
@@ -296,20 +297,20 @@ def store_form_data(data, clientid):
             checkCreditCard = creditCard.get("CreditCardNumber", None)
             conn.execute('SELECT * FROM CreditCard WHERE CreditCardNumber = %s', checkCreditCard)
             if(conn.rowcount == 0):
-                conn.execute('INSERT INTO CreditCard(CreditCardNumber, CVC, ExpirationDate, CID, Type) VALUES (%s, %s, %s, %s, %s)', (checkCreditCard, creditCard.get("CVC", None), creditCard.get("ExpirationDate", None), clientid, creditCard.get("Type", None)))
+                conn.execute('INSERT INTO CreditCard(CreditCardNumber, CVC, ExpirationDate, CID, Type) VALUES (%s, %s, %s, %s, %s)', (checkCreditCard, creditCard.get("CVC", 0), creditCard.get("ExpirationDate", None), clientid, creditCard.get("Type", None)))
             else:
                 if(creditCard.get("CVC", None) != None):
-                    col2 = creditCard.get("CVC", None)
-                    execStr = "UPDATE CreditCard SET CVC = '" + col2 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                    conn.execute(execStr)
+                    col2 = creditCard.get("CVC", 0)
+                    execStr = "UPDATE CreditCard SET CVC = %s WHERE CreditCardNumber = %s"
+                    conn.execute(execStr, col2, checkCreditCard)
                 if(creditCard.get("ExpirationDate", None) != None):
                     col3 = creditCard.get("ExpirationDate", None)
-                    execStr = "UPDATE CreditCard SET ExpirationDate = '" + col3 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                    conn.execute(execStr)
+                    execStr = "UPDATE CreditCard SET ExpirationDate = %s WHERE CreditCardNumber = %s"
+                    conn.execute(execStr, col3, checkCreditCard)
                 if(creditCard.get("Type", None) != None):
                     col4 = creditCard.get("Type", None)
-                    execStr = "UPDATE CreditCard SET Type = '" + col4 + "' WHERE CreditCardNumber = '" + checkCreditCard + "'"
-                    conn.execute(execStr)
+                    execStr = "UPDATE CreditCard SET Type = %s WHERE CreditCardNumber = %s"
+                    conn.execute(execStr, col4, checkCreditCard)
         
         #credentials information
         #print(credentials.get("Username", None))
@@ -321,9 +322,9 @@ def store_form_data(data, clientid):
         for x in range(max(0, len(securityListQ))):
             conn.execute('SELECT * FROM SecurityQuestions WHERE CID = %s AND URL = %s AND Question = %s', (clientid, url, securityListQ[x]))
             if(conn.rowcount == 0 and x < len(securityListA)):
-                conn.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], securityListA[x], url))
+                conn.execute('INSERT ignore INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], securityListA[x], url))
             elif(conn.rowcount == 0):
-                conn.execute('INSERT INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], None, url))
+                conn.execute('INSERT ignore INTO SecurityQuestions(CID, Question, Answer, URL) VALUES (%s, %s, %s, %s)', (clientid, securityListQ[x], None, url))
         
         m = len(securityListA) - len(securityListQ)
         if(m > 0):
@@ -340,5 +341,5 @@ def store_form_data(data, clientid):
             if(conn.rowcount == 0):
                 conn.execute('SELECT * FROM Client WHERE ID = %s', clientid)
                 if(conn.rowcount != 0):
-                    conn.execute('INSERT INTO ComplexForms(CID, JSONFORM, URL) VALUES (%s, %s, %s)', (clientid, complexData, url))
+                    conn.execute('INSERT ignore INTO ComplexForms(CID, JSONFORM, URL) VALUES (%s, %s, %s)', (clientid, complexData, url))
         #conn.commit()
